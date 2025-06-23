@@ -20,9 +20,7 @@ The generated app allows users to interactively submit input to the `apply` endp
 ## 📦 Installation
 
 ```bash
-git clone git@github.com:pasteurlabs/streamlit-factory.git
-cd streamlit-factory
-pip install .
+pip install tesseract-streamlit
 ```
 
 ## 🧰 Usage
