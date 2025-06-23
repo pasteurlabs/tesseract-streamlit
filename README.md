@@ -107,17 +107,17 @@ This will open a browser window with the Streamlit UI where users can input valu
 
 While `tesseract-streamlit` supports Tesseracts with an `InputSchema` formed with arbitrary nesting of Pydantic models, it **does not yet support** nesting Pydantic models **inside native Python collection types** such as:
 
-- `list[Model]`
-- `tuple[Model, ...]`
-- `dict[str, Model]`
+- `list[Model]` ❌
+- `tuple[Model, ...]` ❌
+- `dict[str, Model]` ❌
 
 These types will raise an error or be ignored in the generated app.
 
 You **can** however use these native collections with basic Python types, such as:
 
-- `list[str]`
-- `dict[str, int]`
-- `tuple[float, float]`
+- `list[str]` ✅
+- `dict[str, int]` ✅
+- `tuple[float, float]` ✅
 
 If you would like to request support for nested models within collections in a future release, please let us know.
 
