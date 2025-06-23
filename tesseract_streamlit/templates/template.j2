@@ -1,0 +1,266 @@
+#!/usr/bin/env python
+import sys
+import typing as ty
+
+import numpy as np
+import orjson
+import streamlit as st
+from tesseract_core import Tesseract
+
+{% if needs_pyvista %}
+from stpyvista import stpyvista
+{% endif %}
+
+{#- MACROS FOR REPEATED TEMPLATE LOGIC
+   ================================== -#}
+
+{#- splits up a string spanning multiple lines into multiple strings
+    args:
+        text: the string you wish to break up (with linebreaks included)
+        indentlevel: the number of (4 space) tabs to insert before each line
+    outputs: double quote delimited strings on separate lines, split wherever
+        a line break was found in text. -#}
+{% macro multiline(text) -%}
+    {% for line in text.splitlines() -%}
+        {{- '\n' -}}
+        "{{- line -}}
+        {{- ' ' if not loop.last else '' -}}"{#- add space to end of str -#}
+    {%- endfor %}
+{%- endmacro %}
+
+{#- output the udf plot, along with description and docs
+    args:
+        udf_subset: a list of udf dictionaries, eg. udfs.inputs
+        key: the key associated with this specific list, eg. inputs
+        subheader: text to display as a subheader, below which the plots
+            are nested
+    outputs: streamlit subheader, plot title, description from docs, and
+        streamlit write call to render the output of the plotting func -#}
+{% macro udf_plot(udf_subset, key, subheader) -%}
+{% if udf_subset %}
+st.subheader("{{ subheader }}")
+{% set args = 'inputs=inputs, outputs=outputs' if key == 'both' else key %}
+{% for udf in udf_subset %}
+st.markdown("**{{ udf.title }}**")
+st.markdown({% if not udf.docs %}""{% else %}
+    {{- multiline(udf.docs) | indent(4) }}
+{% endif %})
+{% if udf.backend == "pyvista" -%}stpyvista(
+{%- else -%}st.write(
+{%- endif -%}{{ udf.name }}({{ args }}))
+{% endfor %}
+{% endif %}
+{%- endmacro %}
+
+{#- renders the streamlit form elements for each field.
+    args:
+        schema: the schema for the Streamlit form
+    outputs: streamlit form input elements structure
+-#}
+{% macro render_fields(schema) %}
+{# AUTOMATICALLY POPULATING THE WEB-APP WITH INPUTS FROM THE SCHEMA
+   ================================================================ #}
+{% for field in schema %}
+{# first, instantiate the container to hold the field #}
+{{ field.container }} = {{ field.parent_container }}.container(border=True)
+{# next, add subheading and descriptive text #}
+{{ field.container }}.subheader("{{ field.title }}")
+{% if field.description %}
+{{ field.container }}.caption("{{ field.description }}")
+{% endif %}
+{# identify which type of Streamlit element to render based on field type #}
+{% if field.type == 'string' %}
+{{ field.uid }} = {{ field.container }}.text_input(
+    "{{ field.get('title', field.uid) }}",
+    key="int.{{ field.key }}",
+    value="{{ field.get('default', '') }}",
+)
+{% elif field.type == 'integer' %}
+{{ field.uid }} = {{ field.container }}.number_input(
+    "{{ field.get('title', field.uid) }}",
+    step=1,
+    format="%d",
+    key="int.{{ field.key }}",
+    value={{ field.get("default", None) }},
+)
+{% elif field.type == 'number' %}
+{{ field.uid }} = {{ field.container }}.number_input(
+    "{{ field.get('title', field.uid) }}",
+    key="number.{{ field.key }}",
+    value={{ field.get("default", None) }},
+)
+{% elif field.type == 'boolean' %}
+{{ field.uid }} = {{ field.container }}.checkbox(
+    "{{ field.get('title', field.uid) }}",
+    key="boolean.{{ field.key }}",
+    value={{ field.get("default", None) }},
+)
+{# array inputs are more complex, and require both text and file inputs #}
+{% elif field.type == 'array' %}
+# Array input
+{{ field.container }}.markdown("**Enter JSON array or upload file:**")
+{{ field.uid }}_text = {{ field.container }}.text_area(
+    "Paste {{ field.uid.replace("_", ".") }} JSON",
+    height=100,
+    key="textarea.{{ field.key }}"
+)
+{{ field.uid }}_file = {{ field.container }}.file_uploader(
+    "Upload {{ field.uid.replace("_", ".") }} JSON file",
+    type=["json", "txt"],
+    key="fileupload.{{ field.key }}"
+)
+{# we also validate the JSON in try / except blocks, and alert the user
+   using Streamlit's built-in "error" function. #}
+{{ field.uid }} = None
+if {{ field.uid }}_file is not None:
+    try:
+        {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
+    except Exception as e:
+        {{ field.container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+elif {{ field.uid }}_text:
+    try:
+        {{ field.uid }} = orjson.loads({{ field.uid }}_text)
+    except Exception as e:
+        {{ field.container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
+
+if {{ field.uid }} is not None:
+    try:
+        arr = np.array({{ field.uid }}, dtype=np.float64)
+        {{ field.container }}.write("Array preview:")
+        {{ field.container }}.code(arr)
+    except Exception as e:
+        {{ field.container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endif %}
+
+{% endfor %}
+{% endmacro %}
+
+{#- renders the streamlit output display after the inputs are collected
+    args:
+        schema: the schema for the Streamlit form
+    outputs: code processing and displaying the outputs
+-#}
+{% macro render_outputs(schema, udfs) %}
+{# COLLECT THE INPUTS FOR THE TESSERACT
+   ==================================== #}
+# Collect input values into a dictionary
+inputs_flat = {
+    {% for field in schema if field.type != "composite" %}
+    "{{ field.key }}": {{ field.uid }},
+    {% endfor %}
+}
+inputs = _flat_to_nested(inputs_flat)
+_tesseract_io_preview(inputs, "input")
+
+{# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
+   ========================================================== #}
+with Tesseract("{{ url }}") as tess:
+    outputs = tess.apply(inputs)
+_tesseract_io_preview(outputs, "output")
+
+{# RENDER USER-DEFINED FUNCTIONS
+   ============================= #}
+{% if udfs %}
+{{- udf_plot(udfs.inputs, 'inputs', 'Input plots') -}}
+{{- udf_plot(udfs.outputs, 'outputs', 'Output plots') -}}
+{{- udf_plot(udfs.both, 'both', 'Mixed input + output plots') -}}
+{% endif %}
+{% endmacro %}
+
+{#- inserts the full Streamlit form, with inputs and outputs.
+    args:
+        schema: the schema for the Streamlit form
+        submit: if the form should have a submit button (otherwise outputs
+            updated in real-time with changing inputs)
+    outputs: interactive streamlit form code
+-#}
+{% macro insert_form(schema, udfs, submit) %}
+{% if submit %}
+with st.form("tesseract_form", border=False):
+    {{ render_fields(schema) | indent(4) }}
+    submitted = st.form_submit_button("Submit")
+
+if submitted:
+    {{ render_outputs(schema, udfs) | indent(4) }}
+{% else %}
+{{ render_fields(schema) }}
+{{ render_outputs(schema, udfs) }}
+{% endif %}
+{% endmacro %}
+
+{# PASTE THE USER-DEFINED CODE BEFORE THE AUTOGENERATED WEB-APP
+   ============================================================ #}
+{% if udf_defs %}
+{{ udf_defs | safe }}
+{% endif %}
+PREVIEW_LINE_LIMIT = 100
+
+
+def _insert_nested(
+    dict_node: dict[str, ty.Any],
+    keys: list[str],
+    value: ty.Any,
+) -> None:
+    """Recursively insert keys into dictionary `d`."""
+    key = keys[0]
+    if len(keys) == 1:
+        dict_node[key] = value
+    else:
+        if key not in dict_node or not isinstance(dict_node[key], dict):
+            dict_node[key] = {}
+        _insert_nested(dict_node[key], keys[1:], value)
+
+
+def _flat_to_nested(flat_dict: dict[str, ty.Any]) -> dict[str, ty.Any]:
+    nested = {}
+    for flat_key, value in flat_dict.items():
+        keys = flat_key.split('.')
+        _insert_nested(nested, keys, value)
+    return nested
+
+
+def _serialise_json_pretty(data: dict[str, ty.Any]) -> bytes:
+    return orjson.dumps(
+        data, option=(orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+    )
+
+
+def _tesseract_io_preview(
+    data: dict[str, ty.Any], direction: ty.Literal["input", "output"]
+) -> None:
+    st.subheader(f"Tesseract {direction.capitalize()}")
+    data_json = _serialise_json_pretty(data)
+    if _count_json_lines(data_json) < PREVIEW_LINE_LIMIT:
+        st.json(data_json.decode())
+    else:
+        st.info(f"Tesseract {direction} preview too long to display.")
+
+    st.download_button(
+        f"Download {direction}",
+        data=orjson.dumps(data, option=orjson.OPT_SERIALIZE_NUMPY),
+        file_name=f"tesseract-{direction}.json",
+        on_click="ignore",
+    )
+
+
+def _count_json_lines(json_str: bytes) -> int:
+    return json_str.count(b"\n")
+
+
+{# WEB-APP
+   ======= #}
+def main() -> None:
+    st.title("{{ metadata.title }}")
+    st.markdown(
+        {{- multiline(metadata.description) | indent(8) }}
+    )
+    st.markdown("**version: {{ metadata.version }}**")
+    {{ insert_form(schema, udfs, submit) | indent(4) }}
+
+
+{%- if test -%}
+main()
+{%- else -%}
+if __name__ == "__main__":
+    sys.exit(main())
+{%- endif -%}

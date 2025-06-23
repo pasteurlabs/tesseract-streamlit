@@ -1,0 +1,8 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# global owners will be requested for
+# review when someone opens a pull request.
+
+# Add all people who should have the final say on pull request approval.
+# Example:
+*       @dionhaefner @jacanchaplais @apaleyes

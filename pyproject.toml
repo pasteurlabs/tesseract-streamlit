@@ -1,0 +1,97 @@
+[project]
+name = "tesseract-streamlit"
+# TODO: add a short description here (same as in GitHub UI)
+description = "Tesseract Streamlit automatically generates Streamlit apps from Tesseract APIs."
+readme = "README.md"
+authors = [
+    {name = "The tesseract-streamlit team @ Pasteur Labs", email = "info@simulation.science"},
+]
+requires-python = ">=3.10,<3.14"
+# TODO: add your dependencies here
+dependencies = [
+    "streamlit",
+    "tesseract-core",
+    "jinja2",
+    "numpy",
+    "pyvista",
+    "stpyvista",
+    "typing-extensions",
+    "requests",
+    "click",
+    "orjson",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/pasteurlabs/tesseract-streamlit"
+
+[project.scripts]
+tesseract-streamlit = "tesseract_streamlit.cli:main"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx_autodoc_typehints",
+    "furo",
+    "myst-parser",
+]
+dev = [
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "typeguard",
+    "matplotlib",
+    # Add other extras here, too
+    "tesseract-streamlit[docs]",
+]
+
+[build-system]
+requires = ["setuptools", "versioneer[toml]==0.29"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["tesseract_streamlit", "tesseract_streamlit.*"]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "tesseract_streamlit/_version.py"
+versionfile_build = "tesseract_streamlit/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "tesseract_streamlit-"
+
+[tool.pytest.ini_options]
+# Test type hints via typeguard - disabled by default
+# addopts = ["--typeguard-packages=tesseract_streamlit"]
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    # ignored by default
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::ImportWarning",
+    # raised by Cython, usually harmless
+    "ignore:numpy.dtype size changed",
+    "ignore:numpy.ufunc size changed",
+    # sometimes, dependencies leak resources
+    "ignore:.*socket\\.socket.*:pytest.PytestUnraisableExceptionWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["tesseract_streamlit"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+]
+ignore_errors = true
+omit = [
+    "tesseract_streamlit/_version.py",
+]
