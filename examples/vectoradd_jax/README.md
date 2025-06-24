@@ -47,7 +47,8 @@ With `tesseract-streamlit` installed, generate a ready-to-run Streamlit app:
 tesseract-streamlit --user-code udf.py "http://localhost:<PORT>" app.py
 ```
 
-`udf.py` includes a function that takes the Tesseract's inputs and outputs and drops a Plotly-powered vector addition diagram straight into the web UI — automatically! 🎯
+`udf.py` can be found in under `tesseract-streamlit/examples/vectoradd_jax/`.
+It contains a custom function that takes the Tesseract's inputs and outputs and drops a Plotly-powered vector addition diagram straight into the web UI — automatically! 🎯
 Check it out to see how it works.
 
 ---
