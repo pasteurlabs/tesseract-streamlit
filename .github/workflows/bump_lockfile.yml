@@ -49,8 +49,8 @@ jobs:
             token: ${{ secrets.PL_PASTEURBOT_PAT_PUBLIC }}
             committer: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
             author: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
-            commit-message: Update dependencies
-            title: 📦 Update dependencies
+            commit-message: "chore: update dependencies"
+            title: "chore: 📦 update dependencies"
             branch: _bot/update-deps
             draft: false
             base: main
