@@ -77,7 +77,7 @@ mdit-py-plugins==0.4.2
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
-narwhals==1.43.1
+narwhals==1.44.0
     # via
     #   altair
     #   bokeh
@@ -118,7 +118,7 @@ pandas==2.3.0
     #   bokeh
     #   panel
     #   streamlit
-panel==1.7.1
+panel==1.7.2
     # via stpyvista
 param==2.2.1
     # via
@@ -195,7 +195,7 @@ smmap==5.0.2
     # via gitdb
 stpyvista==0.1.4
     # via tesseract-streamlit
-streamlit==1.46.0
+streamlit==1.46.1
     # via
     #   stpyvista
     #   tesseract-streamlit
