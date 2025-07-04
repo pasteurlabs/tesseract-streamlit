@@ -32,11 +32,19 @@ PACKAGE_DIR = Path(__file__).parent
     default=True,
     show_default=True,
 )
+@click.option(
+    "--exponential-floats/--no-exponential-floats",
+    is_flag=True,
+    help="All float input fields formatted as exponential.",
+    default=False,
+    show_default=True,
+)
 def main(
     url: str,
     output: io.TextIOWrapper,
     user_code: Path | None,
     submit: bool,
+    exponential_floats: bool,
 ) -> None:
     """Generates a Streamlit app from Tesseract OpenAPI schemas.
 
@@ -54,5 +62,9 @@ def main(
     )
     template = env.get_template("templates/template.j2")
     render_kwargs = extract_template_data(url, user_code, submit)
-    rendered_code = template.render(**render_kwargs, test=test)
+    rendered_code = template.render(
+        **render_kwargs,
+        test=test,
+        exponential_floats=exponential_floats,
+    )
     output.write(rendered_code)
