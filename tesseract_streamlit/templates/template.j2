@@ -89,6 +89,10 @@ st.markdown({% if not udf.docs %}""{% else %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     key="number.{{ field.key }}",
+{# if forced, or default is small, switch to exponential formatting #}
+{% if exponential_floats or (field.get("default", 1) < 0.01) %}
+    format="%.4e",
+{% endif %}
     value={{ field.get("default", None) }},
 )
 {% elif field.type == 'boolean' %}
