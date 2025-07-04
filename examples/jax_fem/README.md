@@ -65,6 +65,9 @@ streamlit run app.py
 
 This will launch a web interface for submitting inputs, running the Tesseract, and visualising the results.
 
+The form is populated from sensible defaults defined in `tesseract_api.py`.
+To easily provide the input parameters for the structure itself, you can upload the `bar_params.json` file in the current directory.
+
 ---
 
 ## 🖼️ Screenshots
