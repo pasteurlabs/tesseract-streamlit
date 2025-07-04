@@ -289,6 +289,15 @@ def setup(
 
 
 def apply(inputs: InputSchema) -> OutputSchema:
+    """Computes the compliance of a structure.
+
+    Gridded signed distance function (SDF) is computed from a set of
+    shape parameters, which are taken as inputs.
+    Parameters define control points and radii of piecewise 3D tubes.
+
+    JAX-FEM evaluates compliance of the structure from density as a
+    function of the SDF field.
+    """
     Nx, Ny, Lx, Ly = inputs.Nx, inputs.Ny, inputs.Lx, inputs.Ly
     sdf_geom = compute_sdf(
         params=inputs.bar_params,
