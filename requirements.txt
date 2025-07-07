@@ -451,7 +451,7 @@ typer==0.16.0
     # via tesseract-core
 types-python-dateutil==2.9.0.20250516
     # via arrow
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
     #   aiosignal
     #   altair
