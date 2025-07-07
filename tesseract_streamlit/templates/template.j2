@@ -88,7 +88,9 @@ st.markdown({% if not udf.docs %}""{% else %}
     "{{ field.get('title', field.uid) }}",
     key="number.{{ field.key }}",
 {# if forced, or default is small, switch to exponential formatting #}
-{% if exponential_floats or (field.get("default", 1) < 0.01) %}
+{% set default_val = field.get("default", 1) %}
+{% set default_val = 1 if default_val is none else default_val %}
+{% if exponential_floats or (default_val < 0.01) %}
     format="%.4e",
 {% endif %}
     value={{ field.get("default", None) }},
