@@ -245,7 +245,7 @@ def _find_numpy_arrays(
             yield from _find_numpy_arrays(value, new_path)
     elif isinstance(data, list | tuple):
         for idx, item in enumerate(data):
-            new_path = f"{path}[{idx}]"
+            new_path = f"{path}.{idx}"
             yield from _find_numpy_arrays(item, new_path)
     elif isinstance(data, np.ndarray):
         yield (path, data)
