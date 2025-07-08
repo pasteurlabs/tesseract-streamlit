@@ -12,19 +12,19 @@ PARENT_DIR = Path(__file__).parent
 os.environ["TESSERACT_STREAMLIT_TESTING"] = "1"
 
 
-def test_cli(tesseract_url: str) -> None:
+def test_cli(goodbyeworld_url: str) -> None:
     runner = CliRunner()
     with tempfile.TemporaryDirectory() as temp_dir:
         app_path = f"{temp_dir}/app.py"
-        result = runner.invoke(main, [tesseract_url, app_path])
+        result = runner.invoke(main, [goodbyeworld_url, app_path])
         assert result.exit_code == 0
         assert result.output == ""
         assert Path(app_path).exists()
 
 
-def test_app(tesseract_url: str) -> None:
+def test_app(goodbyeworld_url: str) -> None:
     runner = CliRunner()
-    result = runner.invoke(main, [tesseract_url, "-"])
+    result = runner.invoke(main, [goodbyeworld_url, "-"])
     assert result.exit_code == 0
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
@@ -39,4 +39,16 @@ def test_app(tesseract_url: str) -> None:
     with open(PARENT_DIR / "tess-out.json", "rb") as f:
         sample_output = orjson.loads(f.read())
     assert tess_output == sample_output
+    assert not app.exception
+
+
+def test_zerodim_pprint(zerodim_url: str) -> None:
+    runner = CliRunner()
+    result = runner.invoke(main, [zerodim_url, "-"])
+    assert result.exit_code == 0
+    assert result.output != ""
+    app = AppTest.from_string(result.output, default_timeout=3)
+    app.run()
+    app.number_input(key="int.max_num").set_value(10).run()
+    app.button[0].click().run()
     assert not app.exception
