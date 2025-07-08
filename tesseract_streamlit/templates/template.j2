@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+import copy
+import functools
+import operator
 import sys
-import typing as ty
+import typing
 
 import numpy as np
 import orjson
@@ -203,9 +206,9 @@ PREVIEW_LINE_LIMIT = 100
 
 
 def _insert_nested(
-    dict_node: dict[str, ty.Any],
+    dict_node: dict[str, typing.Any],
     keys: list[str],
-    value: ty.Any,
+    value: typing.Any,
 ) -> None:
     """Recursively insert keys into dictionary `d`."""
     key = keys[0]
@@ -217,7 +220,7 @@ def _insert_nested(
         _insert_nested(dict_node[key], keys[1:], value)
 
 
-def _flat_to_nested(flat_dict: dict[str, ty.Any]) -> dict[str, ty.Any]:
+def _flat_to_nested(flat_dict: dict[str, typing.Any]) -> dict[str, typing.Any]:
     nested = {}
     for flat_key, value in flat_dict.items():
         keys = flat_key.split('.')
@@ -225,14 +228,52 @@ def _flat_to_nested(flat_dict: dict[str, ty.Any]) -> dict[str, ty.Any]:
     return nested
 
 
-def _serialise_json_pretty(data: dict[str, ty.Any]) -> bytes:
+def _nested_setitem(
+    data: dict[str, typing.Any], keys: list[str | int], value: typing.Any
+) -> typing.Any:
+    final_key = keys.pop()
+    penultimate_branch: typing.Any = functools.reduce(
+        operator.getitem, keys, data
+    )
+    penultimate_branch[final_key] = value
+
+
+def _find_numpy_arrays(
+    data: typing.Any, path: str = ""
+) -> typing.Iterator[tuple[str, np.ndarray]]:
+    results = []
+    if isinstance(data, dict):
+        for key, value in data.items():
+            new_path = f"{path}.{key}" if path else str(key)
+            yield from _find_numpy_arrays(value, new_path)
+    elif isinstance(data, list | tuple):
+        for idx, item in enumerate(data):
+            new_path = f"{path}.{idx}"
+            yield from _find_numpy_arrays(item, new_path)
+    elif isinstance(data, np.ndarray):
+        yield (path, data)
+    return results
+
+
+def _replace_zerodim_arrays(data: dict[str, typing.Any]) -> dict[str, typing.Any]:
+    data_copy = copy.deepcopy(data)
+    for path, array in _find_numpy_arrays(data_copy):
+        keys = path.split(".")
+        keys = [int(k) if k.isdigit() else k for k in keys]
+        if np.ndim(array) == 0:
+            _nested_setitem(data_copy, keys, array.item())
+    return data_copy
+
+
+def _serialise_json_pretty(data: dict[str, typing.Any]) -> bytes:
     return orjson.dumps(
-        data, option=(orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
+        _replace_zerodim_arrays(data),
+        option=(orjson.OPT_SERIALIZE_NUMPY | orjson.OPT_INDENT_2)
     )
 
 
 def _tesseract_io_preview(
-    data: dict[str, ty.Any], direction: ty.Literal["input", "output"]
+    data: dict[str, typing.Any], direction: typing.Literal["input", "output"]
 ) -> None:
     st.subheader(f"Tesseract {direction.capitalize()}")
     data_json = _serialise_json_pretty(data)
@@ -243,7 +284,10 @@ def _tesseract_io_preview(
 
     st.download_button(
         f"Download {direction}",
-        data=orjson.dumps(data, option=orjson.OPT_SERIALIZE_NUMPY),
+        data=orjson.dumps(
+            _replace_zerodim_arrays(data),
+            option=orjson.OPT_SERIALIZE_NUMPY
+        ),
         file_name=f"tesseract-{direction}.json",
         on_click="ignore",
     )
