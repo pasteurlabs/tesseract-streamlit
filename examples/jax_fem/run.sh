@@ -2,13 +2,16 @@
 
 # the parent dir of this script:
 scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+workdir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # a temporary dir to store the downloads for the example:
 tmpdir=$(mktemp -d)
-workdir="${tmpdir}/tesseract-streamlit"
 
-# clone tesseract-core for its example subdirectory:
-git clone --depth 1 --branch jacan/examples git@github.com:pasteurlabs/tesseract-streamlit.git $workdir
+if [ "$(basename $workdir)" != "tesseract-streamlit" ]; then
+    echo "Path mismatch: please contact the developers."
+    echo $workdir
+    exit 1
+fi
 
 # install requirements for the udf.py module:
 pip install -r "${scriptdir}/requirements.txt"
