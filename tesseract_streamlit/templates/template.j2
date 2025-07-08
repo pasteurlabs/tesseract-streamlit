@@ -90,6 +90,7 @@ st.markdown({% if not udf.docs %}""{% else %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     key="number.{{ field.key }}",
+    format="%f",
     value={{ field.get("default", None) }},
 )
 {% elif field.type == 'boolean' %}
