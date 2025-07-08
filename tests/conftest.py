@@ -9,11 +9,30 @@ from tesseract_streamlit import parse
 PARENT_DIR = Path(__file__).parent
 
 
+def tess_build(tess_name: str) -> tesseract_core.Tesseract:
+    """Builds and returns a Tesseract.
+
+    Tesseract and its parent directory must have the same name.
+    """
+    tesseract_core.build_tesseract(PARENT_DIR / tess_name, "latest")
+    tess = tesseract_core.Tesseract.from_image(tess_name)
+    return tess
+
+
 @pytest.fixture
-def tesseract_url() -> str:
-    """Builds, serves, and yields a test Tesseract URL."""
-    tesseract_core.build_tesseract(PARENT_DIR / "goodbyeworld", "latest")
-    tess = tesseract_core.Tesseract.from_image("goodbyeworld")
+def goodbyeworld_url() -> str:
+    """Builds, serves, and yields goodbyeworld test Tesseract URL."""
+    tess = tess_build("goodbyeworld")
+    port = engine.get_free_port()
+    tess.serve(str(port))
+    yield f"http://localhost:{port}"
+    tess.teardown()
+
+
+@pytest.fixture
+def zerodim_url() -> str:
+    """Builds, serves, and yields zerodim test Tesseract URL."""
+    tess = tess_build("zerodim")
     port = engine.get_free_port()
     tess.serve(str(port))
     yield f"http://localhost:{port}"
