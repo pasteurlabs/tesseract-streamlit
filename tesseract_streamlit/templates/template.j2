@@ -11,7 +11,7 @@ import streamlit as st
 from tesseract_core import Tesseract
 
 {% if needs_pyvista %}
-from stpyvista import stpyvista
+from stpyvista.trame_backend import stpyvista
 {% endif %}
 
 {#- MACROS FOR REPEATED TEMPLATE LOGIC

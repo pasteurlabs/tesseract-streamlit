@@ -13,7 +13,7 @@ dependencies = [
     "tesseract-core",
     "jinja2",
     "numpy",
-    "pyvista",
+    "pyvista[jupyter]",
     "stpyvista",
     "typing-extensions",
     "requests",
