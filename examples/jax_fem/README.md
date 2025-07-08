@@ -1,7 +1,7 @@
 # Using JAX with finite element methods (JAX-FEM)
 
 In this example, you'll generate a Streamlit app from a Tesseract which models a structure and computes its compliance with finite element methods.
-This is based on the excellent example for [shape optimisation in Tesseract JAX](https://docs.pasteurlabs.ai/projects/tesseract-jax/latest/examples/fem-shapeopt/demo.html) using JAX-FEM.
+This is based on the example for [shape optimisation in Tesseract-JAX](https://docs.pasteurlabs.ai/projects/tesseract-jax/latest/examples/fem-shapeopt/demo.html) using JAX-FEM.
 This, of course, uses `tesseract-streamlit` to automatically generate an interactive web app, this time with an interactive PyVista plot of the structure! ⚡
 
 ---
