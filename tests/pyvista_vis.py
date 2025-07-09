@@ -1,8 +1,10 @@
 # from https://github.com/edsaac/stpyvista?tab=readme-ov-file#-minimal-example
-import asyncio
+import multiprocessing
+
+multiprocessing.set_start_method("fork", force=True)
 
 import pyvista as pv
-from stpyvista.vtkjs_backend import export_vtksz, stpyvista
+from stpyvista.trame_backend import stpyvista
 
 ## Initialize a plotter object
 plotter = pv.Plotter(window_size=[400, 400])
@@ -22,5 +24,4 @@ plotter.add_scalar_bar()
 plotter.background_color = "white"
 
 ## Pass a key to avoid re-rendering at each page change
-vtk_bytes = asyncio.run(export_vtksz(plotter))
-stpyvista(vtk_bytes, key="pv_cube")
+stpyvista(plotter, key="pv_cube")
