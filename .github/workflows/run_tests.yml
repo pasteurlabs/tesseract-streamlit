@@ -62,9 +62,37 @@ jobs:
           files: coverage*.xml
           fail_ci_if_error: true
 
+  test-macos:  # note: docker not available
+    runs-on: macos-latest
+
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Restore UV environment
+        run: cp production.uv.lock uv.lock
+
+      - name: Install dev requirements
+        run: |
+          uv sync --extra dev --frozen
+
+      - name: Run selected tests
+        run: |
+          uv run --no-sync pytest --noconftest tests/test_visuals.py::test_pyvista_vis
+
   all-ok:
     if: always()
-    needs: [tests]
+    needs: [tests, test-macos]
 
     runs-on: ubuntu-latest
 
@@ -72,7 +100,11 @@ jobs:
       - name: Check for errors
         run: |
           if [[ "${{ needs.tests.result }}" != "success" && "${{ needs.tests.result }}" != "skipped" ]]; then
-            echo "Tests failed"
+            echo "Linux tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.test-macos.result }}" != "success" && "${{ needs.test-macos.result }}" != "skipped" ]]; then
+            echo "macOS tests failed"
             exit 1
           fi
 
