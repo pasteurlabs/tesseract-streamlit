@@ -1,6 +1,6 @@
 # from https://github.com/edsaac/stpyvista?tab=readme-ov-file#-minimal-example
 import pyvista as pv
-from stpyvista.trame_backend import stpyvista
+from stpyvista.vtkjs_backend import stpyvista
 
 ## Initialize a plotter object
 plotter = pv.Plotter(window_size=[400, 400])
