@@ -88,7 +88,7 @@ jobs:
 
       - name: Run selected tests
         run: |
-          uv run --no-sync pytest tests/test_visuals.py::test_pyvista_vis
+          uv run --no-sync pytest --noconftest tests/test_visuals.py::test_pyvista_vis
 
   all-ok:
     if: always()
