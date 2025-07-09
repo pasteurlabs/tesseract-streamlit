@@ -11,7 +11,7 @@ jobs:
   tests:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         # NOTE: If bumping the minimum Python version here, also do it in
         # ruff.toml, setup.py and other CI files as well.
 
