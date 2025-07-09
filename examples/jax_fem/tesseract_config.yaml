@@ -17,7 +17,7 @@ build_config:
 
   # Platform to build the container for. In general, images can only be executed
   # on the platform they were built for.
-  target_platform: "linux/x86_64"
+  target_platform: "native"
   base_image: "condaforge/miniforge3:latest"
   requirements:
     provider: conda
