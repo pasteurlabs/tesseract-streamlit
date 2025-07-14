@@ -202,10 +202,10 @@ PREVIEW_LINE_LIMIT = 100
 T = typing.TypeVar("T")
 
 
-def _cast_type(val: T | None, cast_type: type[T]) -> T | None:
+def _cast_type(val: T | None, type_: type[T]) -> T | None:
     if val is None:
         return None
-    return cast_type(val)
+    return type_(val)
 
 
 def _insert_nested(
