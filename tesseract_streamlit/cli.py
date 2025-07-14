@@ -43,8 +43,17 @@ def main(
     URL is the address to the Tesseract you'd like to generate your
     interface for.
 
-    OUTPUT is the file location to write the Streamlit app script.
+    OUTPUT is the file location to write the Streamlit app script. Must
+    have a '.py' file extension, or be a dash '-' to pipe to stdout.
+
+    The generated script can then be passed to the 'streamlit run'
+    command to serve the app.
     """
+    if not (output.name.endswith(".py") or (output.name == "<stdout>")):
+        raise click.UsageError(
+            "OUTPUT must either be '-' (stdout), or a script name ending with "
+            "a '.py' extension."
+        )
     test_var = os.getenv("TESSERACT_STREAMLIT_TESTING", default="0")
     test = test_var.lower() in {"1", "yes", "true", "on", "enabled"}
     env = Environment(
