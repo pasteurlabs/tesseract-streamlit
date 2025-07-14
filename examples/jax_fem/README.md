@@ -29,10 +29,10 @@ pip install -r requirements.txt
 
 ## 🛠️ Step 3: Build and Serve the Tesseract
 
-Use the Tesseract CLI to build and serve `jax-fem`:
+Use the Tesseract CLI to build and serve `jax_fem`:
 
 ```bash
-tesseract build ~/Downloads/tesseract-core/examples/jax_fem
+tesseract build ~/Documents/tesseract-streamlit/examples/jax_fem
 tesseract serve jax-fem
 ```
 
@@ -49,7 +49,7 @@ With `tesseract-streamlit` installed, generate a ready-to-run Streamlit app:
 tesseract-streamlit --user-code udf.py "http://localhost:<PORT>" app.py
 ```
 
-`udf.py` can be found in under `tesseract-streamlit/examples/jax-fem/`.
+`udf.py` can be found in under `tesseract-streamlit/examples/jax_fem/`.
 It contains a custom function that takes the Tesseract's inputs to render a PyVista plot of the design structure directly in the UI! ⚙️
 Check out the [source code to see how it works](https://github.com/pasteurlabs/tesseract-streamlit/examples/jax_fem/udf.py).
 
@@ -60,6 +60,7 @@ Check out the [source code to see how it works](https://github.com/pasteurlabs/t
 Run your new app with:
 
 ```bash
+cd ~/Documents/tesseract-streamlit/examples/jax_fem
 streamlit run app.py
 ```
 
