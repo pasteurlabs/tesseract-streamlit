@@ -86,14 +86,14 @@ st.markdown({% if not udf.docs %}""{% else %}
     step=1,
     format="%d",
     key="int.{{ field.key }}",
-    value={{ field.get("default", None) }},
+    value=_cast_type({{ field.get("default", None) }}, int),
 )
 {% elif field.type == 'number' %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     key="number.{{ field.key }}",
     format="%f",
-    value={{ field.get("default", None) }},
+    value=_cast_type({{ field.get("default", None) }}, float),
 )
 {% elif field.type == 'boolean' %}
 {{ field.uid }} = {{ field.container }}.checkbox(
@@ -200,6 +200,14 @@ if submitted:
 {{ udf_defs | safe }}
 {% endif %}
 PREVIEW_LINE_LIMIT = 100
+
+T = typing.TypeVar("T")
+
+
+def _cast_type(val: T | None, type_: type[T]) -> T | None:
+    if val is None:
+        return None
+    return type_(val)
 
 
 def _insert_nested(
