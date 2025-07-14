@@ -22,6 +22,20 @@ def test_cli(goodbyeworld_url: str) -> None:
         assert Path(app_path).exists()
 
 
+def test_py_extension(goodbyeworld_url: str) -> None:
+    """Checks that exception raised if not using '.py' extension."""
+    err_msg = (
+        "Error: OUTPUT must either be '-' (stdout), or a script name ending "
+        "with a '.py' extension."
+    )
+    runner = CliRunner()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        app_path = f"{temp_dir}/app"
+        result = runner.invoke(main, [goodbyeworld_url, app_path])
+        assert result.exit_code != 0
+        assert err_msg in result.stdout
+
+
 def test_app(goodbyeworld_url: str) -> None:
     runner = CliRunner()
     result = runner.invoke(main, [goodbyeworld_url, "-"])
