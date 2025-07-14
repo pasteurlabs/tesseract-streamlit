@@ -2,7 +2,7 @@
 #    uv export --frozen --color never --no-emit-project --no-hashes
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.13
+aiohttp==3.12.14
     # via
     #   jupyter-server-proxy
     #   wslink
@@ -43,7 +43,7 @@ bokeh==3.7.3
     #   stpyvista
 cachetools==6.1.0
     # via streamlit
-certifi==2025.6.15
+certifi==2025.7.9
     # via requests
 cffi==1.17.1
     # via
@@ -187,7 +187,7 @@ multidict==6.6.3
     # via
     #   aiohttp
     #   yarl
-narwhals==1.45.0
+narwhals==1.46.0
     # via
     #   altair
     #   bokeh
@@ -239,14 +239,14 @@ packaging==25.0
     #   panel
     #   pooch
     #   streamlit
-pandas==2.3.0
+pandas==2.3.1
     # via
     #   bokeh
     #   panel
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.7.2
+panel==1.7.4
     # via stpyvista
 param==2.2.1
     # via
@@ -397,7 +397,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==0.9.1
+tesseract-core==0.10.0
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach
