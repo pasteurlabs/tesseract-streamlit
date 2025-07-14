@@ -33,7 +33,7 @@ def test_py_extension(goodbyeworld_url: str) -> None:
         app_path = f"{temp_dir}/app"
         result = runner.invoke(main, [goodbyeworld_url, app_path])
         assert result.exit_code != 0
-        assert err_msg in result.stdout
+        assert err_msg in result.stderr
 
 
 def test_app(goodbyeworld_url: str) -> None:
