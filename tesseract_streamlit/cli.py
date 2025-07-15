@@ -25,18 +25,10 @@ PACKAGE_DIR = Path(__file__).parent
     type=click.Path(exists=True, path_type=Path),
     help="User defined functions for plotting inputs / outputs of the Tesseract.",
 )
-@click.option(
-    "--submit/--no-submit",
-    is_flag=True,
-    help="Use a submit button to trigger output generation.",
-    default=True,
-    show_default=True,
-)
 def main(
     url: str,
     output: io.TextIOWrapper,
     user_code: Path | None,
-    submit: bool,
 ) -> None:
     """Generates a Streamlit app from Tesseract OpenAPI schemas.
 
@@ -62,6 +54,6 @@ def main(
         lstrip_blocks=True,
     )
     template = env.get_template("templates/template.j2")
-    render_kwargs = extract_template_data(url, user_code, submit)
+    render_kwargs = extract_template_data(url, user_code)
     rendered_code = template.render(**render_kwargs, test=test)
     output.write(rendered_code)
