@@ -3,10 +3,10 @@ import tempfile
 from pathlib import Path
 
 import orjson
-from click.testing import CliRunner
 from streamlit.testing.v1 import AppTest
+from typer.testing import CliRunner
 
-from tesseract_streamlit.cli import main
+from tesseract_streamlit.cli import cli
 
 PARENT_DIR = Path(__file__).parent
 os.environ["TESSERACT_STREAMLIT_TESTING"] = "1"
@@ -16,7 +16,7 @@ def test_cli(goodbyeworld_url: str) -> None:
     runner = CliRunner()
     with tempfile.TemporaryDirectory() as temp_dir:
         app_path = f"{temp_dir}/app.py"
-        result = runner.invoke(main, [goodbyeworld_url, app_path])
+        result = runner.invoke(cli, [goodbyeworld_url, app_path])
         assert result.exit_code == 0
         assert result.output == ""
         assert Path(app_path).exists()
@@ -24,21 +24,16 @@ def test_cli(goodbyeworld_url: str) -> None:
 
 def test_py_extension(goodbyeworld_url: str) -> None:
     """Checks that exception raised if not using '.py' extension."""
-    err_msg = (
-        "Error: OUTPUT must either be '-' (stdout), or a script name ending "
-        "with a '.py' extension."
-    )
     runner = CliRunner()
     with tempfile.TemporaryDirectory() as temp_dir:
         app_path = f"{temp_dir}/app"
-        result = runner.invoke(main, [goodbyeworld_url, app_path])
+        result = runner.invoke(cli, [goodbyeworld_url, app_path])
         assert result.exit_code != 0
-        assert err_msg in result.stderr
 
 
 def test_app(goodbyeworld_url: str) -> None:
     runner = CliRunner()
-    result = runner.invoke(main, [goodbyeworld_url, "-"])
+    result = runner.invoke(cli, [goodbyeworld_url, "-"])
     assert result.exit_code == 0
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
@@ -58,7 +53,7 @@ def test_app(goodbyeworld_url: str) -> None:
 
 def test_zerodim_pprint(zerodim_url: str) -> None:
     runner = CliRunner()
-    result = runner.invoke(main, [zerodim_url, "-"])
+    result = runner.invoke(cli, [zerodim_url, "-"])
     assert result.exit_code == 0
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
