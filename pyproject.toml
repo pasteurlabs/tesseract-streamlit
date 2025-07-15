@@ -13,7 +13,7 @@ dependencies = [
     "tesseract-core",
     "jinja2",
     "numpy",
-    "pyvista",
+    "pyvista[jupyter]",
     "stpyvista",
     "typing-extensions",
     "requests",
@@ -26,7 +26,7 @@ dynamic = ["version"]
 Homepage = "https://github.com/pasteurlabs/tesseract-streamlit"
 
 [project.scripts]
-tesseract-streamlit = "tesseract_streamlit.cli:main"
+tesseract-streamlit = "tesseract_streamlit.cli:cli"
 
 [project.optional-dependencies]
 docs = [
