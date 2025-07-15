@@ -305,6 +305,10 @@ def _count_json_lines(json_str: bytes) -> int:
 {# WEB-APP
    ======= #}
 def main() -> None:
+    st.set_page_config(
+        page_title="{{ metadata.title }}",
+        page_icon="https://pasteurlabs.ai/favicon.png",
+    )
     st.title("{{ metadata.title }}")
     st.markdown(
         {{- multiline(metadata.description) | indent(8) }}
