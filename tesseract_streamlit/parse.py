@@ -450,7 +450,6 @@ class TemplateData(typing.TypedDict):
         metadata: background information on the Tesseract instance.
         schema: structure of the input form.
         url: URI of the running Tesseract instance.
-        submit: whether to inject a submit button into the form.
         needs_pyvista: whether to enable PyVista support for the UDFs.
         udf_defs: source code for the UDF definitions.
         udfs: register of the UDFs, sorted by their input parameters.
@@ -459,7 +458,6 @@ class TemplateData(typing.TypedDict):
     metadata: TesseractMetadata
     schema: list[JinjaField]
     url: str
-    submit: bool
     needs_pyvista: bool
     udf_defs: NotRequired[str]
     udfs: NotRequired[UdfRegister]
@@ -468,7 +466,6 @@ class TemplateData(typing.TypedDict):
 def extract_template_data(
     url: str,
     user_code: Path | None,
-    submit: bool,
 ) -> TemplateData:
     """Formats Tesseract and user-defined function inputs for template.
 
@@ -480,7 +477,6 @@ def extract_template_data(
     Args:
         url: URI of the running Tesseract instance.
         user_code: path of the user-defined plotting function module.
-        submit: whether to inject a submit button into the form.
 
     Returns:
         TemplateData:
@@ -493,7 +489,6 @@ def extract_template_data(
         metadata=metadata,
         schema=schema,
         url=url,
-        submit=submit,
         needs_pyvista=False,
     )
     if user_code is not None:
