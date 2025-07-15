@@ -37,7 +37,6 @@ tesseract-streamlit [OPTIONS] URL OUTPUT
 | Option                 | Description                                                        |
 | ---------------------- | ------------------------------------------------------------------ |
 | `--user-code, -u`      | (Optional) Path to Python file with plotting functions             |
-| `--submit/--no-submit` | Use a submit button to trigger output generation (default: submit) |
 | `--help`               | Show the help message and exit                                     |
 
 ### 📊 With Custom Plotting
