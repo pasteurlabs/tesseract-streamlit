@@ -300,7 +300,7 @@ def _count_json_lines(json_str: bytes) -> int:
 def main() -> None:
     st.set_page_config(
         page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
-        page_icon="https://docs.pasteurlabs.ai/projects/tesseract-core/latest/_static/logo-transparent.png",
+        page_icon="{{ favicon_path }}",
     )
     st.title("{{ metadata.title }}")
     st.markdown(
