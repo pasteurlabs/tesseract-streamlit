@@ -14,7 +14,11 @@ from . import __version__
 
 
 def _copy_favicon() -> Path:
-    """Copies the Tesseract favicon into the user's data directory."""
+    """Copies the Tesseract favicon into the user's data directory.
+
+    Returns:
+        Path to the favicon file in the user's data directory.
+    """
     shared_dir = platformdirs.user_data_path(
         appname="tesseract-streamlit",
         appauthor="pasteur-labs",
