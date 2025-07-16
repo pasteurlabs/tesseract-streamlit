@@ -12,6 +12,7 @@ import typer
 from jinja2 import Environment, FileSystemLoader
 from rich.console import Console
 
+from tesseract_streamlit.config import _copy_favicon
 from tesseract_streamlit.parse import extract_template_data
 
 PACKAGE_DIR = Path(__file__).parent
@@ -66,5 +67,9 @@ def main(
     )
     template = env.get_template("templates/template.j2")
     render_kwargs = extract_template_data(url, user_code)
-    rendered_code = template.render(**render_kwargs, test=test)
+    rendered_code = template.render(
+        **render_kwargs,
+        test=test,
+        favicon_path=_copy_favicon(),
+    )
     output.write(rendered_code)

@@ -9,3 +9,4 @@ recursive-exclude tesseract_streamlit *.c
 
 # Include Jinja templates
 recursive-include tesseract_streamlit/templates *.j2
+recursive-include tesseract_streamlit/resources *.ico

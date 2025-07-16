@@ -19,6 +19,7 @@ dependencies = [
     "requests",
     "click",
     "orjson",
+    "platformdirs",
 ]
 dynamic = ["version"]
 

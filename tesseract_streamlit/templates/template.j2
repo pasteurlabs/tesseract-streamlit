@@ -298,6 +298,10 @@ def _count_json_lines(json_str: bytes) -> int:
 {# WEB-APP
    ======= #}
 def main() -> None:
+    st.set_page_config(
+        page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
+        page_icon="{{ favicon_path }}",
+    )
     st.title("{{ metadata.title }}")
     st.markdown(
         {{- multiline(metadata.description) | indent(8) }}
