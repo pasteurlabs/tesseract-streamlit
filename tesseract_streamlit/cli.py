@@ -10,6 +10,7 @@ from pathlib import Path
 
 import typer
 from jinja2 import Environment, FileSystemLoader
+from requests.exceptions import ConnectionError
 from rich.console import Console
 
 from tesseract_streamlit.config import _copy_favicon
@@ -66,7 +67,18 @@ def main(
         lstrip_blocks=True,
     )
     template = env.get_template("templates/template.j2")
-    render_kwargs = extract_template_data(url, user_code)
+    try:
+        render_kwargs = extract_template_data(url, user_code)
+    except ConnectionError as e:
+        err_console.print(
+            "[bold red]Error: [/bold red]"
+            f"Can't seem to find the Tesseract at {url}. "
+            "Are you sure it's being served?\n\n"
+            "[bold green]Hint: [/bold green]"
+            "You can double check using `tesseract ps`. If it's being served, "
+            "you can find the correct URL in the 'Host Address' column."
+        )
+        raise typer.Exit(code=3) from e
     rendered_code = template.render(
         **render_kwargs,
         test=test,
