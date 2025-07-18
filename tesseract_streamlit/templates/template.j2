@@ -160,8 +160,12 @@ _tesseract_io_preview(inputs, "input")
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
    ========================================================== #}
-with Tesseract("{{ url }}") as tess:
+with (
+    Tesseract("{{ url }}") as tess,
+    st.spinner("Executing Tesseract", show_time=True)
+):
     outputs = tess.apply(inputs)
+st.success("Tesseract execution complete")
 _tesseract_io_preview(outputs, "output")
 
 {# RENDER USER-DEFINED FUNCTIONS
