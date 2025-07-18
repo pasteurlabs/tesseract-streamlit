@@ -33,7 +33,7 @@ Use the Tesseract CLI to build and serve `jax_fem`:
 
 ```bash
 tesseract build ~/Documents/tesseract-streamlit/examples/jax_fem
-tesseract serve jax-fem
+tesseract serve jax_fem
 ```
 
 > [!NOTE]
