@@ -252,6 +252,9 @@ class Elasticity(Problem):
 
         return vm_stress_fn
 
+    # reference:
+    # https://github.com/deepmodeling/jax-fem/blob/ac0aace6537cfd3f44183d760fdfa201cee8ab46/docs/source/learn/linear_elasticity.ipynb#L300
+    # https://github.com/deepmodeling/jax-fem/blob/ac0aace6537cfd3f44183d760fdfa201cee8ab46/applications/outdated/top_opt/fem_model.py#L121
     def compute_von_mises_stress(self, sol, density):
         """Compute element-average von Mises stress."""
         # (num_cells, num_quads, num_nodes, vec, dim)
