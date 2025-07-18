@@ -254,20 +254,14 @@ class Elasticity(Problem):
 
     def compute_von_mises_stress(self, sol, density):
         """Compute element-average von Mises stress."""
-        # (num_cells, 1, num_nodes, vec, 1) * (num_cells, num_quads, num_nodes, 1, dim)
-        # -> (num_cells, num_quads, num_nodes, vec, dim)
-        u_grads = (
-            jnp.take(sol, self.fe.cells, axis=0)[:, None, :, :, None]
-            * self.shape_grads[:, :, :, None, :]
-        )
-        u_grads = np.sum(u_grads, axis=2)  # (num_cells, num_quads, vec, dim)
-        density_at_ips = density[:, None]
-        for i in range(1, 3):
-            density_at_ips = np.repeat(density_at_ips, u_grads.shape[i], i)
+        # (num_cells, num_quads, num_nodes, vec, dim)
+        u_grads = self.fe.sol_to_grad(sol)
+
         vm_stress_fn = self.get_von_mises_stress_fn()
         vm_stress = jax.vmap(jax.vmap(vm_stress_fn))(
             u_grads, *self.internal_vars
         )  # (num_cells, num_quads)
+
         cells_JxW = self.JxW[:, 0, :]  # (num_cells, num_quads)
         volume_avg_vm_stress = np.sum(vm_stress * cells_JxW, axis=1) / np.sum(
             cells_JxW, axis=1
