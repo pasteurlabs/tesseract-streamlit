@@ -431,7 +431,7 @@ def _input_to_jinja(field: _InputField) -> JinjaField:
 
 
 def _parse_tesseract_oas(
-    oas_data: bytes, pretty_headings: bool
+    oas_data: bytes, pretty_headings: bool = True
 ) -> tuple[TesseractMetadata, list[JinjaField]]:
     """Parses Tesseract OAS into a flat list of dictionaries.
 
@@ -442,6 +442,7 @@ def _parse_tesseract_oas(
     Args:
         oas_data: the JSON data as an unparsed string.
         pretty_headings: whether to format parameter names as headings.
+            Default is True.
 
     Returns:
         TesseractMetadata:
