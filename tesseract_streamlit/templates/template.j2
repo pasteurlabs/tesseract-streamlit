@@ -3,6 +3,7 @@ import copy
 import functools
 import operator
 import sys
+import time
 import typing
 
 import numpy as np
@@ -160,12 +161,14 @@ _tesseract_io_preview(inputs, "input")
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
    ========================================================== #}
+start_time = time.perf_counter()
 with (
-    Tesseract("{{ url }}") as tess,
-    st.spinner("Executing Tesseract", show_time=True)
+    st.spinner("Executing Tesseract", show_time=True),
+    Tesseract("{{ url }}") as tess
 ):
     outputs = tess.apply(inputs)
-st.success("Tesseract execution complete")
+elapsed = time.perf_counter() - start_time
+st.success(f"Tesseract execution completed in {elapsed:.1f} seconds.")
 _tesseract_io_preview(outputs, "output")
 
 {# RENDER USER-DEFINED FUNCTIONS
