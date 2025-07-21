@@ -65,6 +65,10 @@ def plot(inputs, outputs) -> go.Figure:
 
 Where we have chosen Plotly as our plotting back-end, but [any supported library by Streamlit is allowed][stplots].
 
+> [!NOTE]
+> Additionally, we support PyVista plots (thanks to [edsaac/stpyvista](https://github.com/edsaac/stpyvista))!
+> Just annotate your function to return a `pyvista.Plotter` instance, and an interactive plot will be inserted.
+
 <details>
 <summary>⚙️ More info on defining custom plotting functions</summary>
 <br />
