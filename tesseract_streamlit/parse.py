@@ -431,7 +431,7 @@ def _input_to_jinja(field: _InputField) -> JinjaField:
 
 
 def _parse_tesseract_oas(
-    oas_data: bytes,
+    oas_data: bytes, pretty_headings: bool
 ) -> tuple[TesseractMetadata, list[JinjaField]]:
     """Parses Tesseract OAS into a flat list of dictionaries.
 
@@ -441,6 +441,7 @@ def _parse_tesseract_oas(
 
     Args:
         oas_data: the JSON data as an unparsed string.
+        pretty_headings: whether to format parameter names as headings.
 
     Returns:
         TesseractMetadata:
@@ -457,7 +458,9 @@ def _parse_tesseract_oas(
     }
     input_schema = data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = _resolve_refs(input_schema, data)
-    input_fields = _simplify_schema(resolved_schema["properties"])
+    input_fields = _simplify_schema(
+        resolved_schema["properties"], use_title=pretty_headings
+    )
     jinja_fields = [_input_to_jinja(field) for field in input_fields]
     return metadata, jinja_fields
 
@@ -494,6 +497,7 @@ class TemplateData(typing.TypedDict):
 def extract_template_data(
     url: str,
     user_code: Path | None,
+    pretty_headings: bool,
 ) -> TemplateData:
     """Formats Tesseract and user-defined function inputs for template.
 
@@ -505,6 +509,7 @@ def extract_template_data(
     Args:
         url: URI of the running Tesseract instance.
         user_code: path of the user-defined plotting function module.
+        pretty_headings: whether to format parameters names as headings.
 
     Returns:
         TemplateData:
@@ -512,7 +517,9 @@ def extract_template_data(
             ``InputSchema``, ready for injection into the app template.
     """
     response = requests.get(f"{url}/openapi.json")
-    metadata, schema = _parse_tesseract_oas(response.content)
+    metadata, schema = _parse_tesseract_oas(
+        response.content, pretty_headings=pretty_headings
+    )
     render_kwargs = TemplateData(
         metadata=metadata,
         schema=schema,
