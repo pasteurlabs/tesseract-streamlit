@@ -40,8 +40,6 @@ def main(
     user_code: typing.Annotated[
         Path | None,
         typer.Option(
-            "--user-code",
-            "-u",
             help=(
                 "User defined functions for plotting inputs / outputs of the Tesseract."
             ),
