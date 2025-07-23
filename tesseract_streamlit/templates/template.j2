@@ -3,6 +3,7 @@ import copy
 import functools
 import operator
 import sys
+import time
 import typing
 
 import numpy as np
@@ -160,8 +161,14 @@ _tesseract_io_preview(inputs, "input")
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
    ========================================================== #}
-with Tesseract("{{ url }}") as tess:
+start_time = time.perf_counter()
+with (
+    st.spinner("Executing Tesseract", show_time=True),
+    Tesseract("{{ url }}") as tess
+):
     outputs = tess.apply(inputs)
+elapsed = time.perf_counter() - start_time
+st.success(f"Tesseract execution completed in {elapsed:.1f} seconds.")
 _tesseract_io_preview(outputs, "output")
 
 {# RENDER USER-DEFINED FUNCTIONS
@@ -298,6 +305,10 @@ def _count_json_lines(json_str: bytes) -> int:
 {# WEB-APP
    ======= #}
 def main() -> None:
+    st.set_page_config(
+        page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
+        page_icon="{{ favicon_path }}",
+    )
     st.title("{{ metadata.title }}")
     st.markdown(
         {{- multiline(metadata.description) | indent(8) }}
