@@ -275,6 +275,11 @@ class _InputField(typing.TypedDict):
     default: NotRequired[typing.Any]
 
 
+def _key_to_title(key: str) -> str:
+    """Formats an OAS key to a title for the web UI."""
+    return key.replace("_", " ").title()
+
+
 def _format_field(
     field_key: str,
     field_data: dict[str, typing.Any],
