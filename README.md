@@ -93,7 +93,7 @@ This setup gives you control over what to display and how to explain it, directl
 See the example README for a basic example walk-through, or simply run the following script to see the end result!
 
 ```bash
-bash examples/run.sh
+bash examples/vectoradd_jax/run.sh
 ```
 
 This will open a browser window with the Streamlit UI where users can input values and visualise the response.

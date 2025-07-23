@@ -2,7 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 
-def plot_vector_addition(inputs, outputs) -> go.Figure:  # noqa
+def plot_vector_addition(inputs, outputs) -> go.Figure:
     """Plot vector addition using the triangle method with Plotly.
 
     Adds the input vectors A and B, scaled by their associated factors.
