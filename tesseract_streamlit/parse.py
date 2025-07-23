@@ -312,6 +312,7 @@ def _format_field(
                 default_val = ""
             field["default"] = default_val
         return field
+    field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
         data_type = "array"
         if _is_scalar(field_data["properties"]["shape"]):
