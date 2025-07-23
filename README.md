@@ -98,9 +98,9 @@ bash examples/vectoradd_jax/run.sh
 
 This will open a browser window with the Streamlit UI where users can input values and visualise the response.
 
-| ![](examples/screenshots/header-vec-a.png) | ![](examples/screenshots/outputs.png) |
+| ![](examples/vectoradd_jax/screenshots/header-vec-a.png) | ![](examples/vectoradd_jax/screenshots/outputs.png) |
 | --------------------------------- | ---------------------------- |
-| ![](examples/screenshots/vec-b.png)        | ![](examples/screenshots/plot.png)    |
+| ![](examples/vectoradd_jax/screenshots/vec-b.png)        | ![](examples/vectoradd_jax/screenshots/plot.png)    |
 
 ## ⚠️ Current Limitations
 
