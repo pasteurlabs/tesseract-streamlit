@@ -48,6 +48,16 @@ def main(
             exists=True,
         ),
     ] = None,
+    pretty_headings: typing.Annotated[
+        bool,
+        typer.Option(
+            "--pretty-headings/--no-pretty-headings",
+            is_flag=True,
+            help=(
+                "Formats schema parameters as headings, with spaces and capitalisation."
+            ),
+        ),
+    ] = True,
 ) -> None:
     """Generates a Streamlit app from Tesseract OpenAPI schemas.
 
@@ -70,7 +80,7 @@ def main(
     )
     template = env.get_template("templates/template.j2")
     try:
-        render_kwargs = extract_template_data(url, user_code)
+        render_kwargs = extract_template_data(url, user_code, pretty_headings)
     except ConnectionError as e:
         err_console.print(
             "[bold red]Error: [/bold red]"
