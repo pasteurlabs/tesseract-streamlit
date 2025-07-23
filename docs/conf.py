@@ -7,8 +7,12 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import re
+import shutil
+from pathlib import Path
 
 from tesseract_streamlit import __version__
+
+PARENT_DIR = Path(__file__).parent.resolve()
 
 project = "tesseract-streamlit"
 copyright = "2024, The tesseract-streamlit Team @ Pasteur Labs"
@@ -55,3 +59,10 @@ exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_static_path = ["static"]
+
+# Copy example notebooks to docs/examples folder on every build
+for example_dir in Path("../examples").glob("*/"):
+    # Copy the example directory to the docs folder
+    shutil.copytree(
+        example_dir, PARENT_DIR / "examples" / example_dir.name, dirs_exist_ok=True
+    )
