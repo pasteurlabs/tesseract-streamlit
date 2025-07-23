@@ -275,10 +275,61 @@ class _InputField(typing.TypedDict):
     default: NotRequired[typing.Any]
 
 
+def _key_to_title(key: str) -> str:
+    """Formats an OAS key to a title for the web UI."""
+    return key.replace("_", " ").title()
+
+
+def _format_field(
+    field_key: str,
+    field_data: dict[str, typing.Any],
+    ancestors: list[str],
+    use_title: bool,
+) -> _InputField:
+    """Formats a node of the OAS tree representing an input field.
+
+    Args:
+        field_key: key of the node in the OAS tree.
+        field_data: dictionary of data representing the field.
+        ancestors: ordered list of ancestors in which the field is
+            nested.
+        use_title: whether to use the OAS formatted title, or the
+            field_key.
+
+    Returns:
+        Formatted input field data.
+    """
+    field = _InputField(
+        type=field_data["type"],
+        title=field_data.get("title", field_key) if use_title else field_key,
+        description=field_data.get("description", None),
+        ancestors=[*ancestors, field_key],
+    )
+    if "properties" not in field_data:  # signals a Python primitive type
+        if field["type"] != "object":
+            default_val = field_data.get("default", None)
+            if (field_data["type"] == "string") and (default_val is None):
+                default_val = ""
+            field["default"] = default_val
+        return field
+    field["title"] = _key_to_title(field_key) if use_title else field_key
+    if ARRAY_PROPS <= set(field_data["properties"]):
+        data_type = "array"
+        if _is_scalar(field_data["properties"]["shape"]):
+            data_type = "number"
+            field["default"] = field_data.get("default", None)
+        field["type"] = data_type
+        return field
+    # at this point, not an array or primitive, so must be composite
+    field["type"] = "composite"
+    return field
+
+
 def _simplify_schema(
     schema_node: dict[str, typing.Any],
     accum: list | None = None,
     ancestors: list | None = None,
+    use_title: bool = True,
 ) -> list[_InputField]:
     """Returns a flat simplified representation of the ``InputSchema``.
 
@@ -299,6 +350,10 @@ def _simplify_schema(
         accum: List containing the inputs we are accumulating.
         ancestors: Ancestors which the parent node is nested beneath,
             *eg.* the names of the parent schemas, in order.
+        use_title: Sets whether to use the OAS generated title. These
+            are the parameter names, with spaces instead of underscores,
+            and capitalised. If False, will use the parameter name
+            without formatting. Default is True.
 
     Returns:
         List of ``_InputField`` instances, describing the structure of
@@ -309,35 +364,14 @@ def _simplify_schema(
     if ancestors is None:
         ancestors = []
     for child_key, child_val in schema_node.items():
-        child_data = _InputField(
-            type=child_val["type"],
-            title=child_val.get("title", child_key),
-            description=child_val.get("description", None),
-            ancestors=[*ancestors, child_key],
-        )
-        if "properties" not in child_val:  # signals a Python primitive type
-            if child_data["type"] != "object":
-                default_val = child_val.get("default", None)
-                if (child_val["type"] == "string") and (default_val is None):
-                    default_val = ""
-                child_data["default"] = default_val
-                accum.append(child_data)
-            # TODO: dicts in InputSchema use additionalProperties
-            continue
-        child_data["title"] = child_key.capitalize()
-        if ARRAY_PROPS <= set(child_val["properties"]):
-            data_type = "array"
-            if _is_scalar(child_val["properties"]["shape"]):
-                data_type = "number"
-                child_data["default"] = child_val.get("default", None)
-            child_data["type"] = data_type
-            accum.append(child_data)
-            continue
-        # at this point, not an array or primitive, so must be composite
-        child_data["type"] = "composite"
+        child_data = _format_field(child_key, child_val, ancestors, use_title)
         accum.append(child_data)
+        if child_data["type"] != "composite":
+            continue
         accum.extend(
-            _simplify_schema(child_val["properties"], [], child_data["ancestors"])
+            _simplify_schema(
+                child_val["properties"], [], child_data["ancestors"], use_title
+            )
         )
     return accum
 
@@ -403,7 +437,7 @@ def _input_to_jinja(field: _InputField) -> JinjaField:
 
 
 def _parse_tesseract_oas(
-    oas_data: bytes,
+    oas_data: bytes, pretty_headings: bool = True
 ) -> tuple[TesseractMetadata, list[JinjaField]]:
     """Parses Tesseract OAS into a flat list of dictionaries.
 
@@ -413,6 +447,8 @@ def _parse_tesseract_oas(
 
     Args:
         oas_data: the JSON data as an unparsed string.
+        pretty_headings: whether to format parameter names as headings.
+            Default is True.
 
     Returns:
         TesseractMetadata:
@@ -429,7 +465,9 @@ def _parse_tesseract_oas(
     }
     input_schema = data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = _resolve_refs(input_schema, data)
-    input_fields = _simplify_schema(resolved_schema["properties"])
+    input_fields = _simplify_schema(
+        resolved_schema["properties"], use_title=pretty_headings
+    )
     jinja_fields = [_input_to_jinja(field) for field in input_fields]
     return metadata, jinja_fields
 
@@ -466,6 +504,7 @@ class TemplateData(typing.TypedDict):
 def extract_template_data(
     url: str,
     user_code: Path | None,
+    pretty_headings: bool,
 ) -> TemplateData:
     """Formats Tesseract and user-defined function inputs for template.
 
@@ -477,6 +516,7 @@ def extract_template_data(
     Args:
         url: URI of the running Tesseract instance.
         user_code: path of the user-defined plotting function module.
+        pretty_headings: whether to format parameters names as headings.
 
     Returns:
         TemplateData:
@@ -484,7 +524,9 @@ def extract_template_data(
             ``InputSchema``, ready for injection into the app template.
     """
     response = requests.get(f"{url}/openapi.json")
-    metadata, schema = _parse_tesseract_oas(response.content)
+    metadata, schema = _parse_tesseract_oas(
+        response.content, pretty_headings=pretty_headings
+    )
     render_kwargs = TemplateData(
         metadata=metadata,
         schema=schema,
