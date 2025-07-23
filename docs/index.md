@@ -11,3 +11,11 @@
 self
 api
 ```
+
+```{toctree}
+:caption: Examples
+:maxdepth: 2
+:hidden:
+
+examples/vectoradd_jax/README.md
+```
