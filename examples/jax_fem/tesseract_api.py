@@ -91,6 +91,13 @@ class OutputSchema(BaseModel):
         ]
     ] = Field(description="Compliance of the structure, a measure of stiffness")
 
+    von_mises_stress: Differentiable[
+        Array[
+            (None,),
+            Float32,
+        ]
+    ] = Field(description="The average von Mises stress in each element")
+
 
 #
 # Helper functions
@@ -224,12 +231,45 @@ class Elasticity(Problem):
             sol[self.fe.cells][boundary_inds[:, 0]][:, None, :, :]
             * self.fe.face_shape_vals[boundary_inds[:, 1]][:, :, :, None]
         )
+
         u_face = jnp.sum(u_face, axis=2)
         subset_quad_points = self.physical_surface_quad_points[0]
         neumann_fn = self.get_surface_maps()[0]
         traction = -jax.vmap(jax.vmap(neumann_fn))(u_face, subset_quad_points)
         val = jnp.sum(traction * u_face * nanson_scale[:, :, None])
         return val
+
+    def get_von_mises_stress_fn(self):
+        def vm_stress_fn_helper(sigma):
+            dim = 2
+            s_dev = sigma - 1.0 / dim * jnp.trace(sigma) * np.eye(dim)
+            vm_s = jnp.sqrt(3.0 / 2.0 * np.sum(s_dev * s_dev))
+            return vm_s
+
+        def vm_stress_fn(u_grad, theta):
+            sigma = self.get_tensor_map()(u_grad, theta)
+            return vm_stress_fn_helper(sigma)
+
+        return vm_stress_fn
+
+    # reference:
+    # https://github.com/deepmodeling/jax-fem/blob/ac0aace6537cfd3f44183d760fdfa201cee8ab46/docs/source/learn/linear_elasticity.ipynb#L300
+    # https://github.com/deepmodeling/jax-fem/blob/ac0aace6537cfd3f44183d760fdfa201cee8ab46/applications/outdated/top_opt/fem_model.py#L121
+    def compute_von_mises_stress(self, sol, density):
+        """Compute element-average von Mises stress."""
+        # (num_cells, num_quads, num_nodes, vec, dim)
+        u_grads = self.fe.sol_to_grad(sol)
+
+        vm_stress_fn = self.get_von_mises_stress_fn()
+        vm_stress = jax.vmap(jax.vmap(vm_stress_fn))(
+            u_grads, *self.internal_vars
+        )  # (num_cells, num_quads)
+
+        cells_JxW = self.JxW[:, 0, :]  # (num_cells, num_quads)
+        volume_avg_vm_stress = np.sum(vm_stress * cells_JxW, axis=1) / np.sum(
+            cells_JxW, axis=1
+        )  # (num_cells,)
+        return volume_avg_vm_stress
 
 
 # Memoize the setup function to avoid expensive recomputation
@@ -317,7 +357,8 @@ def apply(inputs: InputSchema) -> OutputSchema:
     )
     sol_list = fwd_pred(density)
     compliance = problem.compute_compliance(sol_list[0])
-    return OutputSchema(compliance=compliance)
+    vm = problem.compute_von_mises_stress(sol_list[0], density)
+    return OutputSchema(compliance=compliance, von_mises_stress=vm)
 
 
 #
