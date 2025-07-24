@@ -43,7 +43,7 @@ bokeh==3.7.3
     #   stpyvista
 cachetools==6.1.0
     # via streamlit
-certifi==2025.7.9
+certifi==2025.7.14
     # via requests
 cffi==1.17.1
     # via
@@ -81,7 +81,7 @@ executing==2.2.0
     # via stack-data
 fastjsonschema==2.21.1
     # via nbformat
-fonttools==4.58.5
+fonttools==4.59.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
@@ -91,7 +91,7 @@ frozenlist==1.7.0
     #   aiosignal
 gitdb==4.0.12
     # via gitpython
-gitpython==3.1.44
+gitpython==3.1.45
     # via streamlit
 idna==3.10
     # via
@@ -122,7 +122,7 @@ jinja2==3.1.6
     #   tesseract-streamlit
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema==4.24.0
+jsonschema==4.25.0
     # via
     #   altair
     #   jupyter-events
@@ -154,6 +154,8 @@ jupyterlab-widgets==3.0.15
     # via ipywidgets
 kiwisolver==1.4.8
     # via matplotlib
+lark==1.2.2
+    # via rfc3987-syntax
 linkify-it-py==2.0.3
     # via panel
 markdown==3.8.2
@@ -187,7 +189,7 @@ multidict==6.6.3
     # via
     #   aiohttp
     #   yarl
-narwhals==1.46.0
+narwhals==1.48.0
     # via
     #   altair
     #   bokeh
@@ -224,7 +226,7 @@ numpy==2.3.1 ; python_full_version >= '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-orjson==3.10.18
+orjson==3.11.0
     # via tesseract-streamlit
 overrides==7.7.0
     # via jupyter-server
@@ -246,7 +248,7 @@ pandas==2.3.1
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.7.4
+panel==1.7.5
     # via stpyvista
 param==2.2.1
     # via
@@ -287,7 +289,7 @@ ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_pla
     #   terminado
 pure-eval==0.2.3
     # via stack-data
-pyarrow==20.0.0
+pyarrow==21.0.0
     # via streamlit
 pycparser==2.22
     # via cffi
@@ -315,13 +317,13 @@ python-json-logger==3.3.0
     # via jupyter-events
 pytz==2025.2
     # via pandas
-pyvista==0.45.2
+pyvista==0.45.3
     # via
     #   stpyvista
     #   tesseract-streamlit
 pyviz-comms==3.0.6
     # via panel
-pywin32==310 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
+pywin32==311 ; platform_python_implementation != 'PyPy' and sys_platform == 'win32'
     # via jupyter-core
 pywinpty==2.0.15 ; os_name == 'nt'
     # via
@@ -358,6 +360,8 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
+rfc3987-syntax==1.1.0
+    # via jsonschema
 rich==14.0.0
     # via
     #   tesseract-core
@@ -388,7 +392,7 @@ stack-data==0.6.3
     # via ipython
 stpyvista==0.1.4
     # via tesseract-streamlit
-streamlit==1.46.1
+streamlit==1.47.0
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -398,7 +402,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==0.10.0
+tesseract-core==0.10.2
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach
@@ -428,7 +432,7 @@ traitlets==5.14.3
     #   nbclient
     #   nbconvert
     #   nbformat
-trame==3.10.2
+trame==3.11.0
     # via pyvista
 trame-client==3.9.1
     # via
@@ -444,7 +448,7 @@ trame-server==3.5.0
     # via
     #   pyvista
     #   trame
-trame-vtk==2.9.0
+trame-vtk==2.9.1
     # via pyvista
 trame-vuetify==3.0.1
     # via pyvista
