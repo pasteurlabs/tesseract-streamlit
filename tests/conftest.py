@@ -1,7 +1,9 @@
+import ast
 from pathlib import Path
 
 import pytest
 import tesseract_core
+import yaml
 from tesseract_core.sdk import engine
 
 from tesseract_streamlit import parse
@@ -30,6 +32,12 @@ def goodbyeworld_url() -> str:
 
 
 @pytest.fixture
+def goodbyeworld_config() -> dict[str, str]:
+    with open(PARENT_DIR / "goodbyeworld/tesseract_config.yaml", "rb") as f:
+        return yaml.load(f, Loader=yaml.Loader)
+
+
+@pytest.fixture
 def zerodim_url() -> str:
     """Builds, serves, and yields zerodim test Tesseract URL."""
     tess = tess_build("zerodim")
@@ -37,6 +45,17 @@ def zerodim_url() -> str:
     tess.serve(str(port))
     yield f"http://localhost:{port}"
     tess.teardown()
+
+
+@pytest.fixture
+def zerodim_apply_docstring() -> str:
+    with open(PARENT_DIR / "zerodim/tesseract_api.py", "rb") as f:
+        tree = ast.parse(f.read())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "apply":
+            docstring = ast.get_docstring(node)
+            return "" if docstring is None else docstring
+    return ""
 
 
 @pytest.fixture

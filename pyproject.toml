@@ -42,7 +42,7 @@ dev = [
     "pytest-cov",
     "typeguard",
     "matplotlib",
-    # Add other extras here, too
+    "pyyaml",
     "tesseract-streamlit[docs]",
 ]
 

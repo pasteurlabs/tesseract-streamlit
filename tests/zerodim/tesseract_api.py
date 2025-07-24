@@ -22,4 +22,5 @@ class OutputSchema(BaseModel):
 
 
 def apply(inputs: InputSchema) -> OutputSchema:
+    """Takes the sum of the natural numbers up to max_num."""
     return OutputSchema(nat_sum=np.arange(inputs.max_num).sum())
