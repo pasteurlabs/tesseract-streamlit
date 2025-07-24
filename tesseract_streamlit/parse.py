@@ -458,11 +458,12 @@ def _parse_tesseract_oas(
             Tesseract.
     """
     data = orjson.loads(oas_data)
-    metadata = {
-        "title": data["info"]["title"],
-        "version": data["info"]["version"],
-        "description": data["paths"]["/apply"]["post"]["description"],
-    }
+    apply_descr = data["paths"]["/apply"]["post"]["description"]
+    metadata = TesseractMetadata(
+        title=data["info"]["title"],
+        version=data["info"]["version"],
+        description=data["info"].get("description", apply_descr),
+    )
     input_schema = data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = _resolve_refs(input_schema, data)
     input_fields = _simplify_schema(
