@@ -32,7 +32,7 @@ repos:
   rev: v0.12.5
   hooks:
   # Run the linter.
-  - id: ruff
+  - id: ruff-check
     args: [--fix]
     types_or: [pyi, python, jupyter]
     # Ignore global python configuration for private registry and install hooks from public index
@@ -56,7 +56,7 @@ repos:
   # Update production.uv.lock after pyproject.toml changes
   - id: update-uv-env
     name: update-uv-env
-    files: pyproject.toml$
+    files: ^pyproject.toml$
     stages: [pre-commit]
     language: python
     entry: |
@@ -69,7 +69,7 @@ repos:
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.6.11,--isolated]
+    additional_dependencies: [uv==0.7.17,--isolated]
 
   # Update requirements.txt after production.uv.lock changes
   - id: update-requirements
@@ -81,10 +81,10 @@ repos:
       bash -c ' \
         cp uv.lock uv.lock.bak; \
         cp production.uv.lock uv.lock; \
-        uv export --frozen --color never --no-emit-project --no-hashes > requirements.txt; \
+        python -m uv export --config-file /dev/null --frozen --color never --no-emit-project --no-hashes > requirements.txt; \
         rc=$?; \
         cp uv.lock production.uv.lock; \
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.6.11,--isolated]
+    additional_dependencies: [uv==0.7.17,--isolated]

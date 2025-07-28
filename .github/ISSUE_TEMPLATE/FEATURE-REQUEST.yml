@@ -14,7 +14,7 @@ body:
       required: true
 
   - type: textarea
-    id: neccesity
+    id: necessity
     attributes:
       label: "Why is this needed?"
       description: Provide an explanation of why this feature is needed. Who is it for? What problem does it solve? Why do none of the existing features solve this problem?
