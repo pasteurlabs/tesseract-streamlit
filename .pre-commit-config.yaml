@@ -16,7 +16,6 @@ repos:
 
   - id: check-yaml
     additional_dependencies: [--isolated]
-    exclude: "^.*templates/.*[yaml|yml]$"
 
   - id: detect-private-key
     additional_dependencies: [--isolated]
@@ -29,10 +28,10 @@ repos:
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.12.5
+  rev: v0.12.2
   hooks:
   # Run the linter.
-  - id: ruff
+  - id: ruff-check
     args: [--fix]
     types_or: [pyi, python, jupyter]
     # Ignore global python configuration for private registry and install hooks from public index
@@ -44,32 +43,30 @@ repos:
     types_or: [pyi, python, jupyter]
     additional_dependencies: [--isolated]
 
-- repo: https://github.com/compilerla/conventional-pre-commit
-  rev: v4.2.0
-  hooks:
-    - id: conventional-pre-commit
-      stages: [commit-msg]
-      args: []
-
 - repo: local
   hooks:
+
   # Update production.uv.lock after pyproject.toml changes
   - id: update-uv-env
     name: update-uv-env
-    files: pyproject.toml$
+    files: ^pyproject.toml$
     stages: [pre-commit]
     language: python
     entry: |
       bash -c ' \
+        if [ -z "$DOWNLOAD_TOKEN" ]; then \
+          DOWNLOAD_TOKEN="VssSessionToken"; \
+          uv tool install keyring --with artifacts-keyring; \
+        fi; \
         cp uv.lock uv.lock.bak; \
         cp production.uv.lock uv.lock; \
-        uv lock --refresh; \
+        python -m uv lock --config-file /dev/null --index https://$DOWNLOAD_TOKEN@pkgs.dev.azure.com/pasteur-labs/d89796ea-4a5b-48aa-9930-4cebcdc9d64a/_packaging/internal/pypi/simple/ --keyring-provider subprocess; \
         rc=$?; \
         cp uv.lock production.uv.lock; \
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.6.11,--isolated]
+    additional_dependencies: [uv==0.7.17,--isolated]
 
   # Update requirements.txt after production.uv.lock changes
   - id: update-requirements
@@ -81,10 +78,10 @@ repos:
       bash -c ' \
         cp uv.lock uv.lock.bak; \
         cp production.uv.lock uv.lock; \
-        uv export --frozen --color never --no-emit-project --no-hashes > requirements.txt; \
+        python -m uv export --config-file /dev/null --frozen --color never --no-emit-project --no-hashes > requirements.txt; \
         rc=$?; \
         cp uv.lock production.uv.lock; \
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.6.11,--isolated]
+    additional_dependencies: [uv==0.7.17,--isolated]

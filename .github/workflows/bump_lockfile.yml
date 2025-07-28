@@ -14,25 +14,38 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          enable-cache: true
+            # https://github.com/azure/login/tree/v2/?tab=readme-ov-file#creds
+            creds: |
+              {
+                "clientId": "${{ secrets.PL_INTERNAL_TOOLS_AZ_CLIENT_ID }}",
+                "clientSecret": "${{ secrets.PL_INTERNAL_TOOLS_AZ_CLIENT_SECRET }}",
+                "subscriptionId": "${{ vars.PL_INTERNAL_TOOLS_AZ_CLIENT_SUB_ID }}",
+                "tenantId": "${{ secrets.PL_INTERNAL_TOOLS_AZ_TENANT_ID }}"
+              }
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
 
+      - name: Get Download Token
+        run: echo "DOWNLOAD_TOKEN=$(az account get-access-token --query accessToken -o tsv)" >> $GITHUB_ENV
+
+      - name: Install pre-commit
+        run: |
+          pip install pre-commit
+
       - name: Update lockfile
         run: |
-          mv production.uv.lock uv.lock
-          uv lock --upgrade
-          mv uv.lock production.uv.lock
+          # Remove lockfile to force update
+          rm production.uv.lock
+          pre-commit run update-uv-env --all-files || true
 
       - name: Generate new requirements.txt
         run : |
-          pip install pre-commit
           pre-commit run update-requirements --all-files || true
 
       - name: Detect if changes were made
@@ -46,11 +59,11 @@ jobs:
         if: steps.git-diff.outputs.update_done == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-            token: ${{ secrets.PL_PASTEURBOT_PAT_PUBLIC }}
+            token: ${{ secrets.PL_PASTEURBOT_PAT_PRIVATE }}
             committer: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
             author: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
-            commit-message: "chore: update dependencies"
-            title: "chore: 📦 update dependencies"
+            commit-message: Update dependencies
+            title: 📦 Update dependencies
             branch: _bot/update-deps
             draft: false
             base: main
