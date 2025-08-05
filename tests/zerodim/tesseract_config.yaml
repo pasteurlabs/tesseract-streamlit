@@ -3,7 +3,7 @@
 
 name: "zerodim"
 version: "0.0.1"
-description: "Test Tesseract that has a zero dimensional array output."
+description: ""
 
 build_config:
   # Base image to use for the container, must be Ubuntu or Debian-based

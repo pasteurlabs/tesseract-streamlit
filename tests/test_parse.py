@@ -129,3 +129,29 @@ def test_metadata_extract(mock_schema: bytes) -> None:
     for key, val in reference_vals.items():
         message = f"Tesseract {key} incorrectly extracted."
         assert val == metadata[key], message
+
+
+def test_description_from_oas(
+    goodbyeworld_url: str,
+    goodbyeworld_config: dict[str, str],
+    zerodim_url: str,
+    zerodim_apply_docstring: str,
+) -> None:
+    """Checks description text in web UI is pulled properly.
+
+    The default description blurb at the top of the web UI is the
+    description provided in tesseract_config.yaml. If this is missing,
+    it falls back on the docstring of the apply endpoint.
+    """
+    # test that default uses tesseract_config.yaml
+    gbw_template = parse.extract_template_data(goodbyeworld_url, None, True)
+    gbw_descr = gbw_template["metadata"]["description"]
+    gbw_config_descr = goodbyeworld_config["description"]
+    assert gbw_descr == gbw_config_descr
+    # test that fallback uses apply endpoint docstring
+    zd_template = parse.extract_template_data(zerodim_url, None, True)
+    zd_descr = zd_template["metadata"]["description"]
+    zd_apply_docs = (
+        f"Apply the Tesseract to the input data.\n\n{zerodim_apply_docstring}"
+    )
+    assert zd_descr == zd_apply_docs
