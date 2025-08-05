@@ -20,17 +20,35 @@ The generated app allows users to interactively submit input to the `apply` endp
 ## 📦 Installation
 
 ```bash
-pip install tesseract-streamlit
+$ pip install tesseract-streamlit
 ```
 
 ## 🧰 Usage
 
 ```bash
-tesseract-streamlit [OPTIONS] URL OUTPUT
+$ tesseract-streamlit [OPTIONS] URL OUTPUT
 ```
 
 * `URL`: The address to the Tesseract instance you want to interface with.
 * `OUTPUT`: The file path to write the generated Streamlit app.
+
+For example:
+
+```bash
+# Install dependencies
+$ pip install tesseract-core tesseract-streamlit
+
+# Clone Tesseract Core and build example Tesseract
+$ git clone https://github.com/pasteurlabs/tesseract-core.git
+$ tesseract build tesseract-core/examples/vectoradd
+
+# Serve Tesseract
+$ tesseract serve vectoradd --port 61725
+
+# Connect via tesseract-streamlit
+$ tesseract-streamlit http://127.0.0.1:61725 app.py
+$ streamlit run app.py
+```
 
 ### ⚙️ Options
 
@@ -44,7 +62,7 @@ tesseract-streamlit [OPTIONS] URL OUTPUT
 You can optionally pass a Python file containing user-defined functions for plotting inputs and/or outputs.
 
 ```bash
-tesseract-streamlit --user-code udf.py http://localhost:48819 app.py
+$ tesseract-streamlit --user-code udf.py http://localhost:48819 app.py
 ```
 
 The `udf.py` file should define functions like:
@@ -97,7 +115,7 @@ This setup gives you control over what to display and how to explain it, directl
 See the example README for a basic example walk-through, or simply run the following script to see the end result!
 
 ```bash
-bash examples/vectoradd_jax/run.sh
+$ bash examples/vectoradd_jax/run.sh
 ```
 
 This will open a browser window with the Streamlit UI where users can input values and visualise the response.
