@@ -406,7 +406,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==0.10.2
+tesseract-core==1.0.0
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach

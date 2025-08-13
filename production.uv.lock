@@ -3392,7 +3392,7 @@ wheels = [
 
 [[package]]
 name = "tesseract-core"
-version = "0.10.2"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
@@ -3405,9 +3405,9 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8d/1d/3506e960c703cf97dc73fe8252cd6c55b56b0b65fddad3811f37ac141ebf/tesseract_core-0.10.2.tar.gz", hash = "sha256:6d863e19e766344a5f45c6bbfb6d3700f3adf60a7366c5f9379ac2638e826746", size = 4243966, upload-time = "2025-07-21T18:38:07.442Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/62/8e6da7d2f51dce6b631ac3e91da43ae2d529b04f51e4818041b43e97bde2/tesseract_core-1.0.0.tar.gz", hash = "sha256:e08083b5f6aef491d1650e7c0cce4c2b587bb613808cd72a2323ece50303d4a1", size = 4240409, upload-time = "2025-08-08T07:13:01.748Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/c5/c2fb06757fd34e07a6114e8bd25865746550496565ebcc0b633648f8d7ca/tesseract_core-0.10.2-py3-none-any.whl", hash = "sha256:782f554d87b92ceca00cfe91c74fd62d8d7af244e9476cbbaff83e588b3f0b54", size = 104700, upload-time = "2025-07-21T18:38:05.691Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/51/bac7253256b285472ff7aac21dabb29aad4ff2604da3f4680561922a9c25/tesseract_core-1.0.0-py3-none-any.whl", hash = "sha256:46ca8e8a8cc66e1a465b46ac26aaf92162f486fc08e373918d6312505badc0e9", size = 101636, upload-time = "2025-08-08T07:12:59.893Z" },
 ]
 
 [[package]]
@@ -3472,7 +3472,7 @@ requires-dist = [
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'" },
     { name = "stpyvista" },
     { name = "streamlit" },
-    { name = "tesseract-core" },
+    { name = "tesseract-core", specifier = ">=1.0.0" },
     { name = "tesseract-streamlit", extras = ["docs"], marker = "extra == 'dev'" },
     { name = "typeguard", marker = "extra == 'dev'" },
     { name = "typing-extensions" },
