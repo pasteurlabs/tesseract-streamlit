@@ -1,7 +1,11 @@
+import ast
+import contextlib
+import typing
 from pathlib import Path
 
 import pytest
 import tesseract_core
+import yaml
 from tesseract_core.sdk import engine
 
 from tesseract_streamlit import parse
@@ -9,34 +13,47 @@ from tesseract_streamlit import parse
 PARENT_DIR = Path(__file__).parent
 
 
-def tess_build(tess_name: str) -> tesseract_core.Tesseract:
+@contextlib.contextmanager
+def tess_build_and_serve(tess_name: str) -> typing.Iterator[str]:
     """Builds and returns a Tesseract.
 
     Tesseract and its parent directory must have the same name.
     """
     tesseract_core.build_tesseract(PARENT_DIR / tess_name, "latest")
-    tess = tesseract_core.Tesseract.from_image(tess_name)
-    return tess
+    port = engine.get_free_port()
+    with tesseract_core.Tesseract.from_image(tess_name, port=str(port)):
+        yield f"http://localhost:{port}"
 
 
 @pytest.fixture
-def goodbyeworld_url() -> str:
+def goodbyeworld_url() -> typing.Iterator[str]:
     """Builds, serves, and yields goodbyeworld test Tesseract URL."""
-    tess = tess_build("goodbyeworld")
-    port = engine.get_free_port()
-    tess.serve(str(port))
-    yield f"http://localhost:{port}"
-    tess.teardown()
+    with tess_build_and_serve("goodbyeworld") as url:
+        yield url
 
 
 @pytest.fixture
-def zerodim_url() -> str:
+def goodbyeworld_config() -> dict[str, str]:
+    with open(PARENT_DIR / "goodbyeworld/tesseract_config.yaml", "rb") as f:
+        return yaml.load(f, Loader=yaml.Loader)
+
+
+@pytest.fixture
+def zerodim_url() -> typing.Iterator[str]:
     """Builds, serves, and yields zerodim test Tesseract URL."""
-    tess = tess_build("zerodim")
-    port = engine.get_free_port()
-    tess.serve(str(port))
-    yield f"http://localhost:{port}"
-    tess.teardown()
+    with tess_build_and_serve("zerodim") as url:
+        yield url
+
+
+@pytest.fixture
+def zerodim_apply_docstring() -> str:
+    with open(PARENT_DIR / "zerodim/tesseract_api.py", "rb") as f:
+        tree = ast.parse(f.read())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "apply":
+            docstring = ast.get_docstring(node)
+            return "" if docstring is None else docstring
+    return ""
 
 
 @pytest.fixture
