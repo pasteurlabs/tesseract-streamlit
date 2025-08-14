@@ -3466,7 +3466,7 @@ requires-dist = [
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'" },
     { name = "stpyvista" },
     { name = "streamlit" },
-    { name = "tesseract-core" },
+    { name = "tesseract-core", specifier = ">=1.0.0" },
     { name = "tesseract-streamlit", extras = ["docs"], marker = "extra == 'dev'" },
     { name = "typeguard", marker = "extra == 'dev'" },
     { name = "typing-extensions" },
