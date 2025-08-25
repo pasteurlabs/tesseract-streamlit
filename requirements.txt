@@ -29,7 +29,7 @@ attrs==25.3.0
     #   aiohttp
     #   jsonschema
     #   referencing
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.5
     # via nbconvert
 bleach==6.2.0
     # via
@@ -126,7 +126,7 @@ jinja2==3.1.6
     #   tesseract-streamlit
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema==4.25.0
+jsonschema==4.25.1
     # via
     #   altair
     #   jupyter-events
@@ -146,7 +146,7 @@ jupyter-core==5.8.1
     #   nbformat
 jupyter-events==0.12.0
     # via jupyter-server
-jupyter-server==2.16.0
+jupyter-server==2.17.0
     # via jupyter-server-proxy
 jupyter-server-proxy==4.4.0
     # via pyvista
@@ -232,7 +232,7 @@ numpy==2.3.2 ; python_full_version >= '3.11'
     #   tesseract-streamlit
 orjson==3.11.2
     # via tesseract-streamlit
-overrides==7.7.0
+overrides==7.7.0 ; python_full_version < '3.12'
     # via jupyter-server
 packaging==25.0
     # via
@@ -245,7 +245,7 @@ packaging==25.0
     #   panel
     #   pooch
     #   streamlit
-pandas==2.3.1
+pandas==2.3.2
     # via
     #   bokeh
     #   panel
@@ -258,7 +258,7 @@ param==2.2.1
     # via
     #   panel
     #   pyviz-comms
-parso==0.8.4
+parso==0.8.5
     # via jedi
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
@@ -321,7 +321,7 @@ python-json-logger==3.3.0
     # via jupyter-events
 pytz==2025.2
     # via pandas
-pyvista==0.46.1
+pyvista==0.46.2
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -340,7 +340,7 @@ pyyaml==6.0.2
     #   jupyter-events
     #   tesseract-core
     #   trame
-pyzmq==27.0.1
+pyzmq==27.0.2
     # via
     #   jupyter-client
     #   jupyter-server
@@ -349,7 +349,7 @@ referencing==0.36.2
     #   jsonschema
     #   jsonschema-specifications
     #   jupyter-events
-requests==2.32.4
+requests==2.32.5
     # via
     #   panel
     #   pooch
@@ -435,9 +435,9 @@ traitlets==5.14.3
     #   nbclient
     #   nbconvert
     #   nbformat
-trame==3.11.0
+trame==3.12.0
     # via pyvista
-trame-client==3.9.2
+trame-client==3.10.1
     # via
     #   pyvista
     #   trame
@@ -455,9 +455,9 @@ trame-vtk==2.9.1
     # via pyvista
 trame-vuetify==3.0.2
     # via pyvista
-typer==0.16.0
+typer==0.16.1
     # via tesseract-core
-types-python-dateutil==2.9.0.20250809
+types-python-dateutil==2.9.0.20250822
     # via arrow
 typing-extensions==4.14.1
     # via
@@ -504,7 +504,7 @@ websocket-client==1.8.0
     # via jupyter-server
 widgetsnbextension==4.0.14
     # via ipywidgets
-wslink==2.3.4
+wslink==2.4.0
     # via
     #   trame
     #   trame-server
