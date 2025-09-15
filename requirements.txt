@@ -37,7 +37,7 @@ bleach==6.2.0
     #   panel
 blinker==1.9.0
     # via streamlit
-bokeh==3.7.3
+bokeh==3.8.0
     # via
     #   panel
     #   stpyvista
@@ -45,7 +45,7 @@ cachetools==6.2.0
     # via streamlit
 certifi==2025.8.3
     # via requests
-cffi==1.17.1
+cffi==2.0.0
     # via
     #   argon2-cffi-bindings
     #   pyzmq
@@ -131,7 +131,7 @@ jsonschema==4.25.1
     #   altair
     #   jupyter-events
     #   nbformat
-jsonschema-specifications==2025.4.1
+jsonschema-specifications==2025.9.1
     # via jsonschema
 jupyter-client==8.6.3
     # via
@@ -193,7 +193,7 @@ multidict==6.6.4
     # via
     #   aiohttp
     #   yarl
-narwhals==2.3.0
+narwhals==2.5.0
     # via
     #   altair
     #   bokeh
@@ -219,7 +219,7 @@ numpy==2.2.6 ; python_full_version < '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-numpy==2.3.2 ; python_full_version >= '3.11'
+numpy==2.3.3 ; python_full_version >= '3.11'
     # via
     #   bokeh
     #   contourpy
@@ -252,7 +252,7 @@ pandas==2.3.2
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.7.5
+panel==1.8.0
     # via stpyvista
 param==2.2.1
     # via
@@ -285,7 +285,7 @@ propcache==0.3.2
     # via
     #   aiohttp
     #   yarl
-protobuf==6.32.0
+protobuf==6.32.1
     # via streamlit
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -295,9 +295,9 @@ pure-eval==0.2.3
     # via stack-data
 pyarrow==21.0.0
     # via streamlit
-pycparser==2.22
+pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
-pydantic==2.11.7
+pydantic==2.11.9
     # via tesseract-core
 pydantic-core==2.33.2
     # via pydantic
@@ -309,7 +309,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
     #   nbconvert
     #   rich
-pyparsing==3.2.3
+pyparsing==3.2.4
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
@@ -340,7 +340,7 @@ pyyaml==6.0.2
     #   jupyter-events
     #   tesseract-core
     #   trame
-pyzmq==27.0.2
+pyzmq==27.1.0
     # via
     #   jupyter-client
     #   jupyter-server
@@ -406,7 +406,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==1.0.0
+tesseract-core==1.1.0
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach
@@ -437,7 +437,7 @@ traitlets==5.14.3
     #   nbformat
 trame==3.12.0
     # via pyvista
-trame-client==3.10.1
+trame-client==3.10.2
     # via
     #   pyvista
     #   trame
@@ -453,7 +453,7 @@ trame-server==3.6.0
     #   trame
 trame-vtk==2.9.1
     # via pyvista
-trame-vuetify==3.0.2
+trame-vuetify==3.0.3
     # via pyvista
 typer==0.17.4
     # via tesseract-core
