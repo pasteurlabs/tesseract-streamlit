@@ -51,7 +51,7 @@ cffi==2.0.0
     #   pyzmq
 charset-normalizer==3.4.3
     # via requests
-click==8.2.1
+click==8.3.0
     # via
     #   streamlit
     #   tesseract-streamlit
@@ -85,7 +85,7 @@ executing==2.2.1
     # via stack-data
 fastjsonschema==2.21.2
     # via nbformat
-fonttools==4.59.2
+fonttools==4.60.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
@@ -252,7 +252,7 @@ pandas==2.3.2
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.8.0
+panel==1.8.1
     # via stpyvista
 param==2.2.1
     # via
@@ -277,7 +277,7 @@ platformdirs==4.4.0
     #   tesseract-streamlit
 pooch==1.8.2
     # via pyvista
-prometheus-client==0.22.1
+prometheus-client==0.23.1
     # via jupyter-server
 prompt-toolkit==3.0.52
     # via ipython
@@ -309,7 +309,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
     #   nbconvert
     #   rich
-pyparsing==3.2.4
+pyparsing==3.2.5
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
@@ -374,7 +374,7 @@ rpds-py==0.27.1
     # via
     #   jsonschema
     #   referencing
-scooby==0.10.1
+scooby==0.10.2
     # via pyvista
 send2trash==1.8.3
     # via jupyter-server
@@ -447,7 +447,7 @@ trame-common==1.0.1
     # via
     #   trame
     #   trame-client
-trame-server==3.6.0
+trame-server==3.6.1
     # via
     #   pyvista
     #   trame
@@ -455,7 +455,7 @@ trame-vtk==2.9.1
     # via pyvista
 trame-vuetify==3.0.3
     # via pyvista
-typer==0.17.4
+typer==0.19.1
     # via tesseract-core
 types-python-dateutil==2.9.0.20250822
     # via arrow
@@ -488,7 +488,7 @@ uri-template==1.3.0
     # via jsonschema
 urllib3==2.5.0
     # via requests
-vtk==9.5.1
+vtk==9.5.2
     # via pyvista
 watchdog==6.0.0 ; sys_platform != 'darwin'
     # via streamlit
