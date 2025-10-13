@@ -2,7 +2,7 @@
 #    uv export --config-file /dev/null --frozen --color never --no-emit-project --no-hashes
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.15
+aiohttp==3.13.0
     # via
     #   jupyter-server-proxy
     #   wslink
@@ -24,7 +24,7 @@ asttokens==3.0.0
     # via stack-data
 async-timeout==5.0.1 ; python_full_version < '3.11'
     # via aiohttp
-attrs==25.3.0
+attrs==25.4.0
     # via
     #   aiohttp
     #   jsonschema
@@ -41,7 +41,7 @@ bokeh==3.8.0
     # via
     #   panel
     #   stpyvista
-cachetools==6.2.0
+cachetools==6.2.1
     # via streamlit
 certifi==2025.10.5
     # via requests
@@ -89,7 +89,7 @@ fonttools==4.60.1
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
-frozenlist==1.7.0
+frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
@@ -97,7 +97,7 @@ gitdb==4.0.12
     # via gitpython
 gitpython==3.1.45
     # via streamlit
-idna==3.10
+idna==3.11
     # via
     #   anyio
     #   jsonschema
@@ -173,7 +173,7 @@ markupsafe==3.0.3
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.10.6
+matplotlib==3.10.7
     # via
     #   pyvista
     #   vtk
@@ -187,13 +187,13 @@ mistune==3.1.4
     # via nbconvert
 more-itertools==10.8.0
     # via trame-server
-msgpack==1.1.1
+msgpack==1.1.2
     # via wslink
-multidict==6.6.4
+multidict==6.7.0
     # via
     #   aiohttp
     #   yarl
-narwhals==2.6.0
+narwhals==2.7.0
     # via
     #   altair
     #   bokeh
@@ -252,7 +252,7 @@ pandas==2.3.3
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.8.1
+panel==1.8.2
     # via stpyvista
 param==2.2.1
     # via
@@ -270,7 +270,7 @@ pillow==11.3.0
     #   streamlit
 pip==25.2
     # via tesseract-core
-platformdirs==4.4.0
+platformdirs==4.5.0
     # via
     #   jupyter-core
     #   pooch
@@ -281,7 +281,7 @@ prometheus-client==0.23.1
     # via jupyter-server
 prompt-toolkit==3.0.52
     # via ipython
-propcache==0.4.0
+propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
@@ -297,9 +297,9 @@ pyarrow==21.0.0
     # via streamlit
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
-pydantic==2.11.10
+pydantic==2.12.0
     # via tesseract-core
-pydantic-core==2.33.2
+pydantic-core==2.41.1
     # via pydantic
 pydeck==0.9.1
     # via streamlit
@@ -317,7 +317,7 @@ python-dateutil==2.9.0.post0
     #   jupyter-client
     #   matplotlib
     #   pandas
-python-json-logger==3.3.0
+python-json-logger==4.0.0
     # via jupyter-events
 pytz==2025.2
     # via pandas
@@ -366,7 +366,7 @@ rfc3986-validator==0.1.1
     #   jupyter-events
 rfc3987-syntax==1.1.0
     # via jsonschema
-rich==14.1.0
+rich==14.2.0
     # via
     #   tesseract-core
     #   typer
@@ -437,7 +437,7 @@ traitlets==5.14.3
     #   nbformat
 trame==3.12.0
     # via pyvista
-trame-client==3.11.0
+trame-client==3.11.2
     # via
     #   pyvista
     #   trame
@@ -447,7 +447,7 @@ trame-common==1.0.1
     # via
     #   trame
     #   trame-client
-trame-server==3.6.2
+trame-server==3.6.3
     # via
     #   pyvista
     #   trame
@@ -457,7 +457,7 @@ trame-vuetify==3.1.0
     # via pyvista
 typer==0.19.2
     # via tesseract-core
-types-python-dateutil==2.9.0.20250822
+types-python-dateutil==2.9.0.20251008
     # via arrow
 typing-extensions==4.15.0
     # via
@@ -500,7 +500,7 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websocket-client==1.8.0
+websocket-client==1.9.0
     # via jupyter-server
 widgetsnbextension==4.0.14
     # via ipywidgets
@@ -510,5 +510,5 @@ wslink==2.4.0
     #   trame-server
 xyzservices==2025.4.0
     # via bokeh
-yarl==1.21.0
+yarl==1.22.0
     # via aiohttp
