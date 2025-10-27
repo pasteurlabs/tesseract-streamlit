@@ -177,7 +177,7 @@ matplotlib==3.10.7
     # via
     #   pyvista
     #   vtk
-matplotlib-inline==0.1.7
+matplotlib-inline==0.2.1
     # via ipython
 mdit-py-plugins==0.5.0
     # via panel
@@ -193,7 +193,7 @@ multidict==6.7.0
     # via
     #   aiohttp
     #   yarl
-narwhals==2.8.0
+narwhals==2.9.0
     # via
     #   altair
     #   bokeh
@@ -230,7 +230,7 @@ numpy==2.3.4 ; python_full_version >= '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-orjson==3.11.3
+orjson==3.11.4
     # via tesseract-streamlit
 overrides==7.7.0 ; python_full_version < '3.12'
     # via jupyter-server
@@ -268,7 +268,7 @@ pillow==11.3.0
     #   matplotlib
     #   pyvista
     #   streamlit
-pip==25.2
+pip==25.3
     # via tesseract-core
 platformdirs==4.5.0
     # via
@@ -293,7 +293,7 @@ ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_pla
     #   terminado
 pure-eval==0.2.3
     # via stack-data
-pyarrow==21.0.0
+pyarrow==22.0.0
     # via streamlit
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
@@ -368,7 +368,7 @@ rich==14.2.0
     # via
     #   tesseract-core
     #   typer
-rpds-py==0.27.1
+rpds-py==0.28.0
     # via
     #   jsonschema
     #   referencing
@@ -445,7 +445,7 @@ trame-common==1.0.1
     # via
     #   trame
     #   trame-client
-trame-server==3.6.3
+trame-server==3.8.0
     # via
     #   pyvista
     #   trame
@@ -453,7 +453,7 @@ trame-vtk==2.10.0
     # via pyvista
 trame-vuetify==3.1.0
     # via pyvista
-typer==0.19.2
+typer==0.20.0
     # via tesseract-core
 typing-extensions==4.15.0
     # via
@@ -502,7 +502,7 @@ websocket-client==1.9.0
     # via jupyter-server
 widgetsnbextension==4.0.14
     # via ipywidgets
-wslink==2.4.0
+wslink==2.5.0
     # via
     #   trame
     #   trame-server
