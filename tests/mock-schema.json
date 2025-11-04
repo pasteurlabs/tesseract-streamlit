@@ -200,7 +200,8 @@
                         "description": "Height of person in cm.",
                         "default": 175,
                         "minimum": 0,
-                        "maximum": 300
+                        "maximum": 300,
+                        "multipleOf": 0.1
                     },
                     "alive": {
                         "type": "boolean",
