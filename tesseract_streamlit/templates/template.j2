@@ -84,9 +84,9 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% elif field.type == 'integer' %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
-    min_value={{ field.get("minimum", None) }},
-    max_value={{ field.get("maximum", None) }},
-    step={{ field.get("multiple_of", 1) }},
+    min_value={{ field.get("number_constraints", {}).get("min_value", None) }},
+    max_value={{ field.get("number_constraints", {}).get("max_value", None) }},
+    step={{ field.get("number_constraints", {}).get("step", 1) }},
     format="%d",
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),
@@ -94,10 +94,10 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% elif field.type == 'number' %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
-    min_value={{ field.get("minimum", None) }},
-    max_value={{ field.get("maximum", None) }},
-    {% if field.get('multiple_of') is not none %}
-    step={{ field.multiple_of }},
+    min_value={{ field.get("number_constraints", {}).get("min_value", None) }},
+    max_value={{ field.get("number_constraints", {})get("max_value", None) }},
+    {% if field.get("number_constraints", {}).get('step') is not none %}
+    step={{ field.number_constraints.step }},
     {% endif %}
     key="number.{{ field.key }}",
     format="%f",
