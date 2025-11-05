@@ -38,6 +38,10 @@ def test_app(goodbyeworld_url: str) -> None:
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
     app.run()
+
+    # Note: AppTest.set_value() bypasses UI validation, so we only test valid values
+    # The min_value/max_value constraints are enforced by the browser UI, not Python
+
     app.number_input(key="number.weight").set_value(83.0).run()
     app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
     app.text_input(key="int.hobby.name").input("hula hoop").run()
