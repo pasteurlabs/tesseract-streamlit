@@ -262,7 +262,7 @@ def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
 
 
 class NumberConstraints(typing.TypedDict):
-    """Container for constraints on scalar numeric values"""
+    """Container for constraints on scalar numeric values."""
 
     min_value: NotRequired[float]
     max_value: NotRequired[float]
