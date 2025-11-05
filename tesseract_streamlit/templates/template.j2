@@ -95,7 +95,7 @@ st.markdown({% if not udf.docs %}""{% else %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value={{ field.get("number_constraints", {}).get("min_value", None) }},
-    max_value={{ field.get("number_constraints", {})get("max_value", None) }},
+    max_value={{ field.get("number_constraints", {}).get("max_value", None) }},
     {% if field.get("number_constraints", {}).get('step') is not none %}
     step={{ field.number_constraints.step }},
     {% endif %}
