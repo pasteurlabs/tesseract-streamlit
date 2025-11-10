@@ -11,7 +11,9 @@ from tesseract_core.runtime import Array, Int64
 
 
 class InputSchema(BaseModel):
-    max_num: int = Field(description="Endpoint for a sum of natural numbers.")
+    max_num: int = Field(
+        description="Endpoint for a sum of natural numbers.", minimum=0
+    )
 
 
 class OutputSchema(BaseModel):

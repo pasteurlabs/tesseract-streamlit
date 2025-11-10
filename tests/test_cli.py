@@ -38,6 +38,19 @@ def test_app(goodbyeworld_url: str) -> None:
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
     app.run()
+
+    # Note: AppTest.set_value() bypasses UI validation, so we only test valid values
+    # The min_value/max_value constraints are enforced by the browser UI, not Python
+
+    # Test manually set step
+    app.number_input(key="number.height").increment().run()
+    height_after_decrement = app.number_input(key="number.height").value
+    assert height_after_decrement == 175.1, (
+        f"Height should be incremented in steps 0.1, but got {height_after_decrement - 175}"
+    )
+    # reset to original default
+    app.number_input(key="number.height").decrement().run()
+
     app.number_input(key="number.weight").set_value(83.0).run()
     app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
     app.text_input(key="int.hobby.name").input("hula hoop").run()

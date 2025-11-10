@@ -1,1 +1,533 @@
-{"openapi":"3.1.0","info":{"title":"goodbyeworld","version":"1.0.0"},"paths":{"/apply":{"post":{"summary":"Apply","description":"Apply the Tesseract to the input data.\n\nGreet a person whose name is given as input.","operationId":"apply_apply_post","parameters":[{"name":"accept","in":"header","required":false,"schema":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Accept"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ApplyInputSchema"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ApplyOutputSchema"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/health":{"get":{"summary":"Health","description":"Get health status of the Tesseract instance.","operationId":"health_health_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Health Health Get"}}}}}}},"/input_schema":{"get":{"summary":"Input Schema","description":"Get input schema for tesseract apply function.","operationId":"input_schema_input_schema_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Input Schema Input Schema Get"}}}}}}},"/output_schema":{"get":{"summary":"Output Schema","description":"Get output schema for tesseract apply function.","operationId":"output_schema_output_schema_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"additionalProperties":true,"type":"object","title":"Response Output Schema Output Schema Get"}}}}}}}},"components":{"schemas":{"ApplyInputSchema":{"properties":{"inputs":{"$ref":"#/components/schemas/Apply_InputSchema","description":"The input data to apply the Tesseract to."}},"additionalProperties":false,"type":"object","required":["inputs"],"title":"ApplyInputSchema","differentiable_arrays":{}},"ApplyOutputSchema":{"$ref":"#/components/schemas/Apply_OutputSchema","title":"ApplyOutputSchema","description":"The output data from applying the Tesseract.","differentiable_arrays":{}},"Apply_Hobby":{"properties":{"name":{"type":"string","title":"Name","description":"Name of the activity."},"active":{"type":"boolean","title":"Active","description":"Does the person actively engage with it?"},"experience":{"type":"integer","title":"Experience","description":"Experience practising it in years."}},"additionalProperties":false,"type":"object","required":["name","active","experience"],"title":"Apply_Hobby"},"Apply_InputSchema":{"properties":{"name":{"type":"string","title":"Name","description":"Name of the person you want to greet.","default":"John Doe"},"age":{"type":"integer","title":"Age","description":"Age of person in years.","default":30},"height":{"type":"number","title":"Height","description":"Height of person in cm.","default":175.0},"alive":{"type":"boolean","title":"Alive","description":"Whether the person is (currently) alive.","default":true},"weight":{"$ref":"#/components/schemas/EncodedArrayModel__scalar__float32__noflags","title":"Weight","description":"The person's weight in kg."},"leg_lengths":{"$ref":"#/components/schemas/EncodedArrayModel__2__float32__noflags","title":"Leg Lengths","description":"The length of the person's left and right legs in cm."},"hobby":{"$ref":"#/components/schemas/Apply_Hobby","description":"The person's only hobby."}},"additionalProperties":false,"type":"object","required":["weight","leg_lengths","hobby"],"title":"Apply_InputSchema"},"Apply_OutputSchema":{"properties":{"greeting":{"type":"string","title":"Greeting","description":"A greeting!"}},"additionalProperties":false,"type":"object","required":["greeting"],"title":"Apply_OutputSchema"},"Base64ArrayData":{"properties":{"buffer":{"type":"string","title":"Buffer","description":"Base64 encoded binary buffer","examples":["<base64 encoded string>"]},"encoding":{"type":"string","const":"base64","title":"Encoding"}},"additionalProperties":false,"type":"object","required":["buffer","encoding"],"title":"Base64ArrayData","description":"Data structure for base64 encoded binary buffers."},"BinrefArrayData":{"properties":{"buffer":{"type":"string","pattern":"^.+?(\\:\\d+)?$","title":"Buffer"},"encoding":{"type":"string","const":"binref","title":"Encoding"}},"additionalProperties":false,"type":"object","required":["buffer","encoding"],"title":"BinrefArrayData","description":"Data structure that dumps array data to binary file."},"EncodedArrayModel__2__float32__noflags":{"properties":{"object_type":{"type":"string","const":"array","title":"Object Type","description":"Indicates that this dict can be parsed to an array.","default":"array"},"shape":{"prefixItems":[{"type":"integer","enum":[1,2]}],"items":{"type":"integer"},"type":"array","maxItems":1,"minItems":1,"title":"Shape","description":"Shape of the array","examples":[[2]]},"dtype":{"type":"string","enum":["float16","float32","float64","int8","int16","int32","int64","bool","uint8","uint16","uint32","uint64"],"title":"Dtype","description":"Data type of the array","examples":["float32"]},"data":{"oneOf":[{"$ref":"#/components/schemas/BinrefArrayData"},{"$ref":"#/components/schemas/Base64ArrayData"},{"$ref":"#/components/schemas/JsonArrayData"}],"title":"Data","discriminator":{"propertyName":"encoding","mapping":{"base64":"#/components/schemas/Base64ArrayData","binref":"#/components/schemas/BinrefArrayData","json":"#/components/schemas/JsonArrayData"}}}},"additionalProperties":false,"type":"object","required":["shape","dtype","data"],"title":"EncodedArrayModel__2__float32__noflags","array_flags":[]},"EncodedArrayModel__scalar__float32__noflags":{"properties":{"object_type":{"type":"string","const":"array","title":"Object Type","description":"Indicates that this dict can be parsed to an array.","default":"array"},"shape":{"items":{"type":"integer"},"type":"array","maxItems":0,"minItems":0,"title":"Shape","description":"Shape of the array","examples":[[]]},"dtype":{"type":"string","enum":["float16","float32","float64","int8","int16","int32","int64","bool","uint8","uint16","uint32","uint64"],"title":"Dtype","description":"Data type of the array","examples":["float32"]},"data":{"oneOf":[{"$ref":"#/components/schemas/BinrefArrayData"},{"$ref":"#/components/schemas/Base64ArrayData"},{"$ref":"#/components/schemas/JsonArrayData"}],"title":"Data","discriminator":{"propertyName":"encoding","mapping":{"base64":"#/components/schemas/Base64ArrayData","binref":"#/components/schemas/BinrefArrayData","json":"#/components/schemas/JsonArrayData"}}}},"additionalProperties":false,"type":"object","required":["shape","dtype","data"],"title":"EncodedArrayModel__scalar__float32__noflags","array_flags":[]},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"JsonArrayData":{"properties":{"buffer":{"$ref":"#/components/schemas/JsonValue"},"encoding":{"type":"string","const":"json","title":"Encoding"}},"additionalProperties":false,"type":"object","required":["buffer","encoding"],"title":"JsonArrayData","description":"Data structure for json buffers (list of decimal numbers)."},"JsonValue":{},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"}}}}
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "goodbyeworld",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/apply": {
+            "post": {
+                "summary": "Apply",
+                "description": "Apply the Tesseract to the input data.\n\nGreet a person whose name is given as input.",
+                "operationId": "apply_apply_post",
+                "parameters": [
+                    {
+                        "name": "accept",
+                        "in": "header",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Accept"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyInputSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApplyOutputSchema"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health",
+                "description": "Get health status of the Tesseract instance.",
+                "operationId": "health_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": true,
+                                    "type": "object",
+                                    "title": "Response Health Health Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/input_schema": {
+            "get": {
+                "summary": "Input Schema",
+                "description": "Get input schema for tesseract apply function.",
+                "operationId": "input_schema_input_schema_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": true,
+                                    "type": "object",
+                                    "title": "Response Input Schema Input Schema Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/output_schema": {
+            "get": {
+                "summary": "Output Schema",
+                "description": "Get output schema for tesseract apply function.",
+                "operationId": "output_schema_output_schema_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": true,
+                                    "type": "object",
+                                    "title": "Response Output Schema Output Schema Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ApplyInputSchema": {
+                "properties": {
+                    "inputs": {
+                        "$ref": "#/components/schemas/Apply_InputSchema",
+                        "description": "The input data to apply the Tesseract to."
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "inputs"
+                ],
+                "title": "ApplyInputSchema",
+                "differentiable_arrays": {}
+            },
+            "ApplyOutputSchema": {
+                "$ref": "#/components/schemas/Apply_OutputSchema",
+                "title": "ApplyOutputSchema",
+                "description": "The output data from applying the Tesseract.",
+                "differentiable_arrays": {}
+            },
+            "Apply_Hobby": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Name of the activity."
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "description": "Does the person actively engage with it?"
+                    },
+                    "experience": {
+                        "type": "integer",
+                        "title": "Experience",
+                        "description": "Experience practising it in years.",
+                        "minimum": 0,
+                        "maximum": 120
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "name",
+                    "active",
+                    "experience"
+                ],
+                "title": "Apply_Hobby"
+            },
+            "Apply_InputSchema": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Name of the person you want to greet.",
+                        "default": "John Doe"
+                    },
+                    "age": {
+                        "type": "integer",
+                        "title": "Age",
+                        "description": "Age of person in years.",
+                        "default": 30,
+                        "minimum": 0,
+                        "maximum": 125
+                    },
+                    "height": {
+                        "type": "number",
+                        "title": "Height",
+                        "description": "Height of person in cm.",
+                        "default": 175,
+                        "minimum": 0,
+                        "maximum": 300,
+                        "multipleOf": 0.1
+                    },
+                    "alive": {
+                        "type": "boolean",
+                        "title": "Alive",
+                        "description": "Whether the person is (currently) alive.",
+                        "default": true
+                    },
+                    "weight": {
+                        "$ref": "#/components/schemas/EncodedArrayModel__scalar__float32__noflags",
+                        "title": "Weight",
+                        "description": "The person's weight in kg.",
+                        "minimum": 0
+                    },
+                    "leg_lengths": {
+                        "$ref": "#/components/schemas/EncodedArrayModel__2__float32__noflags",
+                        "title": "Leg Lengths",
+                        "description": "The length of the person's left and right legs in cm."
+                    },
+                    "hobby": {
+                        "$ref": "#/components/schemas/Apply_Hobby",
+                        "description": "The person's only hobby."
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "weight",
+                    "leg_lengths",
+                    "hobby"
+                ],
+                "title": "Apply_InputSchema"
+            },
+            "Apply_OutputSchema": {
+                "properties": {
+                    "greeting": {
+                        "type": "string",
+                        "title": "Greeting",
+                        "description": "A greeting!"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "greeting"
+                ],
+                "title": "Apply_OutputSchema"
+            },
+            "Base64ArrayData": {
+                "properties": {
+                    "buffer": {
+                        "type": "string",
+                        "title": "Buffer",
+                        "description": "Base64 encoded binary buffer",
+                        "examples": [
+                            "<base64 encoded string>"
+                        ]
+                    },
+                    "encoding": {
+                        "type": "string",
+                        "const": "base64",
+                        "title": "Encoding"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "buffer",
+                    "encoding"
+                ],
+                "title": "Base64ArrayData",
+                "description": "Data structure for base64 encoded binary buffers."
+            },
+            "BinrefArrayData": {
+                "properties": {
+                    "buffer": {
+                        "type": "string",
+                        "pattern": "^.+?(\\:\\d+)?$",
+                        "title": "Buffer"
+                    },
+                    "encoding": {
+                        "type": "string",
+                        "const": "binref",
+                        "title": "Encoding"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "buffer",
+                    "encoding"
+                ],
+                "title": "BinrefArrayData",
+                "description": "Data structure that dumps array data to binary file."
+            },
+            "EncodedArrayModel__2__float32__noflags": {
+                "properties": {
+                    "object_type": {
+                        "type": "string",
+                        "const": "array",
+                        "title": "Object Type",
+                        "description": "Indicates that this dict can be parsed to an array.",
+                        "default": "array"
+                    },
+                    "shape": {
+                        "prefixItems": [
+                            {
+                                "type": "integer",
+                                "enum": [
+                                    1,
+                                    2
+                                ]
+                            }
+                        ],
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "maxItems": 1,
+                        "minItems": 1,
+                        "title": "Shape",
+                        "description": "Shape of the array",
+                        "examples": [
+                            [
+                                2
+                            ]
+                        ]
+                    },
+                    "dtype": {
+                        "type": "string",
+                        "enum": [
+                            "float16",
+                            "float32",
+                            "float64",
+                            "int8",
+                            "int16",
+                            "int32",
+                            "int64",
+                            "bool",
+                            "uint8",
+                            "uint16",
+                            "uint32",
+                            "uint64"
+                        ],
+                        "title": "Dtype",
+                        "description": "Data type of the array",
+                        "examples": [
+                            "float32"
+                        ]
+                    },
+                    "data": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/BinrefArrayData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/Base64ArrayData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/JsonArrayData"
+                            }
+                        ],
+                        "title": "Data",
+                        "discriminator": {
+                            "propertyName": "encoding",
+                            "mapping": {
+                                "base64": "#/components/schemas/Base64ArrayData",
+                                "binref": "#/components/schemas/BinrefArrayData",
+                                "json": "#/components/schemas/JsonArrayData"
+                            }
+                        }
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "shape",
+                    "dtype",
+                    "data"
+                ],
+                "title": "EncodedArrayModel__2__float32__noflags",
+                "array_flags": []
+            },
+            "EncodedArrayModel__scalar__float32__noflags": {
+                "properties": {
+                    "object_type": {
+                        "type": "string",
+                        "const": "array",
+                        "title": "Object Type",
+                        "description": "Indicates that this dict can be parsed to an array.",
+                        "default": "array"
+                    },
+                    "shape": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "maxItems": 0,
+                        "minItems": 0,
+                        "title": "Shape",
+                        "description": "Shape of the array",
+                        "examples": [
+                            []
+                        ]
+                    },
+                    "dtype": {
+                        "type": "string",
+                        "enum": [
+                            "float16",
+                            "float32",
+                            "float64",
+                            "int8",
+                            "int16",
+                            "int32",
+                            "int64",
+                            "bool",
+                            "uint8",
+                            "uint16",
+                            "uint32",
+                            "uint64"
+                        ],
+                        "title": "Dtype",
+                        "description": "Data type of the array",
+                        "examples": [
+                            "float32"
+                        ]
+                    },
+                    "data": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/BinrefArrayData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/Base64ArrayData"
+                            },
+                            {
+                                "$ref": "#/components/schemas/JsonArrayData"
+                            }
+                        ],
+                        "title": "Data",
+                        "discriminator": {
+                            "propertyName": "encoding",
+                            "mapping": {
+                                "base64": "#/components/schemas/Base64ArrayData",
+                                "binref": "#/components/schemas/BinrefArrayData",
+                                "json": "#/components/schemas/JsonArrayData"
+                            }
+                        }
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "shape",
+                    "dtype",
+                    "data"
+                ],
+                "title": "EncodedArrayModel__scalar__float32__noflags",
+                "array_flags": []
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "JsonArrayData": {
+                "properties": {
+                    "buffer": {
+                        "$ref": "#/components/schemas/JsonValue"
+                    },
+                    "encoding": {
+                        "type": "string",
+                        "const": "json",
+                        "title": "Encoding"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "buffer",
+                    "encoding"
+                ],
+                "title": "JsonArrayData",
+                "description": "Data structure for json buffers (list of decimal numbers)."
+            },
+            "JsonValue": {},
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
