@@ -8,19 +8,27 @@ from tesseract_core.runtime import Array, Float32
 class Hobby(BaseModel):
     name: str = Field(description="Name of the activity.")
     active: bool = Field(description="Does the person actively engage with it?")
-    experience: int = Field(description="Experience practising it in years.")
+    experience: int = Field(description="Experience practising it in years.", minimum=0)
 
 
 class InputSchema(BaseModel):
     name: str = Field(
         description="Name of the person you want to greet.", default="John Doe"
     )
-    age: int = Field(description="Age of person in years.", default=30)
-    height: float = Field(description="Height of person in cm.", default=175.0)
+    age: int = Field(
+        description="Age of person in years.", default=30, minimum=0, maximum=125
+    )
+    height: float = Field(
+        description="Height of person in cm.",
+        default=175.0,
+        minimum=0,
+        maximum=300.0,
+        multiple_of=0.1,
+    )
     alive: bool = Field(
         description="Whether the person is (currently) alive.", default=True
     )
-    weight: Float32 = Field(description="The person's weight in kg.")
+    weight: Float32 = Field(description="The person's weight in kg.", minimum=0.0)
     leg_lengths: Array[(2,), Float32] = Field(
         description="The length of the person's left and right legs in cm."
     )

@@ -261,6 +261,14 @@ def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
     return False
 
 
+class NumberConstraints(typing.TypedDict):
+    """Container for constraints on scalar numeric values."""
+
+    min_value: NotRequired[float]
+    max_value: NotRequired[float]
+    step: NotRequired[float]
+
+
 class _InputField(typing.TypedDict):
     """Simplified schema for an input field in the Streamlit template.
 
@@ -273,6 +281,7 @@ class _InputField(typing.TypedDict):
     description: str
     ancestors: list[str]
     default: NotRequired[typing.Any]
+    number_constraints: NumberConstraints
 
 
 def _key_to_title(key: str) -> str:
@@ -305,12 +314,19 @@ def _format_field(
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
     )
+
     if "properties" not in field_data:  # signals a Python primitive type
         if field["type"] != "object":
             default_val = field_data.get("default", None)
             if (field_data["type"] == "string") and (default_val is None):
                 default_val = ""
             field["default"] = default_val
+            if field_data["type"] in ("number", "integer"):
+                field["number_constraints"] = {
+                    "min_value": field_data.get("minimum", None),
+                    "max_value": field_data.get("maximum", None),
+                    "step": field_data.get("multipleOf", None),
+                }
         return field
     field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
@@ -318,6 +334,11 @@ def _format_field(
         if _is_scalar(field_data["properties"]["shape"]):
             data_type = "number"
             field["default"] = field_data.get("default", None)
+            field["number_constraints"] = {
+                "min_value": field_data.get("minimum", None),
+                "max_value": field_data.get("maximum", None),
+                "step": field_data.get("multipleOf", None),
+            }
         field["type"] = data_type
         return field
     # at this point, not an array or primitive, so must be composite
@@ -404,6 +425,7 @@ class JinjaField(typing.TypedDict):
     description: str
     title: str
     default: NotRequired[typing.Any]
+    number_constraints: NumberConstraints
 
 
 def _input_to_jinja(field: _InputField) -> JinjaField:
