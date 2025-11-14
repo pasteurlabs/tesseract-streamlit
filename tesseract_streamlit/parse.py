@@ -21,6 +21,7 @@ import functools
 import importlib.util
 import inspect
 import operator
+import re
 import sys
 import typing
 import warnings
@@ -40,6 +41,8 @@ __all__ = [
     "UserDefinedFunctionError",
     "UserDefinedFunctionWarning",
     "extract_template_data",
+    "try_parse_number",
+    "parse_json_or_string",
 ]
 
 
@@ -280,13 +283,157 @@ class _InputField(typing.TypedDict):
     title: str
     description: str
     ancestors: list[str]
+    optional: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
+    could_be_number: NotRequired[bool]
+
+
+def try_parse_number(text: str) -> str | int | float:
+    """Try to parse string as number, fallback to string.
+
+    Uses JSON parsing which handles integers, floats, and strings naturally.
+    This function is used in the Streamlit template for union types that
+    can accept both numbers and strings (e.g., float | str).
+
+    Args:
+        text: The string to parse.
+
+    Returns:
+        The parsed number (int or float) if successful, otherwise the
+        original string.
+    """
+    if not text:
+        return text
+    try:
+        return orjson.loads(text)
+    except:
+        return text
+
+
+def parse_json_or_string(text: str) -> typing.Any:
+    """Parse JSON, or auto-string simple identifiers.
+
+    Attempts to parse input as JSON. If parsing fails, checks if the input
+    is a simple string identifier (contains at least one letter, only
+    alphanumeric characters, spaces, hyphens, and underscores). If so,
+    returns it as a string. Otherwise, re-raises the JSON parsing error.
+
+    This function is used in the Streamlit template for the json field type,
+    which is used for complex unions like Hobby | list[Hobby].
+
+    Args:
+        text: The string to parse.
+
+    Returns:
+        The parsed JSON value, or the string if it matches simple identifier
+        pattern, or None if text is empty.
+
+    Raises:
+        Exception: If text is not valid JSON and doesn't match the simple
+            identifier pattern.
+    """
+    if not text:
+        return None
+    try:
+        return orjson.loads(text)
+    except:
+        # Auto-string: ≥1 letter, only alphanumeric+space+dash+underscore
+        # Rejects: pure numbers, JSON punctuation ([]{},"':)
+        if re.match(r'^(?=.*[a-zA-Z])[a-zA-Z0-9_\s-]+$', text):
+            return text
+        raise  # Re-raise for malformed JSON
 
 
 def _key_to_title(key: str) -> str:
     """Formats an OAS key to a title for the web UI."""
     return key.replace("_", " ").title()
+
+
+def _is_union_type(field_data: dict[str, typing.Any]) -> bool:
+    """Check if a field uses union type (anyOf).
+
+    Args:
+        field_data: dictionary of data representing the field.
+
+    Returns:
+        True if the field uses anyOf (union type), False otherwise.
+    """
+    return "anyOf" in field_data and "type" not in field_data
+
+
+def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool, bool]:
+    """Resolve a union type (anyOf) to a single type.
+
+    Args:
+        field_data: dictionary of data representing the field with anyOf.
+
+    Returns:
+        tuple[str, bool, bool]: (resolved_type, is_optional, could_be_number)
+
+    Resolution rules:
+    1. If null is in union, remove it and set is_optional=True
+    2. If any member has $ref, resolve to "json"
+    3. If only int/float types remain, resolve to "number"
+    4. If array + only int/float, resolve to "array"
+    5. If has number + other non-composite types, resolve to "string" with could_be_number=True
+    6. Otherwise resolve to "string" with could_be_number=False
+    """
+    any_of = field_data.get("anyOf", [])
+
+    # Collect type information from union members
+    types = []
+    has_composite = False
+    has_number = False
+
+    for member in any_of:
+        if "type" in member:
+            member_type = member["type"]
+            types.append(member_type)
+            if member_type in ("integer", "number"):
+                has_number = True
+        elif "$ref" in member:
+            # Complex type (object reference)
+            has_composite = True
+
+    # Remove null type and determine if optional
+    is_optional = "null" in types
+    types = [t for t in types if t != "null"]
+
+    # Apply resolution rules
+    if has_composite:
+        # Rule: Has $ref → json type
+        return ("json", is_optional, False)
+
+    if len(types) == 0:
+        # Only had null type - this should not be possible in valid OpenAPI
+        raise ValueError(
+            "Union type (anyOf) cannot contain only null type. "
+            f"Field data: {field_data}"
+        )
+
+    if len(types) == 1:
+        # Only one type after removing null - preserve the specific type
+        single_type = types[0]
+        return (single_type, is_optional, False)
+
+    # Multiple types remaining
+    # Check if only int/float
+    if set(types) <= {"integer", "number"}:
+        return ("number", is_optional, False)
+
+    # Check if array + only int/float
+    if "array" in types:
+        non_array_types = [t for t in types if t != "array"]
+        if set(non_array_types) <= {"integer", "number"}:
+            return ("array", is_optional, False)
+
+    # Has number + other types → string with could_be_number
+    if has_number:
+        return ("string", is_optional, True)
+
+    # Default fallback
+    return ("string", is_optional, False)
 
 
 def _format_field(
@@ -308,25 +455,47 @@ def _format_field(
     Returns:
         Formatted input field data.
     """
+    # Handle union types (anyOf)
+    is_optional = False
+    could_be_number = False
+    if _is_union_type(field_data):
+        resolved_type, is_optional, could_be_number = _resolve_union_type(field_data)
+        # Inject resolved type into field_data so rest of function works normally
+        field_data = {**field_data, "type": resolved_type}
+
     field = _InputField(
         type=field_data["type"],
         title=field_data.get("title", field_key) if use_title else field_key,
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
+        optional=is_optional,
     )
+
+    # Add could_be_number for string types
+    if field["type"] == "string":
+        field["could_be_number"] = could_be_number
 
     if "properties" not in field_data:  # signals a Python primitive type
         if field["type"] != "object":
             default_val = field_data.get("default", None)
-            if (field_data["type"] == "string") and (default_val is None):
+            # For non-union strings, convert None default to empty string
+            # But for union-resolved strings, preserve None
+            if (
+                (field_data["type"] == "string")
+                and (default_val is None)
+                and not could_be_number
+                and not is_optional
+            ):
                 default_val = ""
             field["default"] = default_val
+            # Only add number_constraints if constraints actually exist
             if field_data["type"] in ("number", "integer"):
-                field["number_constraints"] = {
-                    "min_value": field_data.get("minimum", None),
-                    "max_value": field_data.get("maximum", None),
-                    "step": field_data.get("multipleOf", None),
-                }
+                if any(k in field_data for k in ("minimum", "maximum", "multipleOf")):
+                    field["number_constraints"] = {
+                        "min_value": field_data.get("minimum", None),
+                        "max_value": field_data.get("maximum", None),
+                        "step": field_data.get("multipleOf", None),
+                    }
         return field
     field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
@@ -424,8 +593,10 @@ class JinjaField(typing.TypedDict):
     type: str
     description: str
     title: str
+    optional: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
+    could_be_number: NotRequired[bool]
 
 
 def _input_to_jinja(field: _InputField) -> JinjaField:

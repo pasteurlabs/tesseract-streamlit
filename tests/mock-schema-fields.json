@@ -7,7 +7,8 @@
             "name"
         ],
         "default": "John Doe",
-        "optional": false
+        "optional": false,
+        "could_be_number": false
     },
     {
         "type": "integer",
@@ -91,7 +92,8 @@
             "name"
         ],
         "default": "",
-        "optional": false
+        "optional": false,
+        "could_be_number": false
     },
     {
         "type": "boolean",
@@ -143,7 +145,8 @@
             "optional_name"
         ],
         "default": null,
-        "optional": true
+        "optional": true,
+        "could_be_number": false
     },
     {
         "type": "number",
@@ -163,7 +166,8 @@
             "threshold"
         ],
         "default": null,
-        "optional": false
+        "optional": false,
+        "could_be_number": true
     },
     {
         "type": "array",
@@ -176,7 +180,7 @@
         "optional": false
     },
     {
-        "type": "string",
+        "type": "json",
         "title": "Hobby Union",
         "description": "Single hobby or list of hobbies for testing Hobby | list[Hobby] union.",
         "ancestors": [
@@ -193,6 +197,7 @@
             "complex_optional"
         ],
         "default": null,
-        "optional": true
+        "optional": true,
+        "could_be_number": true
     }
 ]

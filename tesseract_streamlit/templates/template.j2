@@ -10,6 +10,7 @@ import numpy as np
 import orjson
 import streamlit as st
 from tesseract_core import Tesseract
+from tesseract_streamlit.parse import parse_json_or_string, try_parse_number
 
 {% if needs_pyvista %}
 import multiprocessing
@@ -76,11 +77,16 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% endif %}
 {# identify which type of Streamlit element to render based on field type #}
 {% if field.type == 'string' %}
-{{ field.uid }} = {{ field.container }}.text_input(
+{{ field.uid }}_raw = {{ field.container }}.text_input(
     "{{ field.get('title', field.uid) }}",
-    key="int.{{ field.key }}",
+    key="string.{{ field.key }}",
     value="{{ field.get('default', '') }}",
 )
+{% if field.get('could_be_number', False) %}
+{{ field.uid }} = try_parse_number({{ field.uid }}_raw)
+{% else %}
+{{ field.uid }} = {{ field.uid }}_raw
+{% endif %}
 {% elif field.type == 'integer' %}
 {{ field.uid }} = {{ field.container }}.number_input(
     "{{ field.get('title', field.uid) }}",
@@ -142,6 +148,20 @@ if {{ field.uid }} is not None:
         {{ field.container }}.code(arr)
     except Exception as e:
         {{ field.container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% elif field.type == 'json' %}
+# JSON input (with auto-quoting for simple strings)
+{{ field.container }}.markdown("**Enter JSON or simple value:**")
+{{ field.uid }}_text = {{ field.container }}.text_area(
+    "Paste {{ field.uid.replace("_", ".") }} JSON or value",
+    height=100,
+    key="textarea.{{ field.key }}"
+)
+{{ field.uid }} = None
+if {{ field.uid }}_text:
+    try:
+        {{ field.uid }} = parse_json_or_string({{ field.uid }}_text)
+    except Exception as e:
+        {{ field.container }}.error(f"Failed to parse {{ field.uid }}: {e}")
 {% endif %}
 
 {% endfor %}
