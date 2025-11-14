@@ -15,7 +15,7 @@ class InputSchema(BaseModel):
     name: str = Field(
         description="Name of the person you want to greet.", default="John Doe"
     )
-    age: int = Field(
+    age: int | None = Field(
         description="Age of person in years.", default=30, minimum=0, maximum=125
     )
     height: float = Field(
@@ -32,7 +32,7 @@ class InputSchema(BaseModel):
     leg_lengths: Array[(2,), Float32] = Field(
         description="The length of the person's left and right legs in cm."
     )
-    hobby: Hobby = Field(description="The person's only hobby.")
+    hobby: Hobby | list[Hobby] = Field(description="The person's only hobby.")
 
 
 class OutputSchema(BaseModel):
@@ -41,16 +41,28 @@ class OutputSchema(BaseModel):
 
 def apply(inputs: InputSchema) -> OutputSchema:
     """Greet a person whose name is given as input."""
+    if isinstance(inputs.hobby_name, Hobby):
+        hobby_message = f"{inputs.hobby.name} as a hobby"
+    elif isinstance(inputs.hobby_str, list):
+        hobby_message = (
+            f"{', '.join(*inputs.hobby[:-1])} and f{inputs.hobby[-1]} as hobbies."
+        )
+
+    if inputs.age:
+        age_message = "You are {inputs.age} years old."
+    else:
+        age_message = "I understand you don't like to talk about your age, my apologies"
+
     return OutputSchema(
         greeting=(
-            f"Hello {inputs.name}! You are {inputs.age} years old. "
+            f"Hello {inputs.name}! {age_message} "
             f"That's pretty good. Oh, so tall? {inputs.height} cm! Wow. You "
             f"must be very successful. "
             f"You are {inputs.weight} kg? That's much larger than an atom, "
             "and much smaller than the Sun, so pretty middling all things "
             f"considered. Your left leg is {inputs.leg_lengths[0]} and your "
             f"right leg is {inputs.leg_lengths[1]} - is that normal? "
-            f"Ah, I see you do {inputs.hobby.name} as a hobby! That's great. "
+            f"Ah, I see you do {hobby_message}! That's great. "
             f"You've got {inputs.hobby.experience} years of experience, and "
             f"you're {'' if inputs.hobby.active else 'not'} actively doing "
             "it. I guess that's somewhat interesting. Anyway, pretty "

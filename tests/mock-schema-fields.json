@@ -6,7 +6,8 @@
         "ancestors": [
             "name"
         ],
-        "default": "John Doe"
+        "default": "John Doe",
+        "optional": false
     },
     {
         "type": "integer",
@@ -16,6 +17,7 @@
             "age"
         ],
         "default": 30,
+        "optional": false,
         "number_constraints": {
             "max_value": 125,
             "min_value": 0,
@@ -30,6 +32,7 @@
             "height"
         ],
         "default": 175,
+        "optional": false,
         "number_constraints": {
             "max_value": 300,
             "min_value": 0,
@@ -43,7 +46,8 @@
         "ancestors": [
             "alive"
         ],
-        "default": true
+        "default": true,
+        "optional": false
     },
     {
         "type": "number",
@@ -53,6 +57,7 @@
             "weight"
         ],
         "default": null,
+        "optional": false,
         "number_constraints": {
             "max_value": null,
             "min_value": 0,
@@ -65,7 +70,8 @@
         "description": "The length of the person's left and right legs in cm.",
         "ancestors": [
             "leg_lengths"
-        ]
+        ],
+        "optional": false
     },
     {
         "type": "composite",
@@ -73,7 +79,8 @@
         "description": "The person's only hobby.",
         "ancestors": [
             "hobby"
-        ]
+        ],
+        "optional": false
     },
     {
         "type": "string",
@@ -83,7 +90,8 @@
             "hobby",
             "name"
         ],
-        "default": ""
+        "default": "",
+        "optional": false
     },
     {
         "type": "boolean",
@@ -93,7 +101,8 @@
             "hobby",
             "active"
         ],
-        "default": null
+        "default": null,
+        "optional": false
     },
     {
         "type": "integer",
@@ -104,10 +113,86 @@
             "experience"
         ],
         "default": null,
+        "optional": false,
         "number_constraints": {
             "max_value": 120,
             "min_value": 0,
             "step": null
         }
+    },
+    {
+        "type": "integer",
+        "title": "Optional Age",
+        "description": "Optional age field for testing int | None union.",
+        "ancestors": [
+            "optional_age"
+        ],
+        "default": 25,
+        "optional": true,
+        "number_constraints": {
+            "max_value": 125,
+            "min_value": 0,
+            "step": null
+        }
+    },
+    {
+        "type": "string",
+        "title": "Optional Name",
+        "description": "Optional name field for testing str | None union.",
+        "ancestors": [
+            "optional_name"
+        ],
+        "default": null,
+        "optional": true
+    },
+    {
+        "type": "number",
+        "title": "Number Or Int",
+        "description": "Field that accepts int or float for testing number coercion.",
+        "ancestors": [
+            "number_or_int"
+        ],
+        "default": 42,
+        "optional": false
+    },
+    {
+        "type": "string",
+        "title": "Threshold",
+        "description": "Threshold as number or special string like 'auto' for testing float | str union.",
+        "ancestors": [
+            "threshold"
+        ],
+        "default": null,
+        "optional": false
+    },
+    {
+        "type": "array",
+        "title": "Learning Rate",
+        "description": "Single learning rate or schedule for testing float | list[float] union.",
+        "ancestors": [
+            "learning_rate"
+        ],
+        "default": 0.001,
+        "optional": false
+    },
+    {
+        "type": "string",
+        "title": "Hobby Union",
+        "description": "Single hobby or list of hobbies for testing Hobby | list[Hobby] union.",
+        "ancestors": [
+            "hobby_union"
+        ],
+        "default": null,
+        "optional": false
+    },
+    {
+        "type": "string",
+        "title": "Complex Optional",
+        "description": "Field accepting int, str, or None for testing complex union with optional.",
+        "ancestors": [
+            "complex_optional"
+        ],
+        "default": null,
+        "optional": true
     }
 ]
