@@ -49,7 +49,9 @@ def apply(inputs: InputSchema) -> OutputSchema:
     if inputs.age:
         age_message = f"You are {inputs.age} years old."
     else:
-        age_message = "I understand you don't like to talk about your age, my apologies"
+        age_message = (
+            "I understand you don't like to talk about your age, my apologies."
+        )
 
     return OutputSchema(
         greeting=(

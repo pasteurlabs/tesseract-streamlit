@@ -59,6 +59,34 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% endif %}
 {%- endmacro %}
 
+{#- wraps a field with optional checkbox if field is optional.
+    args:
+        field: the field to potentially wrap
+    outputs: either wrapped field with checkbox or unwrapped field
+-#}
+{% macro optional_field_wrapper(field) -%}
+{% if field.get('optional', False) -%}
+{# Optional field: add checkbox on left, input on right (same line) #}
+col1_{{ field.uid }}, col2_{{ field.uid }} = {{ field.container }}.columns([1, 11])
+with col1_{{ field.uid }}:
+    {{ field.uid }}_enabled = st.checkbox(
+        "",
+        key="enabled.{{ field.key }}",
+        value={{ field.get("default", None) is not none }},
+        help="Check to include this field",
+    )
+with col2_{{ field.uid }}:
+{{ caller() | indent(4, first=True) }}
+{# After rendering the widget, conditionally set to None if disabled #}
+if not {{ field.uid }}_enabled:
+    {{ field.uid }} = None
+{% else -%}
+{# Required field: render in container context #}
+with {{ field.container }}:
+{{ caller() | indent(4, first=True) }}
+{% endif -%}
+{% endmacro %}
+
 {#- renders the streamlit form elements for each field.
     args:
         schema: the schema for the Streamlit form
@@ -68,17 +96,20 @@ st.markdown({% if not udf.docs %}""{% else %}
 {# AUTOMATICALLY POPULATING THE WEB-APP WITH INPUTS FROM THE SCHEMA
    ================================================================ #}
 {% for field in schema %}
+{# prepare display title with (optional) suffix if needed #}
+{% set display_title = field.get('title', field.uid) + (' (optional)' if field.get('optional', False) else '') %}
 {# first, instantiate the container to hold the field #}
 {{ field.container }} = {{ field.parent_container }}.container(border=True)
 {# next, add subheading and descriptive text #}
-{{ field.container }}.subheader("{{ field.title }}")
+{{ field.container }}.subheader("{{ display_title }}")
 {% if field.description %}
 {{ field.container }}.caption("{{ field.description }}")
 {% endif %}
 {# identify which type of Streamlit element to render based on field type #}
 {% if field.type == 'string' %}
-{{ field.uid }}_raw = {{ field.container }}.text_input(
-    "{{ field.get('title', field.uid) }}",
+{% call optional_field_wrapper(field) %}
+{{ field.uid }}_raw = st.text_input(
+    "",
     key="string.{{ field.key }}",
     value="{{ field.get('default', '') }}",
 )
@@ -87,9 +118,11 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% else %}
 {{ field.uid }} = {{ field.uid }}_raw
 {% endif %}
+{% endcall %}
 {% elif field.type == 'integer' %}
-{{ field.uid }} = {{ field.container }}.number_input(
-    "{{ field.get('title', field.uid) }}",
+{% call optional_field_wrapper(field) %}
+{{ field.uid }} = st.number_input(
+    "",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
     step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
@@ -97,9 +130,11 @@ st.markdown({% if not udf.docs %}""{% else %}
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),
 )
+{% endcall %}
 {% elif field.type == 'number' %}
-{{ field.uid }} = {{ field.container }}.number_input(
-    "{{ field.get('title', field.uid) }}",
+{% call optional_field_wrapper(field) %}
+{{ field.uid }} = st.number_input(
+    "",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
     step=_cast_type({{ field.get("number_constraints", {}).get("step", None) }}, float),
@@ -107,22 +142,26 @@ st.markdown({% if not udf.docs %}""{% else %}
     format="%f",
     value=_cast_type({{ field.get("default", None) }}, float),
 )
+{% endcall %}
 {% elif field.type == 'boolean' %}
-{{ field.uid }} = {{ field.container }}.checkbox(
-    "{{ field.get('title', field.uid) }}",
+{% call optional_field_wrapper(field) %}
+{{ field.uid }} = st.checkbox(
+    "{{ display_title }}",
     key="boolean.{{ field.key }}",
     value={{ field.get("default", None) }},
 )
+{% endcall %}
 {# array inputs are more complex, and require both text and file inputs #}
 {% elif field.type == 'array' %}
+{% call optional_field_wrapper(field) %}
 # Array input
-{{ field.container }}.markdown("**Enter JSON array or upload file:**")
-{{ field.uid }}_text = {{ field.container }}.text_area(
+st.markdown("**Enter JSON array or upload file:**")
+{{ field.uid }}_text = st.text_area(
     "Paste {{ field.uid.replace("_", ".") }} JSON",
     height=100,
     key="textarea.{{ field.key }}"
 )
-{{ field.uid }}_file = {{ field.container }}.file_uploader(
+{{ field.uid }}_file = st.file_uploader(
     "Upload {{ field.uid.replace("_", ".") }} JSON file",
     type=["json", "txt"],
     key="fileupload.{{ field.key }}"
@@ -134,24 +173,26 @@ if {{ field.uid }}_file is not None:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
     except Exception as e:
-        {{ field.container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+        st.error(f"Failed to load {{ field.uid }} from file: {e}")
 elif {{ field.uid }}_text:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_text)
     except Exception as e:
-        {{ field.container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
+        st.error(f"Failed to parse {{ field.uid }} from text: {e}")
 
 if {{ field.uid }} is not None:
     try:
         arr = np.array({{ field.uid }}, dtype=np.float64)
-        {{ field.container }}.write("Array preview:")
-        {{ field.container }}.code(arr)
+        st.write("Array preview:")
+        st.code(arr)
     except Exception as e:
-        {{ field.container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+        st.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endcall %}
 {% elif field.type == 'json' %}
+{% call optional_field_wrapper(field) %}
 # JSON input (with auto-quoting for simple strings)
-{{ field.container }}.markdown("**Enter JSON or simple value:**")
-{{ field.uid }}_text = {{ field.container }}.text_area(
+st.markdown("**Enter JSON or simple value:**")
+{{ field.uid }}_text = st.text_area(
     "Paste {{ field.uid.replace("_", ".") }} JSON or value",
     height=100,
     key="textarea.{{ field.key }}"
@@ -161,7 +202,8 @@ if {{ field.uid }}_text:
     try:
         {{ field.uid }} = parse_json_or_string({{ field.uid }}_text)
     except Exception as e:
-        {{ field.container }}.error(f"Failed to parse {{ field.uid }}: {e}")
+        st.error(f"Failed to parse {{ field.uid }}: {e}")
+{% endcall %}
 {% endif %}
 
 {% endfor %}
