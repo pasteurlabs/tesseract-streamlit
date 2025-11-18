@@ -87,3 +87,20 @@ def input_geometry(inputs: dict[str, typing.Any]) -> pv.Plotter:
     )
     plotter.add_mesh(isoval, color="red", show_edges=True, line_width=2)
     return plotter
+
+
+def output_stress(outputs: dict[str, typing.Any]) -> pv.Plotter:
+    """Display the von Mises stress field from the outputs."""
+    stress_data = outputs["von_mises_stress"]
+    mesh = pv.PolyData(stress_data["points"], stress_data["faces"])
+    mesh["von_mises_stress"] = stress_data["values"]
+
+    plotter = pv.Plotter()
+    plotter.add_mesh(
+        mesh,
+        scalars="von_mises_stress",
+        cmap="viridis",
+        show_edges=True,
+        edge_color="black",
+    )
+    return plotter

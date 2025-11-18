@@ -16,7 +16,7 @@ from jax_fem.generate_mesh import Mesh, get_meshio_cell_type, rectangle_mesh
 from jax_fem.problem import Problem
 from jax_fem.solver import ad_wrapper
 from pydantic import BaseModel, Field
-from tesseract_core.runtime import Array, Differentiable, Float32
+from tesseract_core.runtime import Array, Differentiable, Float32, Int32
 
 #
 # Schemas
@@ -30,6 +30,7 @@ class InputSchema(BaseModel):
             Float32,
         ]
     ] = Field(
+        default=np.array([[[-30.0,-5.0,0.0],[30.0,-5.0,0.0]]]),
         description=(
             "Vertex positions of the bar geometry. "
             "The shape is (num_bars, num_vertices, 3), where num_bars is the number of bars "
@@ -39,7 +40,7 @@ class InputSchema(BaseModel):
     )
 
     bar_radius: float = Field(
-        default=1.5,
+        default=1.0,
         description=(
             "Radius of the bars in the geometry. "
             "This is a scalar value that defines the thickness of the bars."
@@ -74,13 +75,23 @@ class InputSchema(BaseModel):
             "This is an integer value that defines the resolution of the plane along the y-axis."
         ),
     )
-    epsilon: float = Field(
-        default=1e-5,
-        description=(
-            "Epsilon value for finite difference approximation of the Jacobian. "
-            "This is a small scalar value used to compute the numerical gradient."
-        ),
-    )
+
+
+class OutMeshSchema(BaseModel):
+    points: Array[
+            (None, 3),
+            Float32,
+    ] = Field(description="Array of mesh vertex coordinates with shape (num_points, 3)")
+
+    faces: Array[
+            (None,),
+            Int32,
+        ] = Field(description="Array of mesh faces in pyvista format")
+
+    values: Array[
+            (None,),
+            Float32,
+        ] = Field(description="Array of von Mises stress values for each cell with shape (num_cells,)")
 
 
 class OutputSchema(BaseModel):
@@ -91,12 +102,12 @@ class OutputSchema(BaseModel):
         ]
     ] = Field(description="Compliance of the structure, a measure of stiffness")
 
-    von_mises_stress: Differentiable[
-        Array[
-            (None,),
-            Float32,
-        ]
-    ] = Field(description="The average von Mises stress in each element")
+    von_mises_stress: OutMeshSchema = Field(
+        description=(
+            "Von Mises stress field represented on the tube geometry mesh. "
+            "Includes points, cells, and stress values."
+        )
+    )
 
 
 #
@@ -358,33 +369,26 @@ def apply(inputs: InputSchema) -> OutputSchema:
     sol_list = fwd_pred(density)
     compliance = problem.compute_compliance(sol_list[0])
     vm = problem.compute_von_mises_stress(sol_list[0], density)
-    return OutputSchema(compliance=compliance, von_mises_stress=vm)
 
+    x, y, z = np.meshgrid(
+        np.linspace(-Lx / 2, Lx / 2, Nx),
+        np.linspace(-Ly / 2, Ly / 2, Ny),
+        np.array([0.0]),
+        indexing="ij",
+    )
+    vm_grid = pv.StructuredGrid(x, y, z)
+    vm_grid["von_mises_stress"] = vm
 
-#
-# Optional endpoints
-#
-
-# import numpy as np
-
-# def jacobian(inputs: InputSchema, jac_inputs: set[str], jac_outputs: set[str]):
-#     return {}
-
-# def jacobian_vector_product(
-#     inputs: InputSchema,
-#     jvp_inputs: set[str],
-#     jvp_outputs: set[str],
-#     tangent_vector: dict[str, np.typing.ArrayLike]
-# ) -> dict[str, np.typing.ArrayLike]:
-#     return {}
-
-# def vector_jacobian_product(
-#     inputs: InputSchema,
-#     vjp_inputs: set[str],
-#     vjp_outputs: set[str],
-#     cotangent_vector: dict[str, np.typing.ArrayLike]
-# ) -> dict[str, np.typing.ArrayLike]:
-#     return {}
-
-# def abstract_eval(abstract_inputs):
-#     return {}
+    tube_geom = build_geometry(
+        params=inputs.bar_params,
+        radius=inputs.bar_radius,
+    )
+    tube_geom_merged: pv.PolyData = pv.merge([geom.triangulate() for geom in tube_geom])
+    tube_geom_merged["von_mises_stress"] = tube_geom_merged.interpolate(vm_grid, strategy="closest_point")["von_mises_stress"]
+    
+    out_mesh = OutMeshSchema(
+        points=np.array(tube_geom_merged.points),
+        faces=np.array(tube_geom_merged.faces),
+        values=np.array(tube_geom_merged["von_mises_stress"]),
+    )
+    return OutputSchema(compliance=compliance, von_mises_stress=out_mesh)
