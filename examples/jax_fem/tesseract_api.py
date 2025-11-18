@@ -30,13 +30,13 @@ class InputSchema(BaseModel):
             Float32,
         ]
     ] = Field(
-        default=np.array([[[-30.0,-5.0,0.0],[30.0,-5.0,0.0]]]),
+        default=np.array([[[-30.0, -5.0, 0.0], [30.0, -5.0, 0.0]]]),
         description=(
             "Vertex positions of the bar geometry. "
             "The shape is (num_bars, num_vertices, 3), where num_bars is the number of bars "
             "and num_vertices is the number of vertices per bar. The last dimension represents "
             "the x, y, z coordinates of each vertex."
-        )
+        ),
     )
 
     bar_radius: float = Field(
@@ -79,19 +79,21 @@ class InputSchema(BaseModel):
 
 class OutMeshSchema(BaseModel):
     points: Array[
-            (None, 3),
-            Float32,
+        (None, 3),
+        Float32,
     ] = Field(description="Array of mesh vertex coordinates with shape (num_points, 3)")
 
     faces: Array[
-            (None,),
-            Int32,
-        ] = Field(description="Array of mesh faces in pyvista format")
+        (None,),
+        Int32,
+    ] = Field(description="Array of mesh faces in pyvista format")
 
     values: Array[
-            (None,),
-            Float32,
-        ] = Field(description="Array of von Mises stress values for each cell with shape (num_cells,)")
+        (None,),
+        Float32,
+    ] = Field(
+        description="Array of von Mises stress values for each cell with shape (num_cells,)"
+    )
 
 
 class OutputSchema(BaseModel):
@@ -384,8 +386,10 @@ def apply(inputs: InputSchema) -> OutputSchema:
         radius=inputs.bar_radius,
     )
     tube_geom_merged: pv.PolyData = pv.merge([geom.triangulate() for geom in tube_geom])
-    tube_geom_merged["von_mises_stress"] = tube_geom_merged.interpolate(vm_grid, strategy="closest_point")["von_mises_stress"]
-    
+    tube_geom_merged["von_mises_stress"] = tube_geom_merged.interpolate(
+        vm_grid, strategy="closest_point"
+    )["von_mises_stress"]
+
     out_mesh = OutMeshSchema(
         points=np.array(tube_geom_merged.points),
         faces=np.array(tube_geom_merged.faces),
