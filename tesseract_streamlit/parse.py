@@ -289,7 +289,7 @@ class _InputField(typing.TypedDict):
     could_be_number: NotRequired[bool]
 
 
-def try_parse_number(text: str) -> str | int | float:
+def _try_parse_number(text: str) -> str | int | float:
     """Try to parse string as number, fallback to string.
 
     Uses JSON parsing which handles integers, floats, and strings naturally.
