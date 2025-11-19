@@ -4,11 +4,13 @@
 name: "jax_fem"
 version: "0.1.0"
 description: |
-  Tesseract that computes the compliance of a structure from its gridded signed
-  distance function (SDF), computed from a set of shape parameters.
+  Tesseract that computes the compliance of a structure under load via JAX-FEM.
+  The structure is defined by a set of 3D piecewise linear tubes (bars) that is
+  converted to a signed distance field internally. The compliance is computed
+  using the finite element method (FEM) implemented in JAX-FEM.
 
-  Parameters are expected to define the control points and radii of piecewise
-  linear tubes in 3D space.
+  Simulation is performed in 2D (x-y plane) with zero thickness in the z-direction. 
+  Also returns the von-Mises stress field of the structure mesh for visualization.
 
 
 build_config:

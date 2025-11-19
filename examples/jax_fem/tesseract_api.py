@@ -26,16 +26,18 @@ from tesseract_core.runtime import Array, Differentiable, Float32, Int32
 class InputSchema(BaseModel):
     bar_params: Differentiable[
         Array[
-            (None, None, 3),
+            (None, None, 2),
             Float32,
         ]
     ] = Field(
-        default=np.array([[[-30.0, -5.0, 0.0], [30.0, -5.0, 0.0]]]),
         description=(
             "Vertex positions of the bar geometry. "
-            "The shape is (num_bars, num_vertices, 3), where num_bars is the number of bars "
+            "The shape is (num_bars, num_vertices, 2), where num_bars is the number of bars "
             "and num_vertices is the number of vertices per bar. The last dimension represents "
-            "the x, y, z coordinates of each vertex."
+            "the x, y coordinates of each vertex. "
+            "Example: [[[-30.0, -5.0], [30.0, -5.0]]] defines a single bar from (-30,-5) to (30,-5). "
+            "Example: [[[-30.0, -10.0], [0.0, 10.0], [30.0, -10.0]]] defines a V-shaped bar. "
+            "Example: [[[-30.0, -5.0], [30.0, -5.0]], [[-30.0, 5.0], [30.0, 5.0]]] defines two parallel bars."
         ),
     )
 
@@ -50,29 +52,29 @@ class InputSchema(BaseModel):
     Lx: float = Field(
         default=60.0,
         description=(
-            "Length of the plane in the x direction. "
-            "This is a scalar value that defines the size of the plane along the x-axis."
+            "Length of the domain in the x direction. "
+            "This is a scalar value that defines the size of the domain along the x-axis."
         ),
     )
     Ly: float = Field(
         default=30.0,
         description=(
-            "Length of the plane in the y direction. "
-            "This is a scalar value that defines the size of the plane along the y-axis."
+            "Length of the domain in the y direction. "
+            "This is a scalar value that defines the size of the domain along the y-axis."
         ),
     )
     Nx: int = Field(
         default=60,
         description=(
             "Number of points in the x direction. "
-            "This is an integer value that defines the resolution of the plane along the x-axis."
+            "This is an integer value that defines the resolution of the domain along the x-axis."
         ),
     )
     Ny: int = Field(
         default=30,
         description=(
             "Number of points in the y direction. "
-            "This is an integer value that defines the resolution of the plane along the y-axis."
+            "This is an integer value that defines the resolution of the domain along the y-axis."
         ),
     )
 
@@ -125,6 +127,12 @@ def build_geometry(
 
     The parameters are expected to be of shape (n_chains, n_edges_per_chain + 1, 3),
     """
+    if params.shape[2] < 3:
+        # Add z=0 coordinate if not present
+        params = np.concatenate(
+            [params, np.zeros((*params.shape[:2], 1))], axis=2
+        )
+
     n_chains = params.shape[0]
     geometry = []
 
