@@ -20,7 +20,7 @@ argon2-cffi-bindings==25.1.0
     # via argon2-cffi
 arrow==1.4.0
     # via isoduration
-asttokens==3.0.0
+asttokens==3.0.1
     # via stack-data
 async-timeout==5.0.1 ; python_full_version < '3.11'
     # via aiohttp
@@ -41,9 +41,9 @@ bokeh==3.8.1
     # via
     #   panel
     #   stpyvista
-cachetools==6.2.1
+cachetools==6.2.2
     # via streamlit
-certifi==2025.10.5
+certifi==2025.11.12
     # via requests
 cffi==2.0.0
     # via
@@ -51,7 +51,7 @@ cffi==2.0.0
     #   pyzmq
 charset-normalizer==3.4.4
     # via requests
-click==8.3.0
+click==8.3.1
     # via
     #   streamlit
     #   tesseract-streamlit
@@ -193,10 +193,11 @@ multidict==6.7.0
     # via
     #   aiohttp
     #   yarl
-narwhals==2.10.2
+narwhals==2.11.0
     # via
     #   altair
     #   bokeh
+    #   panel
 nbclient==0.10.2
     # via nbconvert
 nbconvert==7.16.6
@@ -219,7 +220,7 @@ numpy==2.2.6 ; python_full_version < '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-numpy==2.3.4 ; python_full_version >= '3.11'
+numpy==2.3.5 ; python_full_version >= '3.11'
     # via
     #   bokeh
     #   contourpy
@@ -252,9 +253,9 @@ pandas==2.3.3
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.8.2
+panel==1.8.3
     # via stpyvista
-param==2.2.1
+param==2.3.0
     # via
     #   panel
     #   pyviz-comms
@@ -285,7 +286,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.0
+protobuf==6.33.1
     # via streamlit
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -368,7 +369,7 @@ rich==14.2.0
     # via
     #   tesseract-core
     #   typer
-rpds-py==0.28.0
+rpds-py==0.29.0
     # via
     #   jsonschema
     #   referencing
