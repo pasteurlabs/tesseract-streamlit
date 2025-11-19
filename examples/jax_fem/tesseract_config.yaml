@@ -9,7 +9,7 @@ description: |
   converted to a signed distance field internally. The compliance is computed
   using the finite element method (FEM) implemented in JAX-FEM.
 
-  Simulation is performed in 2D (x-y plane) with zero thickness in the z-direction. 
+  Simulation is performed in 2D (x-y plane) with zero thickness in the z-direction.
   Also returns the von-Mises stress field of the structure mesh for visualization.
 
 

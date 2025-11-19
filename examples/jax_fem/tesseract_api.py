@@ -129,9 +129,7 @@ def build_geometry(
     """
     if params.shape[2] < 3:
         # Add z=0 coordinate if not present
-        params = np.concatenate(
-            [params, np.zeros((*params.shape[:2], 1))], axis=2
-        )
+        params = np.concatenate([params, np.zeros((*params.shape[:2], 1))], axis=2)
 
     n_chains = params.shape[0]
     geometry = []
