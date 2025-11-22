@@ -316,6 +316,7 @@ def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool]:
 
     Resolution logic:
     - If union is `Type | None`, return (Type, True)
+    - If union is numeric primitives + arrays, return ("array", is_optional)
     - If union has multiple non-null types, return ("union", is_optional)
     """
     any_of = field_data.get("anyOf", [])
@@ -336,6 +337,14 @@ def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool]:
     # If only one non-null type, return it (e.g., int | None → integer)
     if len(types) == 1:
         return (types[0], is_optional)
+
+    # Check if union is numeric primitives + arrays (e.g., float | list[float])
+    non_array_types = [t for t in types if t != "array"]
+    has_array = "array" in types
+    is_all_numeric = all(t in ("integer", "number") for t in non_array_types)
+
+    if has_array and is_all_numeric and non_array_types:
+        return ("array", is_optional)
 
     # Multiple non-null types → union
     return ("union", is_optional)

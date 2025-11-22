@@ -174,5 +174,15 @@
         ],
         "default": null,
         "optional": true
+    },
+    {
+        "type": "array",
+        "title": "Scalar Or Array",
+        "description": "Field accepting either a single integer or an array of integers for testing int | list[int] union.",
+        "ancestors": [
+            "scalar_or_array"
+        ],
+        "optional": false,
+        "default": null
     }
 ]

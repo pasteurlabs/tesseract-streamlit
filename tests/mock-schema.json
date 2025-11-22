@@ -292,6 +292,21 @@
                         "title": "Complex Optional",
                         "description": "Field accepting int, str, or None for testing complex union with optional.",
                         "default": null
+                    },
+                    "scalar_or_array": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            }
+                        ],
+                        "title": "Scalar Or Array",
+                        "description": "Field accepting either a single integer or an array of integers for testing int | list[int] union."
                     }
                 },
                 "additionalProperties": false,
@@ -300,7 +315,8 @@
                     "weight",
                     "leg_lengths",
                     "hobby",
-                    "threshold"
+                    "threshold",
+                    "scalar_or_array"
                 ],
                 "title": "Apply_InputSchema"
             },
