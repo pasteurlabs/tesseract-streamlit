@@ -277,37 +277,6 @@
                         "title": "Threshold",
                         "description": "Threshold as number or special string like 'auto' for testing float | str union."
                     },
-                    "learning_rate": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "type": "array",
-                                "items": {
-                                    "type": "number"
-                                }
-                            }
-                        ],
-                        "title": "Learning Rate",
-                        "description": "Single learning rate or schedule for testing float | list[float] union.",
-                        "default": 0.001
-                    },
-                    "hobby_union": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/components/schemas/Apply_Hobby"
-                            },
-                            {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/Apply_Hobby"
-                                }
-                            }
-                        ],
-                        "title": "Hobby Union",
-                        "description": "Single hobby or list of hobbies for testing Hobby | list[Hobby] union."
-                    },
                     "complex_optional": {
                         "anyOf": [
                             {
@@ -331,8 +300,7 @@
                     "weight",
                     "leg_lengths",
                     "hobby",
-                    "threshold",
-                    "hobby_union"
+                    "threshold"
                 ],
                 "title": "Apply_InputSchema"
             },

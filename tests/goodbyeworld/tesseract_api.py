@@ -16,7 +16,7 @@ class InputSchema(BaseModel):
         description="Name of the person you want to greet.", default="John Doe"
     )
     age: int | None = Field(
-        description="Age of person in years.", default=30, minimum=0, maximum=125
+        description="Age of person in years.", minimum=0, maximum=125
     )
     height: float = Field(
         description="Height of person in cm.",

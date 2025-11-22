@@ -7,8 +7,7 @@
             "name"
         ],
         "default": "John Doe",
-        "optional": false,
-        "could_be_number": false
+        "optional": false
     },
     {
         "type": "integer",
@@ -92,8 +91,7 @@
             "name"
         ],
         "default": "",
-        "optional": false,
-        "could_be_number": false
+        "optional": false
     },
     {
         "type": "boolean",
@@ -145,11 +143,10 @@
             "optional_name"
         ],
         "default": null,
-        "optional": true,
-        "could_be_number": false
+        "optional": true
     },
     {
-        "type": "number",
+        "type": "union",
         "title": "Number Or Int",
         "description": "Field that accepts int or float for testing number coercion.",
         "ancestors": [
@@ -159,45 +156,23 @@
         "optional": false
     },
     {
-        "type": "string",
+        "type": "union",
         "title": "Threshold",
         "description": "Threshold as number or special string like 'auto' for testing float | str union.",
         "ancestors": [
             "threshold"
         ],
         "default": null,
-        "optional": false,
-        "could_be_number": true
-    },
-    {
-        "type": "array",
-        "title": "Learning Rate",
-        "description": "Single learning rate or schedule for testing float | list[float] union.",
-        "ancestors": [
-            "learning_rate"
-        ],
-        "default": 0.001,
         "optional": false
     },
     {
-        "type": "json",
-        "title": "Hobby Union",
-        "description": "Single hobby or list of hobbies for testing Hobby | list[Hobby] union.",
-        "ancestors": [
-            "hobby_union"
-        ],
-        "default": null,
-        "optional": false
-    },
-    {
-        "type": "string",
+        "type": "union",
         "title": "Complex Optional",
         "description": "Field accepting int, str, or None for testing complex union with optional.",
         "ancestors": [
             "complex_optional"
         ],
         "default": null,
-        "optional": true,
-        "could_be_number": true
+        "optional": true
     }
 ]

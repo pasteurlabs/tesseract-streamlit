@@ -7,7 +7,6 @@ import pytest
 import pyvista as pv
 
 from tesseract_streamlit import parse
-from tesseract_streamlit.parse import parse_json_or_string, try_parse_number
 
 PARENT_DIR = Path(__file__).parent
 
@@ -162,58 +161,3 @@ def test_description_from_oas(
 # ===========================================================
 
 
-def test_try_parse_number() -> None:
-    """Test try_parse_number helper function."""
-    # Empty string
-    assert try_parse_number("") == ""
-
-    # Numbers
-    assert try_parse_number("42") == 42
-    assert try_parse_number("-23") == -23
-    assert try_parse_number("3.14") == 3.14
-    assert try_parse_number("0") == 0
-    assert try_parse_number("-0.5") == -0.5
-
-    # Strings
-    assert try_parse_number("hello") == "hello"
-    assert try_parse_number("hello123") == "hello123"
-    assert try_parse_number("auto") == "auto"
-    assert try_parse_number("hello world") == "hello world"
-
-
-def test_parse_json_or_string() -> None:
-    """Test parse_json_or_string helper function."""
-    # Empty string
-    assert parse_json_or_string("") is None
-
-    # Valid JSON
-    assert parse_json_or_string('{"key":"value"}') == {"key": "value"}
-    assert parse_json_or_string("[1,2,3]") == [1, 2, 3]
-    assert parse_json_or_string("42") == 42
-    assert parse_json_or_string("true") is True
-    assert parse_json_or_string("null") is None
-
-    # Auto-string: simple identifiers
-    assert parse_json_or_string("hello") == "hello"
-    assert parse_json_or_string("hello world") == "hello world"
-    assert parse_json_or_string("my-value_123") == "my-value_123"
-    assert parse_json_or_string("foo bar") == "foo bar"
-    assert parse_json_or_string("test-case") == "test-case"
-    assert parse_json_or_string("value_123") == "value_123"
-
-    # Invalid JSON that should raise (has non-allowed punctuation)
-    with pytest.raises(Exception):
-        parse_json_or_string("[hello")
-
-    with pytest.raises(Exception):
-        parse_json_or_string("hello,world")
-
-    with pytest.raises(Exception):
-        parse_json_or_string("{incomplete")
-
-    with pytest.raises(Exception):
-        parse_json_or_string('"quoted')
-
-    # Pure numbers should parse as numbers, not strings
-    assert parse_json_or_string("123") == 123
-    assert parse_json_or_string("-456") == -456

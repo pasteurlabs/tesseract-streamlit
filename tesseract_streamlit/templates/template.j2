@@ -10,7 +10,6 @@ import numpy as np
 import orjson
 import streamlit as st
 from tesseract_core import Tesseract
-from tesseract_streamlit.parse import parse_json_or_string, try_parse_number
 
 {% if needs_pyvista %}
 import multiprocessing
@@ -59,34 +58,6 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% endif %}
 {%- endmacro %}
 
-{#- wraps a field with optional checkbox if field is optional.
-    args:
-        field: the field to potentially wrap
-    outputs: either wrapped field with checkbox or unwrapped field
--#}
-{% macro optional_field_wrapper(field) -%}
-{% if field.get('optional', False) -%}
-{# Optional field: add checkbox on left, input on right (same line) #}
-col1_{{ field.uid }}, col2_{{ field.uid }} = {{ field.container }}.columns([1, 11])
-with col1_{{ field.uid }}:
-    {{ field.uid }}_enabled = st.checkbox(
-        "",
-        key="enabled.{{ field.key }}",
-        value={{ field.get("default", None) is not none }},
-        help="Check to include this field",
-    )
-with col2_{{ field.uid }}:
-{{ caller() | indent(4, first=True) }}
-{# After rendering the widget, conditionally set to None if disabled #}
-if not {{ field.uid }}_enabled:
-    {{ field.uid }} = None
-{% else -%}
-{# Required field: render in container context #}
-with {{ field.container }}:
-{{ caller() | indent(4, first=True) }}
-{% endif -%}
-{% endmacro %}
-
 {#- renders the streamlit form elements for each field.
     args:
         schema: the schema for the Streamlit form
@@ -106,104 +77,99 @@ with {{ field.container }}:
 {{ field.container }}.caption("{{ field.description }}")
 {% endif %}
 {# identify which type of Streamlit element to render based on field type #}
-{% if field.type == 'string' %}
-{% call optional_field_wrapper(field) %}
-{{ field.uid }}_raw = st.text_input(
-    "",
-    key="string.{{ field.key }}",
-    value="{{ field.get('default', '') }}",
-)
-{% if field.get('could_be_number', False) %}
-{{ field.uid }} = try_parse_number({{ field.uid }}_raw)
-{% else %}
-{{ field.uid }} = {{ field.uid }}_raw
-{% endif %}
-{% endcall %}
+{# All string fields and optional numeric fields use text_input with same pattern #}
+{% if field.type == 'string' or (field.get('optional', False) and field.type in ['integer', 'number']) %}
+with {{ field.container }}:
+    {% set key_prefix = 'string' if field.type == 'string' else ('int' if field.type == 'integer' else 'number') %}
+    {% set label = display_title if field.type == 'string' else field.get('title', field.uid) %}
+    {% set default_val = field.get('default', '') if (field.type == 'string' or field.get('default') is none) else field.get('default', '') %}
+    {{ field.uid }}_raw = st.text_input(
+        "{{ label }}",
+        label_visibility="collapsed",
+        key="{{ key_prefix }}.{{ field.key }}",
+        value="{{ default_val }}",
+        placeholder="{{ 'Leave blank if not needed' if field.get('optional', False) else '' }}",
+    )
+    {{ field.uid }} = {{ field.uid }}_raw if {{ field.uid }}_raw else None
+{# Required numeric fields use number_input with constraints #}
 {% elif field.type == 'integer' %}
-{% call optional_field_wrapper(field) %}
-{{ field.uid }} = st.number_input(
-    "",
-    min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
-    max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
-    step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
-    format="%d",
-    key="int.{{ field.key }}",
-    value=_cast_type({{ field.get("default", None) }}, int),
-)
-{% endcall %}
+with {{ field.container }}:
+    {{ field.uid }} = st.number_input(
+        "{{ field.get('title', field.uid) }}",
+        label_visibility="collapsed",
+        min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
+        max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
+        step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
+        format="%d",
+        key="int.{{ field.key }}",
+        value=_cast_type({{ field.get("default", None) }}, int),
+    )
 {% elif field.type == 'number' %}
-{% call optional_field_wrapper(field) %}
-{{ field.uid }} = st.number_input(
-    "",
-    min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
-    max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
-    step=_cast_type({{ field.get("number_constraints", {}).get("step", None) }}, float),
-    key="number.{{ field.key }}",
-    format="%f",
-    value=_cast_type({{ field.get("default", None) }}, float),
-)
-{% endcall %}
+with {{ field.container }}:
+    {{ field.uid }} = st.number_input(
+        "{{ field.get('title', field.uid) }}",
+        label_visibility="collapsed",
+        min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
+        max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
+        step=_cast_type({{ field.get("number_constraints", {}).get("step", None) }}, float),
+        key="number.{{ field.key }}",
+        format="%f",
+        value=_cast_type({{ field.get("default", None) }}, float),
+    )
 {% elif field.type == 'boolean' %}
-{% call optional_field_wrapper(field) %}
-{{ field.uid }} = st.checkbox(
-    "{{ display_title }}",
-    key="boolean.{{ field.key }}",
-    value={{ field.get("default", None) }},
-)
-{% endcall %}
+with {{ field.container }}:
+    {{ field.uid }} = st.checkbox(
+        "{{ display_title }}",
+        key="boolean.{{ field.key }}",
+        value={{ field.get("default", None) }},
+    )
 {# array inputs are more complex, and require both text and file inputs #}
 {% elif field.type == 'array' %}
-{% call optional_field_wrapper(field) %}
-# Array input
-st.markdown("**Enter JSON array or upload file:**")
-{{ field.uid }}_text = st.text_area(
-    "Paste {{ field.uid.replace("_", ".") }} JSON",
-    height=100,
-    key="textarea.{{ field.key }}"
-)
-{{ field.uid }}_file = st.file_uploader(
-    "Upload {{ field.uid.replace("_", ".") }} JSON file",
-    type=["json", "txt"],
-    key="fileupload.{{ field.key }}"
-)
-{# we also validate the JSON in try / except blocks, and alert the user
-   using Streamlit's built-in "error" function. #}
-{{ field.uid }} = None
-if {{ field.uid }}_file is not None:
-    try:
-        {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
-    except Exception as e:
-        st.error(f"Failed to load {{ field.uid }} from file: {e}")
-elif {{ field.uid }}_text:
-    try:
-        {{ field.uid }} = orjson.loads({{ field.uid }}_text)
-    except Exception as e:
-        st.error(f"Failed to parse {{ field.uid }} from text: {e}")
+with {{ field.container }}:
+    # Array input
+    st.markdown("**Enter JSON array or upload file:**")
+    {{ field.uid }}_text = st.text_area(
+        "Paste {{ field.uid.replace("_", ".") }} JSON",
+        height=100,
+        key="textarea.{{ field.key }}",
+        placeholder="{{ 'Leave blank if not needed' if field.get('optional', False) else '' }}",
+    )
+    {{ field.uid }}_file = st.file_uploader(
+        "Upload {{ field.uid.replace("_", ".") }} JSON file",
+        type=["json", "txt"],
+        key="fileupload.{{ field.key }}"
+    )
+    {# we also validate the JSON in try / except blocks, and alert the user
+       using Streamlit's built-in "error" function. #}
+    {{ field.uid }} = None
+    if {{ field.uid }}_file is not None:
+        try:
+            {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
+        except Exception as e:
+            st.error(f"Failed to load {{ field.uid }} from file: {e}")
+    elif {{ field.uid }}_text:
+        try:
+            {{ field.uid }} = orjson.loads({{ field.uid }}_text)
+        except Exception as e:
+            st.error(f"Failed to parse {{ field.uid }} from text: {e}")
 
-if {{ field.uid }} is not None:
-    try:
-        arr = np.array({{ field.uid }}, dtype=np.float64)
-        st.write("Array preview:")
-        st.code(arr)
-    except Exception as e:
-        st.error(f"Invalid array input for {{ field.uid }}: {e}")
-{% endcall %}
-{% elif field.type == 'json' %}
-{% call optional_field_wrapper(field) %}
-# JSON input (with auto-quoting for simple strings)
-st.markdown("**Enter JSON or simple value:**")
-{{ field.uid }}_text = st.text_area(
-    "Paste {{ field.uid.replace("_", ".") }} JSON or value",
-    height=100,
-    key="textarea.{{ field.key }}"
-)
-{{ field.uid }} = None
-if {{ field.uid }}_text:
-    try:
-        {{ field.uid }} = parse_json_or_string({{ field.uid }}_text)
-    except Exception as e:
-        st.error(f"Failed to parse {{ field.uid }}: {e}")
-{% endcall %}
+    if {{ field.uid }} is not None:
+        try:
+            arr = np.array({{ field.uid }}, dtype=np.float64)
+            st.write("Array preview:")
+            st.code(arr)
+        except Exception as e:
+            st.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% elif field.type == 'union' %}
+with {{ field.container }}:
+    {{ field.uid }}_raw = st.text_input(
+        "{{ field.get('title', field.uid) }}",
+        label_visibility="collapsed",
+        key="union.{{ field.key }}",
+        value="{{ field.get('default', '') }}",
+        placeholder="{{ 'Leave blank if not needed' if field.get('optional', False) else '' }}",
+    )
+    {{ field.uid }} = _autocast({{ field.uid }}_raw)
 {% endif %}
 
 {% endfor %}
@@ -275,6 +241,34 @@ def _cast_type(val: T | None, type_: type[T]) -> T | None:
     if val is None:
         return None
     return type_(val)
+
+
+def _autocast(text: str) -> typing.Any:
+    """Auto-cast text input to int, float, or string.
+
+    Attempts to parse text as integer (if no decimal point or scientific notation),
+    then float, then falls back to string if both fail.
+
+    Args:
+        text: The string to parse.
+
+    Returns:
+        Parsed value as int, float, or string. Returns None for empty strings.
+    """
+    if not text:
+        return None
+
+    text = text.strip()
+
+    try:
+        # Try int first (no decimal point or scientific notation)
+        if '.' not in text and 'e' not in text.lower():
+            return int(text)
+        # Try float
+        return float(text)
+    except ValueError:
+        # Not a number, return as string
+        return text
 
 
 def _insert_nested(
