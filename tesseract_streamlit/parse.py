@@ -201,7 +201,7 @@ def _resolve_refs(
 
     Recursively descends into the nested dictionary, locating '$ref'
     keys. Where these are found, the URI path to elsewhere in the
-    dictionary is resolved, yieldin a dictionary. This dictionary
+    dictionary is resolved, yielding a dictionary. This dictionary
     is then merged with the parent dictionary where the '$ref' key was
     located.
 
