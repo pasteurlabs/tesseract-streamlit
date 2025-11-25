@@ -21,7 +21,6 @@ import functools
 import importlib.util
 import inspect
 import operator
-import re
 import sys
 import typing
 import warnings
@@ -41,8 +40,8 @@ __all__ = [
     "UserDefinedFunctionError",
     "UserDefinedFunctionWarning",
     "extract_template_data",
-    "try_parse_number",
     "parse_json_or_string",
+    "try_parse_number",
 ]
 
 
