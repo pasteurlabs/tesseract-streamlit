@@ -318,8 +318,22 @@ def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool]:
     - If union is `Type | None`, return (Type, True)
     - If union is numeric primitives + arrays, return ("array", is_optional)
     - If union has multiple non-null types, return ("union", is_optional)
+
+    Raises:
+        ValueError: If union includes composite types (not supported)
     """
     any_of = field_data.get("anyOf", [])
+
+    # Check for composite types in union (unsupported)
+    has_composite = any(
+        "$ref" in member or ("properties" in member and "type" not in member)
+        for member in any_of
+    )
+    if has_composite:
+        raise ValueError(
+            "Unions including composite types (e.g., Model | int, Model1 | Model2) "
+            "are not currently supported. Use one of the composite types directly."
+        )
 
     # Collect non-null types
     types = []
@@ -375,6 +389,15 @@ def _format_field(
         resolved_type, is_optional = _resolve_union_type(field_data)
         # Inject resolved type into field_data so rest of function works normally
         field_data = {**field_data, "type": resolved_type}
+
+    # Check for collections of composite types (unsupported)
+    if field_data.get("type") == "array":
+        items = field_data.get("items", {})
+        if "$ref" in items or ("properties" in items and "type" not in items):
+            raise ValueError(
+                f"Collections of composite types (e.g., list[Model]) are not currently "
+                f"supported for field '{field_key}'. Consider restructuring your schema."
+            )
 
     field = _InputField(
         type=field_data["type"],
