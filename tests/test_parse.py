@@ -169,16 +169,15 @@ def test_union_with_composite_raises_error() -> None:
             "field": {
                 "anyOf": [
                     {"type": "integer"},
-                    {"$ref": "#/components/schemas/SomeModel"}
+                    {"$ref": "#/components/schemas/SomeModel"},
                 ],
-                "title": "Field"
+                "title": "Field",
             }
         }
     }
 
     with pytest.raises(
-        ValueError,
-        match=r"Unions including composite types.*not currently supported"
+        ValueError, match=r"Unions including composite types.*not currently supported"
     ):
         parse._simplify_schema(schema_with_union_composite["properties"])
 
@@ -191,15 +190,12 @@ def test_collection_of_composites_raises_error() -> None:
             "models": {
                 "type": "array",
                 "items": {"$ref": "#/components/schemas/SomeModel"},
-                "title": "Models"
+                "title": "Models",
             }
         }
     }
 
     with pytest.raises(
-        ValueError,
-        match=r"Collections of composite types.*not currently supported"
+        ValueError, match=r"Collections of composite types.*not currently supported"
     ):
         parse._simplify_schema(schema_with_collection_composite["properties"])
-
-
