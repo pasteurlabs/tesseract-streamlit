@@ -308,6 +308,7 @@ _SupportedTypes: typing.TypeAlias = typing.Literal[
 
 
 def _is_composite(member: dict[str, typing.Any]) -> bool:
+    """Checks if a node in the OAS represents a composite type."""
     return "$ref" in member or ("properties" in member and "type" not in member)
 
 
