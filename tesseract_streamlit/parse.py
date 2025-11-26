@@ -334,44 +334,33 @@ def _resolve_union_type(
     """
     any_of = field_data.get("anyOf", [])
 
-    # Check for composite types in union (unsupported)
-    has_composite = any(
-        "$ref" in member or ("properties" in member and "type" not in member)
-        for member in any_of
-    )
-    if has_composite:
-        raise ValueError(
-            "Unions including composite types (e.g., Model | int, Model1 | Model2) "
-            "are not currently supported. Use one of the composite types directly."
-        )
-
-    # Collect non-null types
-    types = []
+    types = set()
+    is_optional = False
     for member in any_of:
-        if "type" in member:
-            member_type = member["type"]
-            if member_type != "null":
-                types.append(member_type)
+        if _is_composite(member):
+            raise ValueError(
+                "Unions including composite types (e.g., Model | int, Model1 "
+                "| Model2) are not currently supported. Use one of the "
+                "composite types directly."
+            )
+        if "type" not in member:
+            continue
+        if member["type"] == "null":
+            is_optional = True
+            continue
+        types.add(member["type"])
 
-    # Check if null is in the union
-    is_optional = any(
-        member.get("type") == "null" for member in any_of if "type" in member
-    )
-
-    # If only one non-null type, return it (e.g., int | None → integer)
     if len(types) == 1:
-        return (types[0], is_optional)
+        return types.pop(), is_optional
 
-    # Check if union is numeric primitives + arrays (e.g., float | list[float])
-    non_array_types = [t for t in types if t != "array"]
     has_array = "array" in types
-    is_all_numeric = all(t in ("integer", "number") for t in non_array_types)
+    non_array_types = types - {"array"}
+    is_all_numeric = non_array_types == {"integer", "number"}
 
-    if has_array and is_all_numeric and non_array_types:
-        return ("array", is_optional)
+    if has_array and is_all_numeric:
+        return "array", is_optional
 
-    # Multiple non-null types → union
-    return ("union", is_optional)
+    return "union", is_optional
 
 
 def _format_field(
