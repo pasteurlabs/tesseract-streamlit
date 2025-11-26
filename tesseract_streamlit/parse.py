@@ -356,7 +356,7 @@ def _resolve_union_type(
 
     has_array = "array" in types
     non_array_types = types - {"array"}
-    is_all_numeric = non_array_types == {"integer", "number"}
+    is_all_numeric = non_array_types <= {"integer", "number"}
 
     if has_array and is_all_numeric:
         return "array", is_optional
