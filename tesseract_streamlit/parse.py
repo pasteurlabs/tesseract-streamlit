@@ -306,15 +306,17 @@ def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool]:
     """Resolve union type, preserving base type for simple optionals.
 
     Args:
-        field_data: dictionary of data representing the field with anyOf.
+        field_data: Node in OAS representing a field with key "anyOf".
 
     Returns:
-        tuple[str, bool]: (resolved_type, is_optional)
-
-    Resolution logic:
-    - If union is `Type | None`, return (Type, True)
-    - If union is numeric primitives + arrays, return ("array", is_optional)
-    - If union has multiple non-null types, return ("union", is_optional)
+        resolved_type:
+            String representation of the type's name. For optional
+            types, this will simply be the name of the non-null type,
+            *eg.* `boolean | null` will return "boolean". For unions
+            between `array` and `number` or `integer`, this returns
+            "array". All other combinations of types return `union`.
+        is_optional:
+            Boolean determining if the union contains `null`.
 
     Raises:
         ValueError: If union includes composite types (not supported)
