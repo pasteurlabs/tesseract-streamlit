@@ -391,8 +391,7 @@ def _format_field(
 
     # Check for collections of composite types (unsupported)
     if field_data.get("type") == "array":
-        items = field_data.get("items", {})
-        if "$ref" in items or ("properties" in items and "type" not in items):
+        if _is_composite(field_data.get("items", {})):
             raise ValueError(
                 f"Collections of composite types (e.g., list[Model]) are not currently "
                 f"supported for field '{field_key}'. Consider restructuring your schema."
