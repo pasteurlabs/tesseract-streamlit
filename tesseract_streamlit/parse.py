@@ -418,14 +418,15 @@ def _format_field(
                 default_val = ""
             field["default"] = default_val
             # Only add number_constraints if constraints actually exist
-            if field_data["type"] in ("number", "integer"):
-                if any(k in field_data for k in ("minimum", "maximum", "multipleOf")):
-                    field["number_constraints"] = {
-                        "min_value": field_data.get("minimum", None),
-                        "max_value": field_data.get("maximum", None),
-                        "step": field_data.get("multipleOf", None),
-                    }
+            if field_data["type"] in {"number", "integer"}:
+                if {"minimum", "maximum", "multipleOf"}.intersection(field_data):
+                    field["number_constraints"] = NumberConstraints(
+                        min_value=field_data.get("minimum", None),
+                        max_value=field_data.get("maximum", None),
+                        step=field_data.get("multipleOf", None),
+                    )
         return field
+
     field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
         data_type = "array"
