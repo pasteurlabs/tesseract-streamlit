@@ -302,7 +302,18 @@ def _is_union_type(field_data: dict[str, typing.Any]) -> bool:
     return "anyOf" in field_data and "type" not in field_data
 
 
-def _resolve_union_type(field_data: dict[str, typing.Any]) -> tuple[str, bool]:
+_SupportedTypes: typing.TypeAlias = typing.Literal[
+    "integer", "number", "boolean", "string", "union", "array"
+]
+
+
+def _is_composite(member: dict[str, typing.Any]) -> bool:
+    return "$ref" in member or ("properties" in member and "type" not in member)
+
+
+def _resolve_union_type(
+    field_data: dict[str, typing.Any],
+) -> tuple[_SupportedTypes, bool]:
     """Resolve union type, preserving base type for simple optionals.
 
     Args:
