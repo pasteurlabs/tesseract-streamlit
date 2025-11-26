@@ -239,7 +239,7 @@ ARRAY_PROPS = {"dtype", "shape", "data"}  # if a dict has these keys => array
 def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
     """Determines whether or not an array input is a scalar.
 
-    Array dtypes in a Tesseract ``InputSchema`` may be used without
+    Array dtypes in a Tesseract schema may be used without
     being wrapped in an Array generic, *eg.* ``Float32``, rather
     than ``Array[Float32]``. In this instance, they are marked up as
     arrays in the OpenAPI Specification, but the Tesseract inputs expect
@@ -448,7 +448,7 @@ def _simplify_schema(
     ancestors: list | None = None,
     use_title: bool = True,
 ) -> list[_InputField]:
-    """Returns a flat simplified representation of the ``InputSchema``.
+    """Returns a flat simplified representation of the Tesseract schema.
 
     The resolved OpenAPI specification dictionary is visited recursively
     to accumulate ``_InputField`` descriptions of each input field
@@ -556,11 +556,11 @@ def _input_to_jinja(field: _InputField) -> JinjaField:
 
 
 def _parse_tesseract_oas(
-    oas_data: bytes, pretty_headings: bool = True
+    oas_data: bytes, pretty_headings: bool = True, schema: str = "Apply_InputSchema"
 ) -> tuple[TesseractMetadata, list[JinjaField]]:
     """Parses Tesseract OAS into a flat list of dictionaries.
 
-    Recursively resolves the arbitrarily nested ``InputSchema`` for a
+    Recursively resolves the arbitrarily nested schema for a
     Tesseract API Input Schema. This is primarily to enable a simple
     compatibility layer between Tesseract API and templating engines.
 
@@ -568,6 +568,7 @@ def _parse_tesseract_oas(
         oas_data: the JSON data as an unparsed string.
         pretty_headings: whether to format parameter names as headings.
             Default is True.
+        schema: which schema to parse. Default is Apply_InputSchema.
 
     Returns:
         TesseractMetadata:
@@ -583,7 +584,7 @@ def _parse_tesseract_oas(
         version=data["info"]["version"],
         description=data["info"].get("description", apply_descr),
     )
-    input_schema = data["components"]["schemas"]["Apply_InputSchema"]
+    input_schema = data["components"]["schemas"][schema]
     resolved_schema = _resolve_refs(input_schema, data)
     input_fields = _simplify_schema(
         resolved_schema["properties"], use_title=pretty_headings
@@ -625,6 +626,7 @@ def extract_template_data(
     url: str,
     user_code: Path | None,
     pretty_headings: bool,
+    schema: str = "Apply_InputSchema",
 ) -> TemplateData:
     """Formats Tesseract and user-defined function inputs for template.
 
@@ -637,15 +639,16 @@ def extract_template_data(
         url: URI of the running Tesseract instance.
         user_code: path of the user-defined plotting function module.
         pretty_headings: whether to format parameters names as headings.
+        schema: which schema to parse. Default is Apply_InputSchema.
 
     Returns:
         TemplateData:
             Preprocessed data describing the Streamlit app based on the
-            ``InputSchema``, ready for injection into the app template.
+            schema, ready for injection into the app template.
     """
     response = requests.get(f"{url}/openapi.json")
     metadata, schema = _parse_tesseract_oas(
-        response.content, pretty_headings=pretty_headings
+        response.content, pretty_headings=pretty_headings, schema=schema
     )
     render_kwargs = TemplateData(
         metadata=metadata,
