@@ -269,6 +269,26 @@ class NumberConstraints(typing.TypedDict):
     step: NotRequired[float]
 
 
+def _num_constraints_from_field(field_data: dict[str, typing.Any]) -> NumberConstraints:
+    """Initialise and populate NumberConstraints object from field data.
+
+    Args:
+        field_data: dictionary of data representing the field.
+
+    Returns:
+        Dictionary representing range and increments of valid number
+        values for an input field.
+    """
+    number_constraints = NumberConstraints()
+    if (min_value := field_data.get("minimum", None)) is not None:
+        number_constraints["min_value"] = min_value
+    if (max_value := field_data.get("maximum", None)) is not None:
+        number_constraints["max_value"] = max_value
+    if (step := field_data.get("multipleOf", None)) is not None:
+        number_constraints["step"] = step
+    return number_constraints
+
+
 class _InputField(typing.TypedDict):
     """Simplified schema for an input field in the Streamlit template.
 
@@ -420,10 +440,8 @@ def _format_field(
             # Only add number_constraints if constraints actually exist
             if field_data["type"] in {"number", "integer"}:
                 if {"minimum", "maximum", "multipleOf"}.intersection(field_data):
-                    field["number_constraints"] = NumberConstraints(
-                        min_value=field_data.get("minimum", None),
-                        max_value=field_data.get("maximum", None),
-                        step=field_data.get("multipleOf", None),
+                    field["number_constraints"] = _num_constraints_from_field(
+                        field_data
                     )
         return field
 
@@ -433,11 +451,7 @@ def _format_field(
         if _is_scalar(field_data["properties"]["shape"]):
             data_type = "number"
             field["default"] = field_data.get("default", None)
-            field["number_constraints"] = {
-                "min_value": field_data.get("minimum", None),
-                "max_value": field_data.get("maximum", None),
-                "step": field_data.get("multipleOf", None),
-            }
+            field["number_constraints"] = _num_constraints_from_field(field_data)
         field["type"] = data_type
         return field
     # at this point, not an array or primitive, so must be composite

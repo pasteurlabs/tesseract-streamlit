@@ -20,8 +20,7 @@
         "optional": false,
         "number_constraints": {
             "max_value": 125,
-            "min_value": 0,
-            "step": null
+            "min_value": 0
         }
     },
     {
@@ -59,9 +58,7 @@
         "default": null,
         "optional": false,
         "number_constraints": {
-            "max_value": null,
-            "min_value": 0,
-            "step": null
+            "min_value": 0
         }
     },
     {
@@ -116,8 +113,7 @@
         "optional": false,
         "number_constraints": {
             "max_value": 120,
-            "min_value": 0,
-            "step": null
+            "min_value": 0
         }
     },
     {
@@ -131,8 +127,7 @@
         "optional": true,
         "number_constraints": {
             "max_value": 125,
-            "min_value": 0,
-            "step": null
+            "min_value": 0
         }
     },
     {
