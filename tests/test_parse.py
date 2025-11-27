@@ -155,3 +155,47 @@ def test_description_from_oas(
         f"Apply the Tesseract to the input data.\n\n{zerodim_apply_docstring}"
     )
     assert zd_descr == zd_apply_docs
+
+
+# Testing template helper functions for union type parsing:
+# ===========================================================
+
+
+def test_union_with_composite_raises_error() -> None:
+    """Test that unions including composite types raise ValueError."""
+    # Schema with int | Model union (composite in union)
+    schema_with_union_composite = {
+        "properties": {
+            "field": {
+                "anyOf": [
+                    {"type": "integer"},
+                    {"$ref": "#/components/schemas/SomeModel"},
+                ],
+                "title": "Field",
+            }
+        }
+    }
+
+    with pytest.raises(
+        ValueError, match=r"Unions including composite types.*not currently supported"
+    ):
+        parse._simplify_schema(schema_with_union_composite["properties"])
+
+
+def test_collection_of_composites_raises_error() -> None:
+    """Test that collections of composite types raise ValueError."""
+    # Schema with list[Model] (collection of composites)
+    schema_with_collection_composite = {
+        "properties": {
+            "models": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/SomeModel"},
+                "title": "Models",
+            }
+        }
+    }
+
+    with pytest.raises(
+        ValueError, match=r"Collections of composite types.*not currently supported"
+    ):
+        parse._simplify_schema(schema_with_collection_composite["properties"])

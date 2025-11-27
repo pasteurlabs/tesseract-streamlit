@@ -124,6 +124,37 @@ This will open a browser window with the Streamlit UI where users can input valu
 | --------------------------------- | ---------------------------- |
 | ![](examples/vectoradd_jax/screenshots/vec-b.png)        | ![](examples/vectoradd_jax/screenshots/plot.png)    |
 
+## 🔀 Union Type Support
+
+`tesseract-streamlit` supports Pydantic union types (e.g., `int | str`, `float | None`) with automatic type inference:
+
+### Supported Union Patterns
+
+* **Optional numbers**: `int | None`, `float | None` - Rendered as text inputs (not number inputs) with placeholder text "Leave blank if not needed". This allows the field to truly be empty. The input is parsed as an integer or float when provided.
+* **Optional strings**: `str | None` - Rendered as text inputs with placeholder text. Leave blank to pass `None`.
+* **Mixed scalar types**: `int | float`, `float | str`, `int | str | None` - Rendered as text inputs with automatic type casting.
+
+### Auto-Casting Behavior
+
+Union type fields use a text input with automatic type detection:
+
+1. **Integers**: Input like `42` or `-23` is parsed as `int`
+2. **Floats**: Input like `3.14`, `-0.5`, or `1e-5` is parsed as `float`
+3. **Strings**: Any other input is treated as a string
+4. **None**: Leaving the field blank (for optional fields) passes `None`
+
+**Example:**
+```python
+class InputSchema(BaseModel):
+    threshold: float | str  # Can accept 0.5 (float) or "auto" (string)
+    count: int | None = None  # Optional integer, blank input passes None
+```
+
+### Limitations
+
+* **Collections of complex types**: Unions like `Model | list[Model]` or `float | list[float]` are not yet supported. These are deferred to a future release.
+* **No specialized widgets**: Union fields always use text inputs. For example, `int | float` uses a text input instead of a number input with spinners.
+
 ## ⚠️ Current Limitations
 
 While `tesseract-streamlit` supports Tesseracts with an `InputSchema` formed with arbitrary nesting of Pydantic models, it **does not yet support** nesting Pydantic models **inside native Python collection types** such as:
