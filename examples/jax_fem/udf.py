@@ -12,6 +12,10 @@ def _build_geometry(
 
     The parameters are expected to be of shape (n_chains, n_edges_per_chain + 1, 3),
     """
+    if params.shape[2] < 3:
+        # Add z=0 coordinate if not present
+        params = np.concatenate([params, np.zeros((*params.shape[:2], 1))], axis=2)
+
     n_chains = params.shape[0]
     geometry = []
 
