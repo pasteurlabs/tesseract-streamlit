@@ -366,7 +366,7 @@ def apply(inputs: InputSchema) -> OutputSchema:
         Nx=Nx,
         Ny=Ny,
     )["implicit_distance"]
-    sdf = sdf_geom.reshape((Ny, Nx)).T
+    sdf = sdf_geom.reshape((Nx, Ny))
     density = jnp.reshape(sdf_to_rho(sdf), (Nx * Ny, 1))
     problem, fwd_pred = setup(
         Nx=Nx,
