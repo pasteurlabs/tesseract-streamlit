@@ -310,10 +310,7 @@ def setup(
         return jnp.isclose(point[0], 0.0, atol=1e-5)
 
     def load_location(point):
-        return jnp.logical_and(
-            jnp.isclose(point[0], Lx, atol=1e-5),
-            jnp.isclose(point[1], 0.0, atol=0.1 * Ly + 1e-5),
-        )
+        return jnp.isclose(point[0], Lx, atol=1e-5)
 
     def dirichlet_val(point):
         return 0.0
@@ -393,7 +390,7 @@ def apply(inputs: InputSchema) -> OutputSchema:
     )
     tube_geom_merged: pv.PolyData = pv.merge([geom.triangulate() for geom in tube_geom])
     tube_geom_merged["von_mises_stress"] = tube_geom_merged.interpolate(
-        vm_grid, strategy="closest_point"
+        vm_grid,
     )["von_mises_stress"]
 
     out_mesh = OutMeshSchema(
