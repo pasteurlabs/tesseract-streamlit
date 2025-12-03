@@ -402,11 +402,15 @@ def _format_field(
                 f"supported for field '{field_key}'. Consider restructuring your schema."
             )
 
+    # Get title, rejecting auto-generated model names (contain __ separators)
+    raw_title = field_data.get("title")
+    if raw_title and "__" in raw_title:
+        raw_title = None  # Fall back to formatted field key
+    title = (raw_title or _key_to_title(field_key)) if use_title else field_key
+
     field = _InputField(
         type=field_data["type"],
-        title=field_data.get("title", _key_to_title(field_key))
-        if use_title
-        else field_key,
+        title=title,
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
         optional=is_optional,
