@@ -224,7 +224,13 @@ def _resolve_refs(
         ref_path = schema_node.pop("$ref").lstrip("#/").split("/")
         target = copy.deepcopy(_chain_subscript(schema, ref_path))
         # recursively resolve refs
-        schema_node.update(_resolve_refs(target, schema))
+        resolved_target = _resolve_refs(target, schema)
+        # Only update structural keys
+        preserve_keys = {"title", "description"}
+        for key, value in resolved_target.items():
+            if key in preserve_keys and key in schema_node:
+                continue  # Don't overwrite Field metadata if already set
+            schema_node[key] = value
         return schema_node
     # if dict without $ref, process nested dicts (eg. properties or items)
     resolved = {}
