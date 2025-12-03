@@ -398,7 +398,9 @@ def _format_field(
 
     field = _InputField(
         type=field_data["type"],
-        title=field_data.get("title", field_key) if use_title else field_key,
+        title=field_data.get("title", _key_to_title(field_key))
+        if use_title
+        else field_key,
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
         optional=is_optional,
@@ -424,7 +426,7 @@ def _format_field(
                         "step": field_data.get("multipleOf", None),
                     }
         return field
-    field["title"] = _key_to_title(field_key) if use_title else field_key
+
     if ARRAY_PROPS <= set(field_data["properties"]):
         data_type = "array"
         if _is_scalar(field_data["properties"]["shape"]):
