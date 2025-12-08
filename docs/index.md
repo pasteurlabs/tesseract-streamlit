@@ -18,4 +18,5 @@ api
 :hidden:
 
 examples/vectoradd_jax/README.md
+examples/jax_fem/README.md
 ```
