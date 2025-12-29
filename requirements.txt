@@ -183,7 +183,7 @@ mdit-py-plugins==0.5.0
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.1.4
+mistune==3.2.0
     # via nbconvert
 more-itertools==10.8.0
     # via trame-server
@@ -198,7 +198,7 @@ narwhals==2.14.0
     #   altair
     #   bokeh
     #   panel
-nbclient==0.10.3
+nbclient==0.10.4
     # via nbconvert
 nbconvert==7.16.6
     # via jupyter-server
@@ -310,7 +310,7 @@ pygments==2.19.2
     #   ipython-pygments-lexers
     #   nbconvert
     #   rich
-pyparsing==3.2.5
+pyparsing==3.3.1
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
@@ -452,7 +452,7 @@ trame-vtk==2.10.1
     # via pyvista
 trame-vuetify==3.2.0
     # via pyvista
-typer==0.20.1
+typer==0.21.0
     # via tesseract-core
 typing-extensions==4.15.0
     # via
