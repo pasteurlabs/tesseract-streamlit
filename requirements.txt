@@ -2,7 +2,7 @@
 #    uv export --config-file /dev/null --frozen --color never --no-emit-project --no-hashes
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.2
+aiohttp==3.13.3
     # via
     #   jupyter-server-proxy
     #   wslink
@@ -43,7 +43,7 @@ bokeh==3.8.1
     #   stpyvista
 cachetools==6.2.4
     # via streamlit
-certifi==2025.11.12
+certifi==2026.1.4
     # via requests
 cffi==2.0.0
     # via
@@ -95,7 +95,7 @@ frozenlist==1.8.0
     #   aiosignal
 gitdb==4.0.12
     # via gitpython
-gitpython==3.1.45
+gitpython==3.1.46
     # via streamlit
 idna==3.11
     # via
@@ -253,7 +253,7 @@ pandas==2.3.3
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.8.4
+panel==1.8.5
     # via stpyvista
 param==2.3.1
     # via
@@ -263,7 +263,7 @@ parso==0.8.5
     # via jedi
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
-pillow==12.0.0
+pillow==12.1.0
     # via
     #   bokeh
     #   matplotlib
@@ -375,7 +375,7 @@ rpds-py==0.30.0
     #   referencing
 scooby==0.11.0
     # via pyvista
-send2trash==1.8.3
+send2trash==2.0.0
     # via jupyter-server
 shellingham==1.5.4
     # via typer
