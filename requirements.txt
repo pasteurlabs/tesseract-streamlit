@@ -12,7 +12,7 @@ altair==6.0.0
     # via streamlit
 annotated-types==0.7.0
     # via pydantic
-anyio==4.12.0
+anyio==4.12.1
     # via jupyter-server
 argon2-cffi==25.1.0
     # via jupyter-server
@@ -37,7 +37,7 @@ bleach==6.3.0
     #   panel
 blinker==1.9.0
     # via streamlit
-bokeh==3.8.1
+bokeh==3.8.2
     # via
     #   panel
     #   stpyvista
@@ -103,9 +103,9 @@ idna==3.11
     #   jsonschema
     #   requests
     #   yarl
-ipython==8.37.0 ; python_full_version < '3.11'
+ipython==8.38.0 ; python_full_version < '3.11'
     # via ipywidgets
-ipython==9.8.0 ; python_full_version >= '3.11'
+ipython==9.9.0 ; python_full_version >= '3.11'
     # via ipywidgets
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
     # via ipython
@@ -126,14 +126,14 @@ jinja2==3.1.6
     #   tesseract-streamlit
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema==4.25.1
+jsonschema==4.26.0
     # via
     #   altair
     #   jupyter-events
     #   nbformat
 jsonschema-specifications==2025.9.1
     # via jsonschema
-jupyter-client==8.7.0
+jupyter-client==8.8.0
     # via
     #   jupyter-server
     #   nbclient
@@ -193,7 +193,7 @@ multidict==6.7.0
     # via
     #   aiohttp
     #   yarl
-narwhals==2.14.0
+narwhals==2.15.0
     # via
     #   altair
     #   bokeh
@@ -220,7 +220,7 @@ numpy==2.2.6 ; python_full_version < '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-numpy==2.4.0 ; python_full_version >= '3.11'
+numpy==2.4.1 ; python_full_version >= '3.11'
     # via
     #   bokeh
     #   contourpy
@@ -286,7 +286,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.2
+protobuf==6.33.3
     # via streamlit
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -403,7 +403,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==1.2.0
+tesseract-core==1.3.0
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach
@@ -448,11 +448,11 @@ trame-server==3.9.0
     # via
     #   pyvista
     #   trame
-trame-vtk==2.10.1
+trame-vtk==2.10.2
     # via pyvista
 trame-vuetify==3.2.0
     # via pyvista
-typer==0.21.0
+typer==0.21.1
     # via tesseract-core
 typing-extensions==4.15.0
     # via
@@ -483,7 +483,7 @@ uc-micro-py==1.0.3
     # via linkify-it-py
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.6.2
+urllib3==2.6.3
     # via requests
 vtk==9.5.2
     # via pyvista
