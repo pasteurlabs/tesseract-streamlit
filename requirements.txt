@@ -150,7 +150,7 @@ jupyter-server==2.17.0
     # via jupyter-server-proxy
 jupyter-server-proxy==4.4.0
     # via pyvista
-jupyter-server-terminals==0.5.3
+jupyter-server-terminals==0.5.4
     # via jupyter-server
 jupyterlab-pygments==0.3.0
     # via nbconvert
@@ -164,7 +164,12 @@ linkify-it-py==2.0.3
     # via panel
 markdown==3.10
     # via panel
-markdown-it-py==3.0.0
+markdown-it-py==3.0.0 ; python_full_version < '3.11'
+    # via
+    #   mdit-py-plugins
+    #   panel
+    #   rich
+markdown-it-py==4.0.0 ; python_full_version >= '3.11'
     # via
     #   mdit-py-plugins
     #   panel
@@ -278,7 +283,7 @@ platformdirs==4.5.1
     #   tesseract-streamlit
 pooch==1.8.2
     # via pyvista
-prometheus-client==0.23.1
+prometheus-client==0.24.1
     # via jupyter-server
 prompt-toolkit==3.0.52
     # via ipython
@@ -286,7 +291,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.3
+protobuf==6.33.4
     # via streamlit
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -294,7 +299,7 @@ ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_pla
     #   terminado
 pure-eval==0.2.3
     # via stack-data
-pyarrow==22.0.0
+pyarrow==23.0.0
     # via streamlit
 pycparser==2.23 ; implementation_name != 'PyPy'
     # via cffi
@@ -322,7 +327,7 @@ python-json-logger==4.0.0
     # via jupyter-events
 pytz==2025.2
     # via pandas
-pyvista==0.46.4
+pyvista==0.46.5
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -375,7 +380,7 @@ rpds-py==0.30.0
     #   referencing
 scooby==0.11.0
     # via pyvista
-send2trash==2.0.0
+send2trash==2.1.0
     # via jupyter-server
 shellingham==1.5.4
     # via typer
@@ -387,13 +392,13 @@ six==1.17.0
     #   rfc3339-validator
 smmap==5.0.2
     # via gitdb
-soupsieve==2.8.1
+soupsieve==2.8.2
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
 stpyvista==0.1.4
     # via tesseract-streamlit
-streamlit==1.52.2
+streamlit==1.53.0
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -440,11 +445,11 @@ trame-client==3.11.2
     #   trame
     #   trame-vtk
     #   trame-vuetify
-trame-common==1.1.0
+trame-common==1.1.1
     # via
     #   trame
     #   trame-client
-trame-server==3.9.0
+trame-server==3.10.0
     # via
     #   pyvista
     #   trame
