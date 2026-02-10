@@ -51,9 +51,10 @@ def test_app(goodbyeworld_url: str) -> None:
     # reset to original default
     app.number_input(key="number.height").decrement().run()
 
+    app.text_input(key="int.age").input("30").run()
     app.number_input(key="number.weight").set_value(83.0).run()
     app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
-    app.text_input(key="int.hobby.name").input("hula hoop").run()
+    app.text_input(key="string.hobby.name").input("hula hoop").run()
     app.checkbox(key="boolean.hobby.active").check().run()
     app.number_input(key="int.hobby.experience").set_value(3).run()
     app.button[0].click().run()

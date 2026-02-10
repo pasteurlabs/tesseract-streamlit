@@ -269,6 +269,26 @@ class NumberConstraints(typing.TypedDict):
     step: NotRequired[float]
 
 
+def _num_constraints_from_field(field_data: dict[str, typing.Any]) -> NumberConstraints:
+    """Initialise and populate NumberConstraints object from field data.
+
+    Args:
+        field_data: dictionary of data representing the field.
+
+    Returns:
+        Dictionary representing range and increments of valid number
+        values for an input field.
+    """
+    number_constraints = NumberConstraints()
+    if (min_value := field_data.get("minimum", None)) is not None:
+        number_constraints["min_value"] = min_value
+    if (max_value := field_data.get("maximum", None)) is not None:
+        number_constraints["max_value"] = max_value
+    if (step := field_data.get("multipleOf", None)) is not None:
+        number_constraints["step"] = step
+    return number_constraints
+
+
 class _InputField(typing.TypedDict):
     """Simplified schema for an input field in the Streamlit template.
 
@@ -280,6 +300,7 @@ class _InputField(typing.TypedDict):
     title: str
     description: str
     ancestors: list[str]
+    optional: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
 
@@ -287,6 +308,80 @@ class _InputField(typing.TypedDict):
 def _key_to_title(key: str) -> str:
     """Formats an OAS key to a title for the web UI."""
     return key.replace("_", " ").title()
+
+
+def _is_union_type(field_data: dict[str, typing.Any]) -> bool:
+    """Check if a field uses union type (anyOf).
+
+    Args:
+        field_data: dictionary of data representing the field.
+
+    Returns:
+        True if the field uses anyOf (union type), False otherwise.
+    """
+    return "anyOf" in field_data and "type" not in field_data
+
+
+_SupportedTypes: typing.TypeAlias = typing.Literal[
+    "integer", "number", "boolean", "string", "union", "array"
+]
+
+
+def _is_composite(member: dict[str, typing.Any]) -> bool:
+    """Checks if a node in the OAS represents a composite type."""
+    return "$ref" in member or ("properties" in member and "type" not in member)
+
+
+def _resolve_union_type(
+    field_data: dict[str, typing.Any],
+) -> tuple[_SupportedTypes, bool]:
+    """Resolve union type, preserving base type for simple optionals.
+
+    Args:
+        field_data: Node in OAS representing a field with key "anyOf".
+
+    Returns:
+        resolved_type:
+            String representation of the type's name. For optional
+            types, this will simply be the name of the non-null type,
+            *eg.* `boolean | null` will return "boolean". For unions
+            between `array` and `number` or `integer`, this returns
+            "array". All other combinations of types return `union`.
+        is_optional:
+            Boolean determining if the union contains `null`.
+
+    Raises:
+        ValueError: If union includes composite types (not supported)
+    """
+    any_of = field_data.get("anyOf", [])
+
+    types = set()
+    is_optional = False
+    for member in any_of:
+        if _is_composite(member):
+            raise ValueError(
+                "Unions including composite types (e.g., Model | int, Model1 "
+                "| Model2) are not currently supported. Use one of the "
+                "composite types directly."
+            )
+        if "type" not in member:
+            continue
+        if member["type"] == "null":
+            is_optional = True
+            continue
+        types.add(member["type"])
+
+    if len(types) == 1:
+        return types.pop(), is_optional
+
+    has_array = "array" in types
+    non_array_types = types - {"array"}
+    is_all_numeric = non_array_types <= {"integer", "number"}
+
+    if has_array and is_all_numeric:
+        return "array", is_optional
+
+    return "union", is_optional
 
 
 def _format_field(
@@ -308,37 +403,55 @@ def _format_field(
     Returns:
         Formatted input field data.
     """
+    # Handle union types (anyOf)
+    is_optional = False
+    if _is_union_type(field_data):
+        resolved_type, is_optional = _resolve_union_type(field_data)
+        # Inject resolved type into field_data so rest of function works normally
+        field_data = {**field_data, "type": resolved_type}
+
+    # Check for collections of composite types (unsupported)
+    if field_data.get("type") == "array":
+        if _is_composite(field_data.get("items", {})):
+            raise ValueError(
+                f"Collections of composite types (e.g., list[Model]) are not currently "
+                f"supported for field '{field_key}'. Consider restructuring your schema."
+            )
+
     field = _InputField(
         type=field_data["type"],
         title=field_data.get("title", field_key) if use_title else field_key,
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
+        optional=is_optional,
     )
 
     if "properties" not in field_data:  # signals a Python primitive type
         if field["type"] != "object":
             default_val = field_data.get("default", None)
-            if (field_data["type"] == "string") and (default_val is None):
+            # For non-optional strings, convert None default to empty string
+            if (
+                (field_data["type"] == "string")
+                and (default_val is None)
+                and not is_optional
+            ):
                 default_val = ""
             field["default"] = default_val
-            if field_data["type"] in ("number", "integer"):
-                field["number_constraints"] = {
-                    "min_value": field_data.get("minimum", None),
-                    "max_value": field_data.get("maximum", None),
-                    "step": field_data.get("multipleOf", None),
-                }
+            # Only add number_constraints if constraints actually exist
+            if field_data["type"] in {"number", "integer"}:
+                if {"minimum", "maximum", "multipleOf"}.intersection(field_data):
+                    field["number_constraints"] = _num_constraints_from_field(
+                        field_data
+                    )
         return field
+
     field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
         data_type = "array"
         if _is_scalar(field_data["properties"]["shape"]):
             data_type = "number"
             field["default"] = field_data.get("default", None)
-            field["number_constraints"] = {
-                "min_value": field_data.get("minimum", None),
-                "max_value": field_data.get("maximum", None),
-                "step": field_data.get("multipleOf", None),
-            }
+            field["number_constraints"] = _num_constraints_from_field(field_data)
         field["type"] = data_type
         return field
     # at this point, not an array or primitive, so must be composite
@@ -424,6 +537,7 @@ class JinjaField(typing.TypedDict):
     type: str
     description: str
     title: str
+    optional: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
 

@@ -223,6 +223,90 @@
                     "hobby": {
                         "$ref": "#/components/schemas/Apply_Hobby",
                         "description": "The person's only hobby."
+                    },
+                    "optional_age": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Optional Age",
+                        "description": "Optional age field for testing int | None union.",
+                        "default": 25,
+                        "minimum": 0,
+                        "maximum": 125
+                    },
+                    "optional_name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Optional Name",
+                        "description": "Optional name field for testing str | None union.",
+                        "default": null
+                    },
+                    "number_or_int": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ],
+                        "title": "Number Or Int",
+                        "description": "Field that accepts int or float for testing number coercion.",
+                        "default": 42
+                    },
+                    "threshold": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ],
+                        "title": "Threshold",
+                        "description": "Threshold as number or special string like 'auto' for testing float | str union."
+                    },
+                    "complex_optional": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Complex Optional",
+                        "description": "Field accepting int, str, or None for testing complex union with optional.",
+                        "default": null
+                    },
+                    "scalar_or_array": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            }
+                        ],
+                        "title": "Scalar Or Array",
+                        "description": "Field accepting either a single integer or an array of integers for testing int | list[int] union."
                     }
                 },
                 "additionalProperties": false,
@@ -230,7 +314,9 @@
                 "required": [
                     "weight",
                     "leg_lengths",
-                    "hobby"
+                    "hobby",
+                    "threshold",
+                    "scalar_or_array"
                 ],
                 "title": "Apply_InputSchema"
             },
