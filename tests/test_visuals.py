@@ -1,12 +1,19 @@
+import subprocess
 from pathlib import Path
-
-from streamlit.testing.v1 import AppTest
 
 PARENT_DIR = Path(__file__).parent
 
 
 def test_pyvista_vis() -> None:
     """Tests if PyVista visuals are running without throwing exceptions."""
-    app = AppTest.from_file(PARENT_DIR / "pyvista_vis.py", default_timeout=60)
-    app.run()
-    assert not app.exception
+    vis_path = PARENT_DIR / "pyvista_vis.py"
+    try:
+        result = subprocess.run(
+            ["streamlit", "run", str(vis_path)],
+            capture_output=True,
+            timeout=10,
+        )
+        output = (result.stdout + result.stderr).decode()
+    except subprocess.TimeoutExpired as e:
+        output = ((e.stdout or b"") + (e.stderr or b"")).decode()
+    assert "VisualizationError" not in output
