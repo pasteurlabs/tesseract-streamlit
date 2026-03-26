@@ -14,7 +14,7 @@ from tesseract_core import Tesseract
 {% if needs_pyvista %}
 import multiprocessing
 multiprocessing.set_start_method("fork", force=True)
-from stpyvista.trame_backend import stpyvista
+from stpyvista import stpyvista
 {% endif %}
 
 {#- MACROS FOR REPEATED TEMPLATE LOGIC
@@ -169,7 +169,7 @@ _tesseract_io_preview(inputs, "input")
 start_time = time.perf_counter()
 with (
     st.spinner("Executing Tesseract", show_time=True),
-    Tesseract("{{ url }}") as tess
+    Tesseract.from_url("{{ url }}") as tess
 ):
     outputs = tess.apply(inputs)
 elapsed = time.perf_counter() - start_time
