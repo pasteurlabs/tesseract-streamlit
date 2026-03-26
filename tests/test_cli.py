@@ -57,11 +57,11 @@ def test_app(goodbyeworld_url: str) -> None:
     app.checkbox(key="boolean.hobby.active").check().run()
     app.number_input(key="int.hobby.experience").set_value(3).run()
     app.button[0].click().run()
+    assert not app.exception
     tess_output = orjson.loads(app.json[1].value)
     with open(PARENT_DIR / "tess-out.json", "rb") as f:
         sample_output = orjson.loads(f.read())
     assert tess_output == sample_output
-    assert not app.exception
 
 
 def test_zerodim_pprint(zerodim_url: str) -> None:
