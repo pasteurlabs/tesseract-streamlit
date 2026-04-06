@@ -2,7 +2,7 @@
 #    uv export --config-file /dev/null --frozen --color never --no-emit-project --no-hashes
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.4
+aiohttp==3.13.5
     # via
     #   jupyter-server-proxy
     #   wslink
@@ -52,9 +52,9 @@ cffi==2.0.0
     # via
     #   argon2-cffi-bindings
     #   pyzmq
-charset-normalizer==3.4.6
+charset-normalizer==3.4.7
     # via requests
-click==8.3.1
+click==8.3.2
     # via
     #   streamlit
     #   tesseract-streamlit
@@ -161,7 +161,7 @@ jupyter-events==0.12.0
     # via jupyter-server
 jupyter-server==2.17.0
     # via jupyter-server-proxy
-jupyter-server-proxy==4.4.0
+jupyter-server-proxy==4.5.0
     # via pyvista
 jupyter-server-terminals==0.5.4
     # via jupyter-server
@@ -203,7 +203,7 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.2.0
     # via nbconvert
-more-itertools==10.8.0
+more-itertools==11.0.1
     # via trame-server
 msgpack==1.1.2
     # via wslink
@@ -249,7 +249,7 @@ numpy==2.4.4 ; python_full_version >= '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-orjson==3.11.7
+orjson==3.11.8
     # via
     #   tesseract-core
     #   tesseract-streamlit
@@ -267,7 +267,11 @@ packaging==26.0
     #   pooch
     #   streamlit
     #   tesseract-core
-pandas==2.3.3
+pandas==2.3.3 ; python_full_version < '3.11'
+    # via
+    #   panel
+    #   streamlit
+pandas==3.0.2 ; python_full_version >= '3.11'
     # via
     #   panel
     #   streamlit
@@ -275,7 +279,7 @@ pandocfilters==1.5.1
     # via nbconvert
 panel==1.8.10
     # via stpyvista
-param==2.3.2
+param==2.3.3
     # via
     #   panel
     #   pyviz-comms
@@ -283,7 +287,7 @@ parso==0.8.6
     # via jedi
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   bokeh
     #   matplotlib
@@ -306,7 +310,7 @@ propcache==0.4.1
     # via
     #   aiohttp
     #   yarl
-protobuf==6.33.6
+protobuf==7.34.1
     # via streamlit
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -342,7 +346,7 @@ python-dateutil==2.9.0.post0
     #   pandas
 python-json-logger==4.1.0
     # via jupyter-events
-pytz==2026.1.post1
+pytz==2026.1.post1 ; python_full_version < '3.11'
     # via pandas
 pyvista==0.47.1
     # via
@@ -370,7 +374,7 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-specifications
     #   jupyter-events
-requests==2.33.0
+requests==2.33.1
     # via
     #   panel
     #   pooch
@@ -419,7 +423,7 @@ stack-data==0.6.3
     # via ipython
 stpyvista==0.2.1
     # via tesseract-streamlit
-streamlit==1.55.0
+streamlit==1.56.0
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -503,7 +507,7 @@ typing-extensions==4.15.0
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
-tzdata==2025.3
+tzdata==2026.1
     # via
     #   arrow
     #   pandas
@@ -533,7 +537,7 @@ wslink==2.5.6
     # via
     #   trame
     #   trame-server
-xyzservices==2025.11.0
+xyzservices==2026.3.0
     # via bokeh
 yarl==1.23.0
     # via aiohttp
