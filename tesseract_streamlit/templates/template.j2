@@ -67,22 +67,24 @@ st.markdown({% if not udf.docs %}""{% else %}
 {# AUTOMATICALLY POPULATING THE WEB-APP WITH INPUTS FROM THE SCHEMA
    ================================================================ #}
 {% for field in schema %}
-{# first, instantiate the container to hold the field #}
+{% if field.type == 'composite' %}
+{# composite fields get a bordered container with heading #}
 {{ field.container }} = {{ field.parent_container }}.container(border=True)
-{# next, add subheading and descriptive text #}
 {{ field.container }}.subheader("{{ field.title }}")
-{% if field.description %}
+{% if field.description -%}
 {{ field.container }}.caption("{{ field.description }}")
-{% endif %}
-{# identify which type of Streamlit element to render based on field type #}
-{% if field.type == 'string' %}
-{{ field.uid }} = {{ field.container }}.text_input(
+{% endif -%}
+{% else %}
+{# leaf fields render directly into their parent container #}
+{% if field.type == 'string' -%}
+{{ field.uid }} = {{ field.parent_container }}.text_input(
     "{{ field.get('title', field.uid) }}",
     key="int.{{ field.key }}",
     value="{{ field.get('default', '') }}",
+    {% if field.description -%}help="{{ field.description }}",{% endif %}
 )
-{% elif field.type == 'integer' %}
-{{ field.uid }} = {{ field.container }}.number_input(
+{% elif field.type == 'integer' -%}
+{{ field.uid }} = {{ field.parent_container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
@@ -90,9 +92,10 @@ st.markdown({% if not udf.docs %}""{% else %}
     format="%d",
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),
+    {% if field.description -%}help="{{ field.description }}",{% endif %}
 )
-{% elif field.type == 'number' %}
-{{ field.uid }} = {{ field.container }}.number_input(
+{% elif field.type == 'number' -%}
+{{ field.uid }} = {{ field.parent_container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
@@ -100,50 +103,49 @@ st.markdown({% if not udf.docs %}""{% else %}
     key="number.{{ field.key }}",
     format="%f",
     value=_cast_type({{ field.get("default", None) }}, float),
+    {% if field.description -%}help="{{ field.description }}",{% endif %}
 )
-{% elif field.type == 'boolean' %}
-{{ field.uid }} = {{ field.container }}.checkbox(
+{% elif field.type == 'boolean' -%}
+{{ field.uid }} = {{ field.parent_container }}.checkbox(
     "{{ field.get('title', field.uid) }}",
     key="boolean.{{ field.key }}",
     value={{ field.get("default", None) }},
+    {% if field.description -%}help="{{ field.description }}",{% endif %}
 )
-{# array inputs are more complex, and require both text and file inputs #}
-{% elif field.type == 'array' %}
-# Array input
-{{ field.container }}.markdown("**Enter JSON array or upload file:**")
-{{ field.uid }}_text = {{ field.container }}.text_area(
-    "Paste {{ field.uid.replace("_", ".") }} JSON",
+{% elif field.type == 'array' -%}
+{{ field.uid }}_text = {{ field.parent_container }}.text_area(
+    "{{ field.get('title', field.uid) }}",
     height=100,
-    key="textarea.{{ field.key }}"
+    key="textarea.{{ field.key }}",
+    placeholder="[1.0, 2.0, 3.0]",
+    {% if field.description -%}help="{{ field.description }}",{% endif %}
 )
-{{ field.uid }}_file = {{ field.container }}.file_uploader(
-    "Upload {{ field.uid.replace("_", ".") }} JSON file",
-    type=["json", "txt"],
-    key="fileupload.{{ field.key }}"
-)
-{# we also validate the JSON in try / except blocks, and alert the user
-   using Streamlit's built-in "error" function. #}
+with {{ field.parent_container }}.popover("Upload from file"):
+    {{ field.uid }}_file = st.file_uploader(
+        "Upload {{ field.uid.replace("_", ".") }} JSON file",
+        type=["json", "txt"],
+        key="fileupload.{{ field.key }}"
+    )
 {{ field.uid }} = None
 if {{ field.uid }}_file is not None:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
     except Exception as e:
-        {{ field.container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+        {{ field.parent_container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
 elif {{ field.uid }}_text:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_text)
     except Exception as e:
-        {{ field.container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
-
+        {{ field.parent_container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
 if {{ field.uid }} is not None:
     try:
         arr = np.array({{ field.uid }}, dtype=np.float64)
-        {{ field.container }}.write("Array preview:")
-        {{ field.container }}.code(arr)
+        {{ field.parent_container }}.write("Array preview:")
+        {{ field.parent_container }}.code(arr)
     except Exception as e:
-        {{ field.container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
-{% endif %}
-
+        {{ field.parent_container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endif -%}
+{% endif -%}
 {% endfor %}
 {% endmacro %}
 
@@ -155,14 +157,12 @@ if {{ field.uid }} is not None:
 {% macro render_outputs(schema, udfs) %}
 {# COLLECT THE INPUTS FOR THE TESSERACT
    ==================================== #}
-# Collect input values into a dictionary
 inputs_flat = {
     {% for field in schema if field.type != "composite" %}
     "{{ field.key }}": {{ field.uid }},
     {% endfor %}
 }
 inputs = _flat_to_nested(inputs_flat)
-_tesseract_io_preview(inputs, "input")
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
    ========================================================== #}
@@ -174,29 +174,39 @@ with (
     outputs = tess.apply(inputs)
 elapsed = time.perf_counter() - start_time
 st.success(f"Tesseract execution completed in {elapsed:.1f} seconds.")
-_tesseract_io_preview(outputs, "output")
 
-{# RENDER USER-DEFINED FUNCTIONS
-   ============================= #}
+{# RENDER USER-DEFINED FUNCTIONS FIRST (primary visual output)
+   ============================================================ #}
 {% if udfs %}
 {{- udf_plot(udfs.inputs, 'inputs', 'Input plots') -}}
 {{- udf_plot(udfs.outputs, 'outputs', 'Output plots') -}}
 {{- udf_plot(udfs.both, 'both', 'Mixed input + output plots') -}}
 {% endif %}
+
+{# JSON PREVIEWS (for debugging and download)
+   =========================================== #}
+_tesseract_io_preview(inputs, "input")
+_tesseract_io_preview(outputs, "output")
 {% endmacro %}
 
-{#- inserts the full Streamlit form, with inputs and outputs.
+{#- inserts the full Streamlit form, with inputs and outputs in a two-column layout.
+    the submit button sits at the top of the output column, keeping it always
+    visible for interactive use.
     args:
         schema: the schema for the Streamlit form
     outputs: interactive streamlit form code
 -#}
 {% macro insert_form(schema, udfs) %}
-with st.form("tesseract_form", border=False):
-    {{ render_fields(schema) | indent(4) }}
-    submitted = st.form_submit_button("Submit")
+input_col, output_col = st.columns([2, 3])
+
+with input_col:
+    with st.form("tesseract_form", border=False):
+        {{ render_fields(schema) | indent(8) }}
+        submitted = st.form_submit_button("Submit", use_container_width=True)
 
 if submitted:
-    {{ render_outputs(schema, udfs) | indent(4) }}
+    with output_col:
+        {{ render_outputs(schema, udfs) | indent(8) }}
 {% endmacro %}
 
 {# PASTE THE USER-DEFINED CODE BEFORE THE AUTOGENERATED WEB-APP
@@ -285,14 +295,10 @@ def _serialise_json_pretty(data: dict[str, typing.Any]) -> bytes:
 def _tesseract_io_preview(
     data: dict[str, typing.Any], direction: typing.Literal["input", "output"]
 ) -> None:
-    st.subheader(f"Tesseract {direction.capitalize()}")
     data_json = _serialise_json_pretty(data)
-    if _count_json_lines(data_json) < PREVIEW_LINE_LIMIT:
-        st.json(data_json.decode())
-    else:
-        st.info(f"Tesseract {direction} preview too long to display.")
-
-    st.download_button(
+    label = f"Tesseract {direction.capitalize()} JSON"
+    expander_col, download_col = st.columns([4, 1], vertical_alignment="center")
+    download_col.download_button(
         f"Download {direction}",
         data=orjson.dumps(
             _replace_zerodim_arrays(data),
@@ -300,7 +306,13 @@ def _tesseract_io_preview(
         ),
         file_name=f"tesseract-{direction}.json",
         on_click="ignore",
+        help=f"Download as JSON",
     )
+    with expander_col.expander(label, expanded=False):
+        if _count_json_lines(data_json) < PREVIEW_LINE_LIMIT:
+            st.json(data_json.decode())
+        else:
+            st.info(f"Tesseract {direction} preview too long to display.")
 
 
 def _count_json_lines(json_str: bytes) -> int:
@@ -313,6 +325,7 @@ def main() -> None:
     st.set_page_config(
         page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
         page_icon="{{ favicon_path }}",
+        layout="wide",
     )
     st.title("{{ metadata.title }}")
     st.markdown(
