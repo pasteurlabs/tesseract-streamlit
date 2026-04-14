@@ -48,7 +48,7 @@ Or, skip serving the Tesseract yourself entirely:
 $ tesseract-streamlit --from-image vectoradd
 ```
 
-This serves the Tesseract from the given image, generates the app, and launches Streamlit — all in one command.
+This serves the Tesseract from the given image, generates the app, and launches Streamlit, in a single command.
 
 ### Full example
 
