@@ -4,9 +4,12 @@ Provides functions for serving Tesseracts, launching Streamlit,
 and managing temporary app files.
 """
 
+import contextlib
 import subprocess
 import sys
 import time
+import uuid
+from collections.abc import Iterator
 from pathlib import Path
 
 import platformdirs
@@ -14,13 +17,13 @@ import requests
 
 
 def get_app_path() -> Path:
-    """Return a path in the user cache dir for the generated app."""
+    """Return a unique path in the user cache dir for the generated app."""
     cache_dir = platformdirs.user_cache_path(
         appname="tesseract-streamlit",
         appauthor="pasteur-labs",
     )
     cache_dir.mkdir(parents=True, exist_ok=True)
-    return cache_dir / "app.py"
+    return cache_dir / f"app_{uuid.uuid4().hex[:8]}.py"
 
 
 def wait_for_tesseract(
@@ -39,21 +42,19 @@ def wait_for_tesseract(
     raise TimeoutError(f"Tesseract at {url} did not become ready within {timeout}s")
 
 
-def serve_tesseract(image_name: str) -> tuple[str, object]:
+@contextlib.contextmanager
+def serve_tesseract(image_name: str) -> Iterator[str]:
     """Serve a Tesseract from a container image.
 
-    Returns:
-        A ``(url, context_manager)`` tuple. The context manager's
-        ``__exit__`` tears down the served Tesseract.
+    Yields:
+        The URL of the served Tesseract.
     """
     import tesseract_core
     from tesseract_core.sdk import engine
 
     port = engine.get_free_port()
-    ctx = tesseract_core.Tesseract.from_image(image_name, port=str(port))
-    ctx.__enter__()
-    url = f"http://localhost:{port}"
-    return url, ctx
+    with tesseract_core.Tesseract.from_image(image_name, port=str(port)):
+        yield f"http://localhost:{port}"
 
 
 def run_streamlit(app_path: Path) -> int:

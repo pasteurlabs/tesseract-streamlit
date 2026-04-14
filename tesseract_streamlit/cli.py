@@ -4,6 +4,7 @@ Defines the command-line interface for ``tesseract-streamlit``.
 The main entrypoint of this module is the ``main()`` function.
 """
 
+import contextlib
 import os
 import sys
 import typing
@@ -113,14 +114,13 @@ def main(
         app_path = get_app_path()
 
     # --- Serve Tesseract if requested ---
-    tesseract_ctx = None
-    try:
+    with contextlib.ExitStack() as stack:
         if from_image is not None:
             err_console.print(
                 f"[green]Serving Tesseract from image '{from_image}'...[/green]"
             )
             try:
-                url, tesseract_ctx = serve_tesseract(from_image)
+                url = stack.enter_context(serve_tesseract(from_image))
             except Exception as e:
                 err_console.print(
                     "[bold red]Error: [/bold red]"
@@ -170,12 +170,7 @@ def main(
 
         # --- Auto-launch Streamlit ---
         if auto_launch:
-            assert app_path is not None
             err_console.print(f"[green]App written to {app_path}[/green]")
             err_console.print("[green]Launching Streamlit...[/green]")
             exit_code = run_streamlit(app_path)
             raise typer.Exit(code=exit_code)
-
-    finally:
-        if tesseract_ctx is not None:
-            tesseract_ctx.__exit__(None, None, None)
