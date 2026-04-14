@@ -280,6 +280,7 @@ class _InputField(typing.TypedDict):
     title: str
     description: str
     ancestors: list[str]
+    required: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
 
@@ -294,6 +295,7 @@ def _format_field(
     field_data: dict[str, typing.Any],
     ancestors: list[str],
     use_title: bool,
+    required_keys: set[str] | None = None,
 ) -> _InputField:
     """Formats a node of the OAS tree representing an input field.
 
@@ -304,15 +306,19 @@ def _format_field(
             nested.
         use_title: whether to use the OAS formatted title, or the
             field_key.
+        required_keys: set of field keys that are required by the
+            parent schema. If ``None``, no fields are marked required.
 
     Returns:
         Formatted input field data.
     """
+    is_required = field_key in (required_keys or set())
     field = _InputField(
         type=field_data["type"],
         title=field_data.get("title", field_key) if use_title else field_key,
         description=field_data.get("description", None),
         ancestors=[*ancestors, field_key],
+        required=is_required,
     )
 
     if "properties" not in field_data:  # signals a Python primitive type
@@ -351,6 +357,7 @@ def _simplify_schema(
     accum: list | None = None,
     ancestors: list | None = None,
     use_title: bool = True,
+    required_keys: set[str] | None = None,
 ) -> list[_InputField]:
     """Returns a flat simplified representation of the ``InputSchema``.
 
@@ -375,6 +382,9 @@ def _simplify_schema(
             are the parameter names, with spaces instead of underscores,
             and capitalised. If False, will use the parameter name
             without formatting. Default is True.
+        required_keys: set of field keys that are required at the
+            current nesting level. If ``None``, no fields are marked
+            required.
 
     Returns:
         List of ``_InputField`` instances, describing the structure of
@@ -385,13 +395,20 @@ def _simplify_schema(
     if ancestors is None:
         ancestors = []
     for child_key, child_val in schema_node.items():
-        child_data = _format_field(child_key, child_val, ancestors, use_title)
+        child_data = _format_field(
+            child_key, child_val, ancestors, use_title, required_keys
+        )
         accum.append(child_data)
         if child_data["type"] != "composite":
             continue
+        child_required = set(child_val.get("required", []))
         accum.extend(
             _simplify_schema(
-                child_val["properties"], [], child_data["ancestors"], use_title
+                child_val["properties"],
+                [],
+                child_data["ancestors"],
+                use_title,
+                child_required,
             )
         )
     return accum
@@ -424,6 +441,7 @@ class JinjaField(typing.TypedDict):
     type: str
     description: str
     title: str
+    required: bool
     default: NotRequired[typing.Any]
     number_constraints: NumberConstraints
 
@@ -488,8 +506,11 @@ def _parse_tesseract_oas(
     )
     input_schema = data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = _resolve_refs(input_schema, data)
+    top_level_required = set(resolved_schema.get("required", []))
     input_fields = _simplify_schema(
-        resolved_schema["properties"], use_title=pretty_headings
+        resolved_schema["properties"],
+        use_title=pretty_headings,
+        required_keys=top_level_required,
     )
     jinja_fields = [_input_to_jinja(field) for field in input_fields]
     return metadata, jinja_fields

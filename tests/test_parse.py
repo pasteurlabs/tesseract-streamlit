@@ -108,7 +108,10 @@ def test_schema_parse(mock_schema: bytes, mock_schema_fields: bytes) -> None:
     schema_data = orjson.loads(mock_schema)
     input_schema = schema_data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = parse._resolve_refs(input_schema, schema_data)
-    mock_input_fields = parse._simplify_schema(resolved_schema["properties"])
+    top_level_required = set(resolved_schema.get("required", []))
+    mock_input_fields = parse._simplify_schema(
+        resolved_schema["properties"], required_keys=top_level_required
+    )
     # check that the input fields match the pre-computed values
     precomputed_fields = orjson.loads(mock_schema_fields)
     assert mock_input_fields == precomputed_fields, (
