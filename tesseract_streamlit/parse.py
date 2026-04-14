@@ -438,6 +438,7 @@ class JinjaField(typing.TypedDict):
     uid: str
     stem: str
     key: str
+    qualified_title: str
     type: str
     description: str
     title: str
@@ -466,12 +467,14 @@ def _input_to_jinja(field: _InputField) -> JinjaField:
     parent_container = "st"
     if len(ancestors) > 1:
         parent_container = "container_" + "_".join(ancestors[:-1])
+    qualified_title = ".".join(_key_to_title(a) for a in ancestors)
     return JinjaField(
         parent_container=parent_container,
         container=f"container_{uid}",
         uid=uid,
         stem=ancestors[-1],
         key=".".join(ancestors),
+        qualified_title=qualified_title,
         **field_,
     )
 

@@ -198,10 +198,10 @@ with st.form("tesseract_form", border=False):
 if submitted:
     _missing_fields = [
         {% for field in schema if field.type == "array" and field.required -%}
-        ("{{ field.get('title', field.uid) }}", {{ field.uid }} is None),
+        ("{{ field.qualified_title }}", {{ field.uid }} is None),
         {% endfor -%}
         {% for field in schema if field.type == "string" and field.required -%}
-        ("{{ field.get('title', field.uid) }}", not {{ field.uid }}),
+        ("{{ field.qualified_title }}", not {{ field.uid }}),
         {% endfor -%}
     ]
     _missing_names = [name for name, missing in _missing_fields if missing]
