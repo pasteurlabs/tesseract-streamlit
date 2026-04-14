@@ -46,7 +46,7 @@ def test_auto_launch(goodbyeworld_url: str) -> None:
     mock_run.assert_called_once()
     app_path = mock_run.call_args[0][0]
     assert app_path.exists()
-    assert str(app_path).endswith(".py")
+    assert app_path.suffix == ".py"
 
 
 def test_py_extension(goodbyeworld_url: str) -> None:
