@@ -34,7 +34,7 @@ $ tesseract-streamlit [OPTIONS] [URL] [OUTPUT]
 
 ### Quick start
 
-The fastest way to get started — just point at a running Tesseract:
+If you've got a running Tesseract, you can get started fast by simply passing in its URL.
 
 ```bash
 $ tesseract-streamlit http://127.0.0.1:61725
