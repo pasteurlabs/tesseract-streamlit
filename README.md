@@ -26,13 +26,31 @@ $ pip install tesseract-streamlit
 ## 🧰 Usage
 
 ```bash
-$ tesseract-streamlit [OPTIONS] URL OUTPUT
+$ tesseract-streamlit [OPTIONS] [URL] [OUTPUT]
 ```
 
-* `URL`: The address to the Tesseract instance you want to interface with.
-* `OUTPUT`: The file path to write the generated Streamlit app.
+* `URL`: The address to the Tesseract instance you want to interface with. Not needed with `--from-image`.
+* `OUTPUT`: (Optional) The file path to write the generated Streamlit app. When omitted, the app is written to a cache file and Streamlit is launched automatically.
 
-For example:
+### Quick start
+
+If you've got a running Tesseract, you can get started fast by simply passing in its URL.
+
+```bash
+$ tesseract-streamlit http://127.0.0.1:61725
+```
+
+This generates the app and launches Streamlit in one step.
+
+Or, skip serving the Tesseract yourself entirely:
+
+```bash
+$ tesseract-streamlit --from-image vectoradd
+```
+
+This serves the Tesseract from the given image, generates the app, and launches Streamlit, in a single command.
+
+### Full example
 
 ```bash
 # Install dependencies
@@ -42,10 +60,15 @@ $ pip install tesseract-core tesseract-streamlit
 $ git clone https://github.com/pasteurlabs/tesseract-core.git
 $ tesseract build tesseract-core/examples/vectoradd
 
-# Serve Tesseract
+# Option A: Serve yourself and auto-launch the app
 $ tesseract serve vectoradd --port 61725
+$ tesseract-streamlit http://127.0.0.1:61725
 
-# Connect via tesseract-streamlit
+# Option B: Let tesseract-streamlit handle everything
+$ tesseract-streamlit --from-image vectoradd
+
+# Option C: Generate a script to run later
+$ tesseract serve vectoradd --port 61725
 $ tesseract-streamlit http://127.0.0.1:61725 app.py
 $ streamlit run app.py
 ```
@@ -54,6 +77,7 @@ $ streamlit run app.py
 
 | Option                 | Description                                                        |
 | ---------------------- | ------------------------------------------------------------------ |
+| `--from-image`         | (Optional) Tesseract image to serve automatically                  |
 | `--user-code, -u`      | (Optional) Path to Python file with plotting functions             |
 | `--help`               | Show the help message and exit                                     |
 
@@ -62,7 +86,7 @@ $ streamlit run app.py
 You can optionally pass a Python file containing user-defined functions for plotting inputs and/or outputs.
 
 ```bash
-$ tesseract-streamlit --user-code udf.py http://localhost:48819 app.py
+$ tesseract-streamlit --user-code udf.py http://localhost:48819
 ```
 
 The `udf.py` file should define functions like:
