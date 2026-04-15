@@ -6,6 +6,7 @@
         "ancestors": [
             "name"
         ],
+        "required": false,
         "default": "John Doe"
     },
     {
@@ -15,6 +16,7 @@
         "ancestors": [
             "age"
         ],
+        "required": false,
         "default": 30,
         "number_constraints": {
             "max_value": 125,
@@ -29,6 +31,7 @@
         "ancestors": [
             "height"
         ],
+        "required": false,
         "default": 175,
         "number_constraints": {
             "max_value": 300,
@@ -43,6 +46,7 @@
         "ancestors": [
             "alive"
         ],
+        "required": false,
         "default": true
     },
     {
@@ -52,6 +56,7 @@
         "ancestors": [
             "weight"
         ],
+        "required": true,
         "default": null,
         "number_constraints": {
             "max_value": null,
@@ -65,7 +70,8 @@
         "description": "The length of the person's left and right legs in cm.",
         "ancestors": [
             "leg_lengths"
-        ]
+        ],
+        "required": true
     },
     {
         "type": "composite",
@@ -73,7 +79,8 @@
         "description": "The person's only hobby.",
         "ancestors": [
             "hobby"
-        ]
+        ],
+        "required": true
     },
     {
         "type": "string",
@@ -83,6 +90,7 @@
             "hobby",
             "name"
         ],
+        "required": true,
         "default": ""
     },
     {
@@ -93,6 +101,7 @@
             "hobby",
             "active"
         ],
+        "required": true,
         "default": null
     },
     {
@@ -103,6 +112,7 @@
             "hobby",
             "experience"
         ],
+        "required": true,
         "default": null,
         "number_constraints": {
             "max_value": 120,
