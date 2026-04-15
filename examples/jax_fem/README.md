@@ -41,26 +41,31 @@ tesseract serve jax_fem
 
 ---
 
-## ⚡ Step 4: Generate the Streamlit App
+## ⚡ Step 4: Generate and Launch the Streamlit App
 
-With `tesseract-streamlit` installed, generate a ready-to-run Streamlit app:
+With `tesseract-streamlit` installed, generate and launch the app in one step:
 
 ```bash
-tesseract-streamlit --user-code udf.py "http://localhost:<PORT>" app.py
+cd ~/Documents/tesseract-streamlit/examples/jax_fem
+tesseract-streamlit --user-code udf.py "http://localhost:<PORT>"
 ```
+
+This writes the app to a cache file and launches Streamlit automatically.
 
 `udf.py` can be found in under `tesseract-streamlit/examples/jax_fem/`.
 It contains a custom function that takes the Tesseract's inputs to render a PyVista plot of the design structure directly in the UI! ⚙️
 Check out the [source code to see how it works](https://github.com/pasteurlabs/tesseract-streamlit/examples/jax_fem/udf.py).
 
----
+> [!TIP]
+> You can also skip Step 3 entirely and let `tesseract-streamlit` serve the Tesseract for you:
+> ```bash
+> tesseract-streamlit --from-image jax_fem --user-code udf.py
+> ```
 
-## ▶️ Step 5: Launch the App
-
-Run your new app with:
+If you prefer to generate a script to run later, pass an output path:
 
 ```bash
-cd ~/Documents/tesseract-streamlit/examples/jax_fem
+tesseract-streamlit --user-code udf.py "http://localhost:<PORT>" app.py
 streamlit run app.py
 ```
 
