@@ -50,7 +50,7 @@ intersphinx_mapping = {
     "numpy": ("http://docs.scipy.org/doc/numpy/", None),
 }
 
-templates_path = []
+templates_path = ["_templates"]
 exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
 
 
@@ -59,6 +59,11 @@ exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_static_path = ["static"]
+html_css_files = ["custom.css"]
+html_js_files = [
+    ("https://buttons.github.io/buttons.js", {"async": "async"}),
+    "external-links.js",
+]
 
 # Copy example notebooks to docs/examples folder on every build
 for example_dir in Path("../examples").glob("*/"):
