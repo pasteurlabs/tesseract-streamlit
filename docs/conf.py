@@ -14,9 +14,9 @@ from tesseract_streamlit import __version__
 
 PARENT_DIR = Path(__file__).parent.resolve()
 
-project = "tesseract-streamlit"
-copyright = "2024, The tesseract-streamlit Team @ Pasteur Labs"
-author = "The tesseract-streamlit Team @ Pasteur Labs"
+project = "Tesseract-Streamlit"
+copyright = "2026, The Tesseract-Streamlit Team @ Pasteur Labs"
+author = "The Tesseract-Streamlit Team @ Pasteur Labs"
 
 # The short X.Y version
 parsed_version = re.match(r"(\d+\.\d+\.\d+)", __version__)
