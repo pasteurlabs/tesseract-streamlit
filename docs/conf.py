@@ -59,7 +59,7 @@ exclude_patterns = ["build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_static_path = ["static"]
-html_css_files = ["custom.css"]
+html_css_files = ["top-nav.css", "custom.css"]
 html_js_files = [
     ("https://buttons.github.io/buttons.js", {"async": "async"}),
     "external-links.js",
