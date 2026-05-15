@@ -31,7 +31,7 @@ tesseract-streamlit = "tesseract_streamlit.cli:cli"
 
 [project.optional-dependencies]
 docs = [
-    "sphinx",
+    "sphinx<9",
     "sphinx_autodoc_typehints",
     "furo",
     "myst-parser",
