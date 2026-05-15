@@ -36,6 +36,7 @@ docs = [
     "furo",
     "myst-parser",
     "myst-nb",
+    "sphinx_copybutton",
 ]
 dev = [
     "pre-commit",
