@@ -12,11 +12,11 @@ class Hobby(BaseModel):
 
 
 class InputSchema(BaseModel):
-    name: str = Field(
+    name: str | list[str] = Field(
         description="Name of the person you want to greet.", default="John Doe"
     )
-    age: int = Field(
-        description="Age of person in years.", default=30, minimum=0, maximum=125
+    age: int | None = Field(
+        description="Age of person in years.", minimum=0, maximum=125
     )
     height: float = Field(
         description="Height of person in cm.",
@@ -41,9 +41,21 @@ class OutputSchema(BaseModel):
 
 def apply(inputs: InputSchema) -> OutputSchema:
     """Greet a person whose name is given as input."""
+    if isinstance(inputs.name, str):
+        names = inputs.name
+    elif isinstance(inputs.name, list):
+        names = f"{', '.join(*inputs.name[:-1])} and {inputs.name[-1]}"
+
+    if inputs.age:
+        age_message = f"You are {inputs.age} years old."
+    else:
+        age_message = (
+            "I understand you don't like to talk about your age, my apologies."
+        )
+
     return OutputSchema(
         greeting=(
-            f"Hello {inputs.name}! You are {inputs.age} years old. "
+            f"Hello {names}! {age_message} "
             f"That's pretty good. Oh, so tall? {inputs.height} cm! Wow. You "
             f"must be very successful. "
             f"You are {inputs.weight} kg? That's much larger than an atom, "
@@ -55,6 +67,5 @@ def apply(inputs: InputSchema) -> OutputSchema:
             f"you're {'' if inputs.hobby.active else 'not'} actively doing "
             "it. I guess that's somewhat interesting. Anyway, pretty "
             + ("cool you're alive." if inputs.alive else "sad you're dead.")
-        ),
-        dummy=list(range(100)),
+        )
     )
