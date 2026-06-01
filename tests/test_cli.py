@@ -1,6 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import orjson
 from streamlit.testing.v1 import AppTest
@@ -20,6 +21,32 @@ def test_cli(goodbyeworld_url: str) -> None:
         assert result.exit_code == 0
         assert result.output == ""
         assert Path(app_path).exists()
+
+
+def test_no_url_no_from_image() -> None:
+    """Error when neither URL nor --from-image is provided."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [])
+    assert result.exit_code != 0
+
+
+def test_url_and_from_image_exclusive(goodbyeworld_url: str) -> None:
+    """Error when both URL and --from-image are provided."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [goodbyeworld_url, "--from-image", "some-image"])
+    assert result.exit_code != 0
+
+
+def test_auto_launch(goodbyeworld_url: str) -> None:
+    """When output is omitted, app is written to cache and streamlit is launched."""
+    runner = CliRunner()
+    with patch("tesseract_streamlit.cli.run_streamlit", return_value=0) as mock_run:
+        result = runner.invoke(cli, [goodbyeworld_url])
+    assert result.exit_code == 0
+    mock_run.assert_called_once()
+    app_path = mock_run.call_args[0][0]
+    assert app_path.exists()
+    assert app_path.suffix == ".py"
 
 
 def test_py_extension(goodbyeworld_url: str) -> None:

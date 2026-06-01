@@ -72,7 +72,9 @@ st.markdown({% if not udf.docs %}""{% else %}
 {# next, add subheading and descriptive text #}
 {{ field.container }}.subheader("{{ field.title }}")
 {% if field.description %}
-{{ field.container }}.caption("{{ field.description }}")
+{{ field.container }}.caption(
+    {{- multiline(field.description) | indent(4) }}
+)
 {% endif %}
 {# identify which type of Streamlit element to render based on field type #}
 {% if field.type == 'string' %}
