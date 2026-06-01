@@ -59,14 +59,15 @@ charset-normalizer==3.4.7
 click==8.4.1
     # via
     #   streamlit
+    #   tesseract-core
     #   tesseract-streamlit
-    #   typer
     #   uvicorn
 colorama==0.4.6 ; sys_platform == 'win32'
     # via
     #   click
     #   ipython
     #   tqdm
+    #   typer
 comm==0.2.3
     # via ipywidgets
 contourpy==1.3.2 ; python_full_version < '3.11'
@@ -79,7 +80,7 @@ contourpy==1.3.3 ; python_full_version >= '3.11'
     #   matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==4.16.0
+cyclopts==4.16.1
     # via pyvista
 decorator==5.3.1
     # via ipython
@@ -109,9 +110,9 @@ gitpython==3.1.50
     # via streamlit
 h11==0.16.0
     # via uvicorn
-httptools==0.7.1
+httptools==0.8.0
     # via streamlit
-idna==3.16
+idna==3.17
     # via
     #   anyio
     #   jsonschema
@@ -119,7 +120,7 @@ idna==3.16
     #   yarl
 ipython==8.39.0 ; python_full_version < '3.11'
     # via ipywidgets
-ipython==9.13.0 ; python_full_version >= '3.11'
+ipython==9.14.0 ; python_full_version >= '3.11'
     # via ipywidgets
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
     # via ipython
@@ -162,7 +163,7 @@ jupyter-core==5.9.1
     #   nbformat
 jupyter-events==0.12.1
     # via jupyter-server
-jupyter-server==2.18.2
+jupyter-server==2.19.0
     # via jupyter-server-proxy
 jupyter-server-proxy==4.5.0
     # via pyvista
@@ -283,11 +284,11 @@ pandas==3.0.3 ; python_full_version >= '3.11'
     #   streamlit
 pandocfilters==1.5.1
     # via nbconvert
-panel==1.9.1
+panel==1.9.2
     # via
     #   panel-material-ui
     #   stpyvista
-panel-material-ui==0.11.1
+panel-material-ui==0.11.2
     # via panel
 param==2.4.0
     # via
@@ -303,9 +304,9 @@ pillow==12.2.0
     #   matplotlib
     #   pyvista
     #   streamlit
-pip==26.1.1
+pip==26.1.2
     # via tesseract-core
-platformdirs==4.9.6
+platformdirs==4.10.0
     # via
     #   jupyter-core
     #   pooch
@@ -322,7 +323,7 @@ propcache==0.5.2
     #   yarl
 protobuf==7.35.0
     # via streamlit
-psutil==7.2.2 ; python_full_version >= '3.11'
+psutil==7.2.2 ; python_full_version >= '3.11' and sys_platform != 'emscripten'
     # via ipython
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -359,7 +360,7 @@ python-dateutil==2.9.0.post0
     #   pandas
 python-json-logger==4.1.0
     # via jupyter-events
-python-multipart==0.0.29
+python-multipart==0.0.30
     # via streamlit
 pytz==2026.2 ; python_full_version < '3.11'
     # via pandas
@@ -414,7 +415,11 @@ rich==15.0.0
     #   typer
 rich-rst==2.0.1
     # via cyclopts
-rpds-py==0.30.0
+rpds-py==0.30.0 ; python_full_version < '3.11'
+    # via
+    #   jsonschema
+    #   referencing
+rpds-py==2026.5.1 ; python_full_version >= '3.11'
     # via
     #   jsonschema
     #   referencing
@@ -436,11 +441,11 @@ soupsieve==2.8.4
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==1.1.0
+starlette==1.2.1
     # via streamlit
 stpyvista==0.2.1
     # via tesseract-streamlit
-streamlit==1.57.0
+streamlit==1.58.0
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -450,7 +455,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==1.8.2
+tesseract-core==1.9.0
     # via tesseract-streamlit
 tinycss2==1.4.0
     # via bleach
@@ -458,7 +463,7 @@ toml==0.10.2
     # via streamlit
 tomli==2.4.1 ; python_full_version < '3.11'
     # via cyclopts
-tornado==6.5.5
+tornado==6.5.6
     # via
     #   bokeh
     #   jupyter-client
@@ -482,7 +487,7 @@ traitlets==5.15.0
     #   nbformat
 trame==3.13.2
     # via pyvista
-trame-client==3.12.2
+trame-client==3.12.3
     # via
     #   pyvista
     #   trame
@@ -501,7 +506,7 @@ trame-vtk==2.11.8
     # via pyvista
 trame-vuetify==3.2.2
     # via pyvista
-typer==0.25.1
+typer==0.26.4
     # via tesseract-core
 typing-extensions==4.15.0
     # via
