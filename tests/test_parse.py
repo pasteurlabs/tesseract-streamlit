@@ -1,3 +1,4 @@
+import ast
 import random
 import typing
 from pathlib import Path
@@ -5,8 +6,11 @@ from pathlib import Path
 import orjson
 import pytest
 import pyvista as pv
+from jinja2 import Environment, FileSystemLoader
 
 from tesseract_streamlit import parse
+
+PACKAGE_DIR = Path(__file__).parent.parent / "tesseract_streamlit"
 
 PARENT_DIR = Path(__file__).parent
 
@@ -108,7 +112,10 @@ def test_schema_parse(mock_schema: bytes, mock_schema_fields: bytes) -> None:
     schema_data = orjson.loads(mock_schema)
     input_schema = schema_data["components"]["schemas"]["Apply_InputSchema"]
     resolved_schema = parse._resolve_refs(input_schema, schema_data)
-    mock_input_fields = parse._simplify_schema(resolved_schema["properties"])
+    top_level_required = set(resolved_schema.get("required", []))
+    mock_input_fields = parse._simplify_schema(
+        resolved_schema["properties"], required_keys=top_level_required
+    )
     # check that the input fields match the pre-computed values
     precomputed_fields = orjson.loads(mock_schema_fields)
     assert mock_input_fields == precomputed_fields, (
@@ -129,6 +136,41 @@ def test_metadata_extract(mock_schema: bytes) -> None:
     for key, val in reference_vals.items():
         message = f"Tesseract {key} incorrectly extracted."
         assert val == metadata[key], message
+
+
+def test_newline_in_field_description() -> None:
+    """Descriptions with newlines must not produce invalid Python (GH-87)."""
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    schema = [
+        parse.JinjaField(
+            container="container_foo",
+            parent_container="st",
+            uid="foo",
+            stem="foo",
+            key="foo",
+            type="array",
+            title="Foo",
+            description="first line\nsecond line",
+            number_constraints={},
+        ),
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    # The rendered code must be valid Python — this was the bug in GH-87
+    ast.parse(rendered)
 
 
 def test_description_from_oas(

@@ -1,6 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import orjson
 from streamlit.testing.v1 import AppTest
@@ -20,6 +21,32 @@ def test_cli(goodbyeworld_url: str) -> None:
         assert result.exit_code == 0
         assert result.output == ""
         assert Path(app_path).exists()
+
+
+def test_no_url_no_from_image() -> None:
+    """Error when neither URL nor --from-image is provided."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [])
+    assert result.exit_code != 0
+
+
+def test_url_and_from_image_exclusive(goodbyeworld_url: str) -> None:
+    """Error when both URL and --from-image are provided."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [goodbyeworld_url, "--from-image", "some-image"])
+    assert result.exit_code != 0
+
+
+def test_auto_launch(goodbyeworld_url: str) -> None:
+    """When output is omitted, app is written to cache and streamlit is launched."""
+    runner = CliRunner()
+    with patch("tesseract_streamlit.cli.run_streamlit", return_value=0) as mock_run:
+        result = runner.invoke(cli, [goodbyeworld_url])
+    assert result.exit_code == 0
+    mock_run.assert_called_once()
+    app_path = mock_run.call_args[0][0]
+    assert app_path.exists()
+    assert app_path.suffix == ".py"
 
 
 def test_py_extension(goodbyeworld_url: str) -> None:
@@ -62,6 +89,44 @@ def test_app(goodbyeworld_url: str) -> None:
     with open(PARENT_DIR / "tess-out.json", "rb") as f:
         sample_output = orjson.loads(f.read())
     assert tess_output == sample_output
+
+
+def test_missing_array_blocked(goodbyeworld_url: str) -> None:
+    """Submitting without filling required array fields shows an error."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [goodbyeworld_url, "-"])
+    app = AppTest.from_string(result.output, default_timeout=3)
+    app.run()
+
+    # Fill everything except the required array field (leg_lengths)
+    app.number_input(key="number.weight").set_value(83.0).run()
+    app.text_input(key="int.hobby.name").input("hula hoop").run()
+    app.checkbox(key="boolean.hobby.active").check().run()
+    app.number_input(key="int.hobby.experience").set_value(3).run()
+    app.button[0].click().run()
+
+    assert not app.exception
+    assert len(app.error) == 1
+    assert "Leg Lengths" in app.error[0].value
+
+
+def test_missing_string_blocked(goodbyeworld_url: str) -> None:
+    """Submitting without filling required string fields shows an error."""
+    runner = CliRunner()
+    result = runner.invoke(cli, [goodbyeworld_url, "-"])
+    app = AppTest.from_string(result.output, default_timeout=3)
+    app.run()
+
+    # Fill everything except the required string field (hobby.name)
+    app.number_input(key="number.weight").set_value(83.0).run()
+    app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
+    app.checkbox(key="boolean.hobby.active").check().run()
+    app.number_input(key="int.hobby.experience").set_value(3).run()
+    app.button[0].click().run()
+
+    assert not app.exception
+    assert len(app.error) == 1
+    assert "Name" in app.error[0].value
 
 
 def test_zerodim_pprint(zerodim_url: str) -> None:
