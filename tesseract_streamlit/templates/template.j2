@@ -191,7 +191,10 @@ _tesseract_io_preview(inputs, "input")
 _tesseract_io_preview(outputs, "output")
 {% endmacro %}
 
-{#- inserts the full Streamlit form, with inputs and outputs in a two-column layout.
+{#- inserts the full Streamlit form, with inputs and outputs in a two-column
+    layout. each column is wrapped in a fixed-height container so they scroll
+    independently: the user can keep tweaking inputs and watching results
+    side-by-side without scrolling the whole page.
     the submit button sits at the top of the output column, keeping it always
     visible for interactive use.
     args:
@@ -199,9 +202,50 @@ _tesseract_io_preview(outputs, "output")
     outputs: interactive streamlit form code
 -#}
 {% macro insert_form(schema, udfs) %}
+{# Each column lives in a scrollable st.container. Streamlit only turns a
+   container into a scroll region when it has a fixed `height`, so we set a
+   fallback pixel height and then override it with CSS so the columns instead
+   stretch to fill the viewport below the page header.
+
+   The `key` gives each container a stable `.st-key-<key>` class. That element
+   itself is `flex: 1 1 0%`, so its height is dictated by its parent's
+   `flex-basis` (which Streamlit sets to the fixed pixel height). We therefore
+   target the *parent* via `:has()` and relax its basis to a viewport-relative
+   value; the keyed element then stretches to fill it and scrolls internally. #}
+_COLUMN_FALLBACK_HEIGHT = 800
+st.html(
+    '''
+    <style>
+    /* Pin the whole app to the viewport so only the columns scroll, never the
+       page body. Streamlit's main region (stMain) scrolls by default once the
+       title + the tall default block padding push content past the viewport. */
+    [data-testid="stMain"] {
+        overflow: hidden !important;
+    }
+    /* Trim Streamlit's generous default block padding (~6rem top / 10rem
+       bottom) so the title sits compactly above the columns. */
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 2rem !important;
+        padding-bottom: 1rem !important;
+    }
+    /* Make the columns row fill the height left below the (now compact) header,
+       and have each scroll column stretch to fill that row. The keyed element
+       is a flex child (`flex: 1 1 0%`) sized by its parent's flex-basis, so we
+       target the parent via `:has()`; the `--io-col-height` var is the viewport
+       minus the space above the row (header + title line + description). */
+    div:has(> .st-key-io_col_input),
+    div:has(> .st-key-io_col_output) {
+        --io-col-height: calc(100vh - 12rem);
+        flex: 1 1 var(--io-col-height) !important;
+        height: var(--io-col-height) !important;
+    }
+    </style>
+    '''
+)
+
 input_col, output_col = st.columns([2, 3])
 
-with input_col:
+with input_col.container(height=_COLUMN_FALLBACK_HEIGHT, key="io_col_input"):
     with st.form("tesseract_form", border=False):
         {{ render_fields(schema) | indent(8) }}
         submitted = st.form_submit_button("Submit", use_container_width=True)
@@ -222,7 +266,9 @@ if submitted:
             + ", ".join(f"**{f}**" for f in _missing_names)
         )
     else:
-        with output_col:
+        with output_col.container(
+            height=_COLUMN_FALLBACK_HEIGHT, key="io_col_output"
+        ):
             {{ render_outputs(schema, udfs) | indent(12) }}
 {% endmacro %}
 
@@ -344,11 +390,16 @@ def main() -> None:
         page_icon="{{ favicon_path }}",
         layout="wide",
     )
-    st.title("{{ metadata.title }}")
+    {# Title and version share one compact line so the header takes less
+       vertical space; the description follows below. #}
+    st.markdown(
+        "# {{ metadata.title }} "
+        "<span style='font-size:1rem;color:gray;'>v{{ metadata.version }}</span>",
+        unsafe_allow_html=True,
+    )
     st.markdown(
         {{- multiline(metadata.description) | indent(8) }}
     )
-    st.markdown("**version: {{ metadata.version }}**")
     {{ insert_form(schema, udfs) | indent(4) }}
 
 
