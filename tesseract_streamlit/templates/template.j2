@@ -77,16 +77,18 @@ st.markdown({% if not udf.docs %}""{% else %}
 )
 {% endif -%}
 {% else %}
-{# leaf fields render directly into their parent container #}
+{# leaf fields render directly into their parent container; alias it to
+   `container` so the field-type branches below read uniformly #}
+{% set container = field.parent_container %}
 {% if field.type == 'string' -%}
-{{ field.uid }} = {{ field.parent_container }}.text_input(
+{{ field.uid }} = {{ container }}.text_input(
     "{{ field.get('title', field.uid) }}",
     key="int.{{ field.key }}",
     value="{{ field.get('default', '') }}",
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'integer' -%}
-{{ field.uid }} = {{ field.parent_container }}.number_input(
+{{ field.uid }} = {{ container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
@@ -97,7 +99,7 @@ st.markdown({% if not udf.docs %}""{% else %}
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'number' -%}
-{{ field.uid }} = {{ field.parent_container }}.number_input(
+{{ field.uid }} = {{ container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
@@ -108,21 +110,21 @@ st.markdown({% if not udf.docs %}""{% else %}
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'boolean' -%}
-{{ field.uid }} = {{ field.parent_container }}.checkbox(
+{{ field.uid }} = {{ container }}.checkbox(
     "{{ field.get('title', field.uid) }}",
     key="boolean.{{ field.key }}",
     value={{ field.get("default", None) }},
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'array' -%}
-{{ field.uid }}_text = {{ field.parent_container }}.text_area(
+{{ field.uid }}_text = {{ container }}.text_area(
     "{{ field.get('title', field.uid) }}",
     height=100,
     key="textarea.{{ field.key }}",
     placeholder="[1.0, 2.0, 3.0]",
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-with {{ field.parent_container }}.popover("Upload from file"):
+with {{ container }}.popover("Upload from file"):
     {{ field.uid }}_file = st.file_uploader(
         "Upload {{ field.uid.replace("_", ".") }} JSON file",
         type=["json", "txt"],
@@ -133,19 +135,19 @@ if {{ field.uid }}_file is not None:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
     except Exception as e:
-        {{ field.parent_container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+        {{ container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
 elif {{ field.uid }}_text:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_text)
     except Exception as e:
-        {{ field.parent_container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
+        {{ container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
 if {{ field.uid }} is not None:
     try:
         arr = np.array({{ field.uid }}, dtype=np.float64)
-        {{ field.parent_container }}.write("Array preview:")
-        {{ field.parent_container }}.code(arr)
+        {{ container }}.write("Array preview:")
+        {{ container }}.code(arr)
     except Exception as e:
-        {{ field.parent_container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+        {{ container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
 {% endif -%}
 {% endif -%}
 {% endfor %}
@@ -228,11 +230,22 @@ st.html(
         padding-top: 2rem !important;
         padding-bottom: 1rem !important;
     }
-    /* Make the columns row fill the height left below the (now compact) header,
+    /* Cap the header (title + description) at a fixed height and let it scroll
+       internally if the description is long. This keeps the space above the
+       columns deterministic regardless of description length, so the 12rem
+       budget in the column height calc below holds instead of being a guess
+       that a long description would blow past. The cap lives *inside* that
+       budget, so it doesn't shorten the columns. */
+    .st-key-app_header {
+        max-height: 10rem;
+        overflow-y: auto;
+    }
+    /* Make the columns row fill the height left below the (now capped) header,
        and have each scroll column stretch to fill that row. The keyed element
        is a flex child (`flex: 1 1 0%`) sized by its parent's flex-basis, so we
-       target the parent via `:has()`; the `--io-col-height` var is the viewport
-       minus the space above the row (header + title line + description). */
+       target the parent via `:has()`. The 12rem budget covers the trimmed block
+       padding plus the header; capping the header above keeps that budget valid
+       regardless of how long the description is. */
     div:has(> .st-key-io_col_input),
     div:has(> .st-key-io_col_output) {
         --io-col-height: calc(100vh - 12rem);
@@ -391,15 +404,19 @@ def main() -> None:
         layout="wide",
     )
     {# Title and version share one compact line so the header takes less
-       vertical space; the description follows below. #}
-    st.markdown(
-        "# {{ metadata.title }} "
-        "<span style='font-size:1rem;color:gray;'>v{{ metadata.version }}</span>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        {{- multiline(metadata.description) | indent(8) }}
-    )
+       vertical space; the description follows below. Both live in a keyed
+       container so the CSS can cap its height and scroll it internally,
+       keeping the space above the columns fixed no matter how long the
+       description is. #}
+    with st.container(key="app_header"):
+        st.markdown(
+            "# {{ metadata.title }} "
+            "<span style='font-size:1rem;color:gray;'>v{{ metadata.version }}</span>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            {{- multiline(metadata.description) | indent(12) }}
+        )
     {{ insert_form(schema, udfs) | indent(4) }}
 
 
