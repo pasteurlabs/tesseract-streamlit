@@ -14,7 +14,7 @@ annotated-doc==0.0.4
     # via typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.13.0
+anyio==4.14.0
     # via
     #   jupyter-server
     #   starlette
@@ -48,7 +48,7 @@ bokeh==3.9.1
     #   stpyvista
 cachetools==7.1.4
     # via streamlit
-certifi==2026.5.20
+certifi==2026.6.17
     # via requests
 cffi==2.0.0
     # via
@@ -59,7 +59,6 @@ charset-normalizer==3.4.7
 click==8.4.1
     # via
     #   streamlit
-    #   tesseract-core
     #   tesseract-streamlit
     #   uvicorn
 colorama==0.4.6 ; sys_platform == 'win32'
@@ -163,7 +162,7 @@ jupyter-core==5.9.1
     #   nbformat
 jupyter-events==0.12.1
     # via jupyter-server
-jupyter-server==2.19.0
+jupyter-server==2.20.0
     # via jupyter-server-proxy
 jupyter-server-proxy==4.5.0
     # via pyvista
@@ -209,11 +208,11 @@ mdit-py-plugins==0.6.1
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.2.1
+mistune==3.3.0
     # via nbconvert
 more-itertools==11.1.0
     # via trame-server
-msgpack==1.2.0
+msgpack==1.2.1
     # via wslink
 multidict==6.7.1
     # via
@@ -235,7 +234,7 @@ nbformat==5.10.4
     #   nbconvert
 nest-asyncio2==1.7.2
     # via pyvista
-nh3==0.3.5
+nh3==0.3.6
     # via panel
 numpy==2.2.6 ; python_full_version < '3.11'
     # via
@@ -248,7 +247,18 @@ numpy==2.2.6 ; python_full_version < '3.11'
     #   streamlit
     #   tesseract-core
     #   tesseract-streamlit
-numpy==2.4.6 ; python_full_version >= '3.11'
+numpy==2.4.6 ; python_full_version == '3.11.*'
+    # via
+    #   bokeh
+    #   contourpy
+    #   matplotlib
+    #   pandas
+    #   pydeck
+    #   pyvista
+    #   streamlit
+    #   tesseract-core
+    #   tesseract-streamlit
+numpy==2.5.0 ; python_full_version >= '3.12'
     # via
     #   bokeh
     #   contourpy
@@ -459,7 +469,7 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==1.9.0
+tesseract-core==1.10.0
     # via tesseract-streamlit
 tinycss2==1.5.1
     # via bleach
@@ -474,7 +484,7 @@ tornado==6.5.7
     #   jupyter-server
     #   jupyter-server-proxy
     #   terminado
-tqdm==4.68.2
+tqdm==4.68.3
     # via panel
 traitlets==5.15.1
     # via
