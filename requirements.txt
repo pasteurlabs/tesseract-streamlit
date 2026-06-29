@@ -8,13 +8,13 @@ aiohttp==3.14.1
     #   wslink
 aiosignal==1.4.0
     # via aiohttp
-altair==6.2.1
+altair==6.2.2
     # via streamlit
 annotated-doc==0.0.4
     # via typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.14.0
+anyio==4.14.1
     # via
     #   jupyter-server
     #   starlette
@@ -56,7 +56,7 @@ cffi==2.0.0
     #   pyzmq
 charset-normalizer==3.4.7
     # via requests
-click==8.4.1
+click==8.4.2
     # via
     #   streamlit
     #   tesseract-streamlit
@@ -79,7 +79,7 @@ contourpy==1.3.3 ; python_full_version >= '3.11'
     #   matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==4.18.0
+cyclopts==4.19.0
     # via pyvista
 decorator==5.3.1
     # via ipython
@@ -119,7 +119,7 @@ idna==3.18
     #   yarl
 ipython==8.39.0 ; python_full_version < '3.11'
     # via ipywidgets
-ipython==9.14.1 ; python_full_version >= '3.11'
+ipython==9.15.0 ; python_full_version >= '3.11'
     # via ipywidgets
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
     # via ipython
@@ -208,7 +208,7 @@ mdit-py-plugins==0.6.1
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.3.0
+mistune==3.3.2
     # via nbconvert
 more-itertools==11.1.0
     # via trame-server
@@ -292,7 +292,7 @@ pandas==2.3.3 ; python_full_version < '3.11'
     # via
     #   panel
     #   streamlit
-pandas==3.0.3 ; python_full_version >= '3.11'
+pandas==3.0.4 ; python_full_version >= '3.11'
     # via
     #   panel
     #   streamlit
@@ -337,7 +337,7 @@ propcache==0.5.2
     #   yarl
 protobuf==7.35.1
     # via streamlit
-psutil==7.2.2 ; python_full_version >= '3.11' and sys_platform != 'emscripten'
+psutil==7.2.2 ; python_full_version >= '3.11' and sys_platform != 'cygwin' and sys_platform != 'emscripten'
     # via ipython
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -427,7 +427,7 @@ rich==15.0.0
     #   rich-rst
     #   tesseract-core
     #   typer
-rich-rst==2.0.1
+rich-rst==2.0.2
     # via cyclopts
 rpds-py==0.30.0 ; python_full_version < '3.11'
     # via
@@ -520,7 +520,7 @@ trame-vtk==2.11.8
     # via pyvista
 trame-vuetify==3.2.2
     # via pyvista
-typer==0.26.7
+typer==0.26.8
     # via tesseract-core
 typing-extensions==4.15.0
     # via
