@@ -25,11 +25,11 @@ import sys
 import typing
 import warnings
 from pathlib import Path
+from typing import NotRequired
 
 import orjson
 import pyvista as pv
 import requests
-from typing_extensions import NotRequired
 
 __all__ = [
     "FuncDescription",
