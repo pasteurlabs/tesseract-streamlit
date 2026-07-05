@@ -27,8 +27,6 @@ arrow==1.4.0
     # via isoduration
 asttokens==3.0.1
     # via stack-data
-async-timeout==5.0.1 ; python_full_version < '3.11'
-    # via aiohttp
 attrs==26.1.0
     # via
     #   aiohttp
@@ -69,11 +67,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   typer
 comm==0.2.3
     # via ipywidgets
-contourpy==1.3.2 ; python_full_version < '3.11'
-    # via
-    #   bokeh
-    #   matplotlib
-contourpy==1.3.3 ; python_full_version >= '3.11'
+contourpy==1.3.3
     # via
     #   bokeh
     #   matplotlib
@@ -87,10 +81,6 @@ defusedxml==0.7.1
     # via nbconvert
 docstring-parser==0.18.0
     # via cyclopts
-exceptiongroup==1.3.1 ; python_full_version < '3.11'
-    # via
-    #   anyio
-    #   ipython
 executing==2.2.1
     # via stack-data
 fastjsonschema==2.21.2
@@ -117,11 +107,9 @@ idna==3.18
     #   jsonschema
     #   requests
     #   yarl
-ipython==8.39.0 ; python_full_version < '3.11'
+ipython==9.15.0
     # via ipywidgets
-ipython==9.15.0 ; python_full_version >= '3.11'
-    # via ipywidgets
-ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
+ipython-pygments-lexers==1.1.1
     # via ipython
 ipywidgets==8.1.8
     # via pyvista
@@ -180,12 +168,7 @@ linkify-it-py==2.1.0
     # via panel
 markdown==3.10.2
     # via panel
-markdown-it-py==3.0.0 ; python_full_version < '3.11'
-    # via
-    #   mdit-py-plugins
-    #   panel
-    #   rich
-markdown-it-py==4.2.0 ; python_full_version >= '3.11'
+markdown-it-py==4.2.0
     # via
     #   mdit-py-plugins
     #   panel
@@ -194,11 +177,7 @@ markupsafe==3.0.3
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.10.9 ; python_full_version < '3.11'
-    # via
-    #   pyvista
-    #   vtk
-matplotlib==3.11.0 ; python_full_version >= '3.11'
+matplotlib==3.11.0
     # via
     #   pyvista
     #   vtk
@@ -236,29 +215,7 @@ nest-asyncio2==1.7.2
     # via pyvista
 nh3==0.3.6
     # via panel
-numpy==2.2.6 ; python_full_version < '3.11'
-    # via
-    #   bokeh
-    #   contourpy
-    #   matplotlib
-    #   pandas
-    #   pydeck
-    #   pyvista
-    #   streamlit
-    #   tesseract-core
-    #   tesseract-streamlit
-numpy==2.4.6 ; python_full_version == '3.11.*'
-    # via
-    #   bokeh
-    #   contourpy
-    #   matplotlib
-    #   pandas
-    #   pydeck
-    #   pyvista
-    #   streamlit
-    #   tesseract-core
-    #   tesseract-streamlit
-numpy==2.5.0 ; python_full_version >= '3.12'
+numpy==2.5.0
     # via
     #   bokeh
     #   contourpy
@@ -273,8 +230,6 @@ orjson==3.11.9
     # via
     #   tesseract-core
     #   tesseract-streamlit
-overrides==7.7.0 ; python_full_version < '3.12'
-    # via jupyter-server
 packaging==26.2
     # via
     #   altair
@@ -288,11 +243,7 @@ packaging==26.2
     #   pooch
     #   streamlit
     #   tesseract-core
-pandas==2.3.3 ; python_full_version < '3.11'
-    # via
-    #   panel
-    #   streamlit
-pandas==3.0.4 ; python_full_version >= '3.11'
+pandas==3.0.4
     # via
     #   panel
     #   streamlit
@@ -337,7 +288,7 @@ propcache==0.5.2
     #   yarl
 protobuf==7.35.1
     # via streamlit
-psutil==7.2.2 ; python_full_version >= '3.11' and sys_platform != 'cygwin' and sys_platform != 'emscripten'
+psutil==7.2.2 ; sys_platform != 'cygwin' and sys_platform != 'emscripten'
     # via ipython
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32')
     # via
@@ -376,8 +327,6 @@ python-json-logger==4.1.0
     # via jupyter-events
 python-multipart==0.0.32
     # via streamlit
-pytz==2026.2 ; python_full_version < '3.11'
-    # via pandas
 pyvista==0.48.4
     # via
     #   stpyvista
@@ -429,11 +378,7 @@ rich==15.0.0
     #   typer
 rich-rst==2.0.2
     # via cyclopts
-rpds-py==0.30.0 ; python_full_version < '3.11'
-    # via
-    #   jsonschema
-    #   referencing
-rpds-py==2026.5.1 ; python_full_version >= '3.11'
+rpds-py==2026.5.1
     # via
     #   jsonschema
     #   referencing
@@ -475,8 +420,6 @@ tinycss2==1.5.1
     # via bleach
 toml==0.10.2
     # via streamlit
-tomli==2.4.1 ; python_full_version < '3.11'
-    # via cyclopts
 tornado==6.5.7
     # via
     #   bokeh
@@ -529,12 +472,7 @@ typing-extensions==4.15.0
     #   altair
     #   anyio
     #   beautifulsoup4
-    #   cyclopts
-    #   exceptiongroup
-    #   ipython
     #   jupyter-client
-    #   mistune
-    #   multidict
     #   panel
     #   pydantic
     #   pydantic-core
@@ -544,7 +482,6 @@ typing-extensions==4.15.0
     #   streamlit
     #   tesseract-streamlit
     #   typing-inspection
-    #   uvicorn
 typing-inspection==0.4.2
     # via pydantic
 tzdata==2026.2
