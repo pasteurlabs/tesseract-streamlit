@@ -67,24 +67,28 @@ st.markdown({% if not udf.docs %}""{% else %}
 {# AUTOMATICALLY POPULATING THE WEB-APP WITH INPUTS FROM THE SCHEMA
    ================================================================ #}
 {% for field in schema %}
-{# first, instantiate the container to hold the field #}
+{% if field.type == 'composite' %}
+{# composite fields get a bordered container with heading #}
 {{ field.container }} = {{ field.parent_container }}.container(border=True)
-{# next, add subheading and descriptive text #}
 {{ field.container }}.subheader("{{ field.title }}")
-{% if field.description %}
+{% if field.description -%}
 {{ field.container }}.caption(
     {{- multiline(field.description) | indent(4) }}
 )
-{% endif %}
-{# identify which type of Streamlit element to render based on field type #}
-{% if field.type == 'string' %}
-{{ field.uid }} = {{ field.container }}.text_input(
+{% endif -%}
+{% else %}
+{# leaf fields render directly into their parent container; alias it to
+   `container` so the field-type branches below read uniformly #}
+{% set container = field.parent_container %}
+{% if field.type == 'string' -%}
+{{ field.uid }} = {{ container }}.text_input(
     "{{ field.get('title', field.uid) }}",
     key="int.{{ field.key }}",
     value="{{ field.get('default', '') }}",
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{% elif field.type == 'integer' %}
-{{ field.uid }} = {{ field.container }}.number_input(
+{% elif field.type == 'integer' -%}
+{{ field.uid }} = {{ container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
@@ -92,9 +96,10 @@ st.markdown({% if not udf.docs %}""{% else %}
     format="%d",
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{% elif field.type == 'number' %}
-{{ field.uid }} = {{ field.container }}.number_input(
+{% elif field.type == 'number' -%}
+{{ field.uid }} = {{ container }}.number_input(
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
@@ -102,50 +107,49 @@ st.markdown({% if not udf.docs %}""{% else %}
     key="number.{{ field.key }}",
     format="%f",
     value=_cast_type({{ field.get("default", None) }}, float),
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{% elif field.type == 'boolean' %}
-{{ field.uid }} = {{ field.container }}.checkbox(
+{% elif field.type == 'boolean' -%}
+{{ field.uid }} = {{ container }}.checkbox(
     "{{ field.get('title', field.uid) }}",
     key="boolean.{{ field.key }}",
     value={{ field.get("default", None) }},
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{# array inputs are more complex, and require both text and file inputs #}
-{% elif field.type == 'array' %}
-# Array input
-{{ field.container }}.markdown("**Enter JSON array or upload file:**")
-{{ field.uid }}_text = {{ field.container }}.text_area(
-    "Paste {{ field.uid.replace("_", ".") }} JSON",
+{% elif field.type == 'array' -%}
+{{ field.uid }}_text = {{ container }}.text_area(
+    "{{ field.get('title', field.uid) }}",
     height=100,
-    key="textarea.{{ field.key }}"
+    key="textarea.{{ field.key }}",
+    placeholder="[1.0, 2.0, 3.0]",
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{{ field.uid }}_file = {{ field.container }}.file_uploader(
-    "Upload {{ field.uid.replace("_", ".") }} JSON file",
-    type=["json", "txt"],
-    key="fileupload.{{ field.key }}"
-)
-{# we also validate the JSON in try / except blocks, and alert the user
-   using Streamlit's built-in "error" function. #}
+with {{ container }}.popover("Upload from file"):
+    {{ field.uid }}_file = st.file_uploader(
+        "Upload {{ field.uid.replace("_", ".") }} JSON file",
+        type=["json", "txt"],
+        key="fileupload.{{ field.key }}"
+    )
 {{ field.uid }} = None
 if {{ field.uid }}_file is not None:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
     except Exception as e:
-        {{ field.container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+        {{ container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
 elif {{ field.uid }}_text:
     try:
         {{ field.uid }} = orjson.loads({{ field.uid }}_text)
     except Exception as e:
-        {{ field.container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
-
+        {{ container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
 if {{ field.uid }} is not None:
     try:
         arr = np.array({{ field.uid }}, dtype=np.float64)
-        {{ field.container }}.write("Array preview:")
-        {{ field.container }}.code(arr)
+        {{ container }}.write("Array preview:")
+        {{ container }}.code(arr)
     except Exception as e:
-        {{ field.container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
-{% endif %}
-
+        {{ container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endif -%}
+{% endif -%}
 {% endfor %}
 {% endmacro %}
 
@@ -157,14 +161,12 @@ if {{ field.uid }} is not None:
 {% macro render_outputs(schema, udfs) %}
 {# COLLECT THE INPUTS FOR THE TESSERACT
    ==================================== #}
-# Collect input values into a dictionary
 inputs_flat = {
     {% for field in schema if field.type != "composite" %}
     "{{ field.key }}": {{ field.uid }},
     {% endfor %}
 }
 inputs = _flat_to_nested(inputs_flat)
-_tesseract_io_preview(inputs, "input")
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
    ========================================================== #}
@@ -176,26 +178,90 @@ with (
     outputs = tess.apply(inputs)
 elapsed = time.perf_counter() - start_time
 st.success(f"Tesseract execution completed in {elapsed:.1f} seconds.")
-_tesseract_io_preview(outputs, "output")
 
-{# RENDER USER-DEFINED FUNCTIONS
-   ============================= #}
+{# RENDER USER-DEFINED FUNCTIONS FIRST (primary visual output)
+   ============================================================ #}
 {% if udfs %}
 {{- udf_plot(udfs.inputs, 'inputs', 'Input plots') -}}
 {{- udf_plot(udfs.outputs, 'outputs', 'Output plots') -}}
 {{- udf_plot(udfs.both, 'both', 'Mixed input + output plots') -}}
 {% endif %}
+
+{# JSON PREVIEWS (for debugging and download)
+   =========================================== #}
+_tesseract_io_preview(inputs, "input")
+_tesseract_io_preview(outputs, "output")
 {% endmacro %}
 
-{#- inserts the full Streamlit form, with inputs and outputs.
+{#- inserts the full Streamlit form, with inputs and outputs in a two-column
+    layout. each column is wrapped in a fixed-height container so they scroll
+    independently: the user can keep tweaking inputs and watching results
+    side-by-side without scrolling the whole page.
+    the submit button sits at the top of the output column, keeping it always
+    visible for interactive use.
     args:
         schema: the schema for the Streamlit form
     outputs: interactive streamlit form code
 -#}
 {% macro insert_form(schema, udfs) %}
-with st.form("tesseract_form", border=False):
-    {{ render_fields(schema) | indent(4) }}
-    submitted = st.form_submit_button("Submit")
+{# Each column lives in a scrollable st.container. Streamlit only turns a
+   container into a scroll region when it has a fixed `height`, so we set a
+   fallback pixel height and then override it with CSS so the columns instead
+   stretch to fill the viewport below the page header.
+
+   The `key` gives each container a stable `.st-key-<key>` class. That element
+   itself is `flex: 1 1 0%`, so its height is dictated by its parent's
+   `flex-basis` (which Streamlit sets to the fixed pixel height). We therefore
+   target the *parent* via `:has()` and relax its basis to a viewport-relative
+   value; the keyed element then stretches to fill it and scrolls internally. #}
+_COLUMN_FALLBACK_HEIGHT = 800
+st.html(
+    '''
+    <style>
+    /* Pin the whole app to the viewport so only the columns scroll, never the
+       page body. Streamlit's main region (stMain) scrolls by default once the
+       title + the tall default block padding push content past the viewport. */
+    [data-testid="stMain"] {
+        overflow: hidden !important;
+    }
+    /* Trim Streamlit's generous default block padding (~6rem top / 10rem
+       bottom) so the title sits compactly above the columns. */
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 2rem !important;
+        padding-bottom: 1rem !important;
+    }
+    /* Cap the header (title + description) at a fixed height and let it scroll
+       internally if the description is long. This keeps the space above the
+       columns deterministic regardless of description length, so the 12rem
+       budget in the column height calc below holds instead of being a guess
+       that a long description would blow past. The cap lives *inside* that
+       budget, so it doesn't shorten the columns. */
+    .st-key-app_header {
+        max-height: 10rem;
+        overflow-y: auto;
+    }
+    /* Make the columns row fill the height left below the (now capped) header,
+       and have each scroll column stretch to fill that row. The keyed element
+       is a flex child (`flex: 1 1 0%`) sized by its parent's flex-basis, so we
+       target the parent via `:has()`. The 12rem budget covers the trimmed block
+       padding plus the header; capping the header above keeps that budget valid
+       regardless of how long the description is. */
+    div:has(> .st-key-io_col_input),
+    div:has(> .st-key-io_col_output) {
+        --io-col-height: calc(100vh - 12rem);
+        flex: 1 1 var(--io-col-height) !important;
+        height: var(--io-col-height) !important;
+    }
+    </style>
+    '''
+)
+
+input_col, output_col = st.columns([2, 3])
+
+with input_col.container(height=_COLUMN_FALLBACK_HEIGHT, key="io_col_input"):
+    with st.form("tesseract_form", border=False):
+        {{ render_fields(schema) | indent(8) }}
+        submitted = st.form_submit_button("Submit", use_container_width=True)
 
 if submitted:
     _missing_fields = [
@@ -213,7 +279,10 @@ if submitted:
             + ", ".join(f"**{f}**" for f in _missing_names)
         )
     else:
-        {{ render_outputs(schema, udfs) | indent(8) }}
+        with output_col.container(
+            height=_COLUMN_FALLBACK_HEIGHT, key="io_col_output"
+        ):
+            {{ render_outputs(schema, udfs) | indent(12) }}
 {% endmacro %}
 
 {# PASTE THE USER-DEFINED CODE BEFORE THE AUTOGENERATED WEB-APP
@@ -302,14 +371,10 @@ def _serialise_json_pretty(data: dict[str, typing.Any]) -> bytes:
 def _tesseract_io_preview(
     data: dict[str, typing.Any], direction: typing.Literal["input", "output"]
 ) -> None:
-    st.subheader(f"Tesseract {direction.capitalize()}")
     data_json = _serialise_json_pretty(data)
-    if _count_json_lines(data_json) < PREVIEW_LINE_LIMIT:
-        st.json(data_json.decode())
-    else:
-        st.info(f"Tesseract {direction} preview too long to display.")
-
-    st.download_button(
+    label = f"Tesseract {direction.capitalize()} JSON"
+    expander_col, download_col = st.columns([4, 1], vertical_alignment="center")
+    download_col.download_button(
         f"Download {direction}",
         data=orjson.dumps(
             _replace_zerodim_arrays(data),
@@ -317,7 +382,13 @@ def _tesseract_io_preview(
         ),
         file_name=f"tesseract-{direction}.json",
         on_click="ignore",
+        help=f"Download as JSON",
     )
+    with expander_col.expander(label, expanded=False):
+        if _count_json_lines(data_json) < PREVIEW_LINE_LIMIT:
+            st.json(data_json.decode())
+        else:
+            st.info(f"Tesseract {direction} preview too long to display.")
 
 
 def _count_json_lines(json_str: bytes) -> int:
@@ -330,12 +401,22 @@ def main() -> None:
     st.set_page_config(
         page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
         page_icon="{{ favicon_path }}",
+        layout="wide",
     )
-    st.title("{{ metadata.title }}")
-    st.markdown(
-        {{- multiline(metadata.description) | indent(8) }}
-    )
-    st.markdown("**version: {{ metadata.version }}**")
+    {# Title and version share one compact line so the header takes less
+       vertical space; the description follows below. Both live in a keyed
+       container so the CSS can cap its height and scroll it internally,
+       keeping the space above the columns fixed no matter how long the
+       description is. #}
+    with st.container(key="app_header"):
+        st.markdown(
+            "# {{ metadata.title }} "
+            "<span style='font-size:1rem;color:gray;'>v{{ metadata.version }}</span>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            {{- multiline(metadata.description) | indent(12) }}
+        )
     {{ insert_form(schema, udfs) | indent(4) }}
 
 
