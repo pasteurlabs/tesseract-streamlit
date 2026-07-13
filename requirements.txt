@@ -14,7 +14,7 @@ annotated-doc==0.0.4
     # via typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.14.1
+anyio==4.14.2
     # via
     #   jupyter-server
     #   starlette
@@ -25,7 +25,7 @@ argon2-cffi-bindings==25.1.0
     # via argon2-cffi
 arrow==1.4.0
     # via isoduration
-asttokens==3.0.1
+asttokens==3.0.2
     # via stack-data
 async-timeout==5.0.1 ; python_full_version < '3.11'
     # via aiohttp
@@ -50,11 +50,11 @@ cachetools==7.1.4
     # via streamlit
 certifi==2026.6.17
     # via requests
-cffi==2.0.0
+cffi==2.1.0
     # via
     #   argon2-cffi-bindings
     #   pyzmq
-charset-normalizer==3.4.7
+charset-normalizer==3.4.9
     # via requests
 click==8.4.2
     # via
@@ -79,7 +79,7 @@ contourpy==1.3.3 ; python_full_version >= '3.11'
     #   matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==4.20.0
+cyclopts==4.21.0
     # via pyvista
 decorator==5.3.1
     # via ipython
@@ -105,7 +105,7 @@ frozenlist==1.8.0
     #   aiosignal
 gitdb==4.0.12
     # via gitpython
-gitpython==3.1.50
+gitpython==3.1.51
     # via streamlit
 h11==0.16.0
     # via uvicorn
@@ -208,7 +208,7 @@ mdit-py-plugins==0.6.1
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.3.2
+mistune==3.3.3
     # via nbconvert
 more-itertools==11.1.0
     # via trame-server
@@ -302,7 +302,7 @@ panel==1.9.3
     # via
     #   panel-material-ui
     #   stpyvista
-panel-material-ui==0.13.0
+panel-material-ui==0.14.0
     # via panel
 param==2.4.1
     # via
@@ -345,7 +345,7 @@ ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_pla
     #   terminado
 pure-eval==0.2.3
     # via stack-data
-pyarrow==24.0.0
+pyarrow==25.0.0
     # via streamlit
 pybase64==1.4.3
     # via tesseract-core
@@ -459,7 +459,7 @@ starlette==1.3.1
     # via streamlit
 stpyvista==0.2.1
     # via tesseract-streamlit
-streamlit==1.58.0
+streamlit==1.59.1
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -484,7 +484,7 @@ tornado==6.5.7
     #   jupyter-server
     #   jupyter-server-proxy
     #   terminado
-tqdm==4.68.3
+tqdm==4.68.4
     # via panel
 traitlets==5.15.1
     # via
@@ -547,7 +547,7 @@ typing-extensions==4.16.0
     #   uvicorn
 typing-inspection==0.4.2
     # via pydantic
-tzdata==2026.2
+tzdata==2026.3
     # via
     #   arrow
     #   pandas
@@ -557,7 +557,7 @@ uri-template==1.3.0
     # via jsonschema
 urllib3==2.7.0
     # via requests
-uvicorn==0.50.0
+uvicorn==0.51.0
     # via streamlit
 vtk==9.6.2
     # via pyvista
@@ -573,7 +573,7 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.9.0
     # via jupyter-server
-websockets==16.0
+websockets==16.1
     # via streamlit
 widgetsnbextension==4.0.15
     # via ipywidgets
