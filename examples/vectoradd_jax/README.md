@@ -55,6 +55,7 @@ It contains a custom function that takes the Tesseract's inputs and outputs and 
 
 > [!TIP]
 > You can also skip Step 3 entirely and let `tesseract-streamlit` serve the Tesseract for you:
+>
 > ```bash
 > tesseract-streamlit --from-image vectoradd_jax --user-code udf.py
 > ```
