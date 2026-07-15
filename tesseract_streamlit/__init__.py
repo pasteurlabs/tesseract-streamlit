@@ -1,6 +1,7 @@
-from . import _version, parse
+from . import parse
+from ._version import __version__ as scm_version
 
-__version__ = _version.get_versions()["version"]
+__version__ = scm_version
 
 # import public API of the package
 # from . import <obj>
