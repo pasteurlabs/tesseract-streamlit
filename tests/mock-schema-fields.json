@@ -1,123 +1,100 @@
 [
-    {
-        "type": "string",
-        "title": "Name",
-        "description": "Name of the person you want to greet.",
-        "ancestors": [
-            "name"
-        ],
-        "required": false,
-        "default": "John Doe"
-    },
-    {
-        "type": "integer",
-        "title": "Age",
-        "description": "Age of person in years.",
-        "ancestors": [
-            "age"
-        ],
-        "required": false,
-        "default": 30,
-        "number_constraints": {
-            "max_value": 125,
-            "min_value": 0,
-            "step": null
-        }
-    },
-    {
-        "type": "number",
-        "title": "Height",
-        "description": "Height of person in cm.",
-        "ancestors": [
-            "height"
-        ],
-        "required": false,
-        "default": 175,
-        "number_constraints": {
-            "max_value": 300,
-            "min_value": 0,
-            "step": 0.1
-        }
-    },
-    {
-        "type": "boolean",
-        "title": "Alive",
-        "description": "Whether the person is (currently) alive.",
-        "ancestors": [
-            "alive"
-        ],
-        "required": false,
-        "default": true
-    },
-    {
-        "type": "number",
-        "title": "Weight",
-        "description": "The person's weight in kg.",
-        "ancestors": [
-            "weight"
-        ],
-        "required": true,
-        "default": null,
-        "number_constraints": {
-            "max_value": null,
-            "min_value": 0,
-            "step": null
-        }
-    },
-    {
-        "type": "array",
-        "title": "Leg Lengths",
-        "description": "The length of the person's left and right legs in cm.",
-        "ancestors": [
-            "leg_lengths"
-        ],
-        "required": true
-    },
-    {
-        "type": "composite",
-        "title": "Hobby",
-        "description": "The person's only hobby.",
-        "ancestors": [
-            "hobby"
-        ],
-        "required": true
-    },
-    {
-        "type": "string",
-        "title": "Name",
-        "description": "Name of the activity.",
-        "ancestors": [
-            "hobby",
-            "name"
-        ],
-        "required": true,
-        "default": ""
-    },
-    {
-        "type": "boolean",
-        "title": "Active",
-        "description": "Does the person actively engage with it?",
-        "ancestors": [
-            "hobby",
-            "active"
-        ],
-        "required": true,
-        "default": null
-    },
-    {
-        "type": "integer",
-        "title": "Experience",
-        "description": "Experience practising it in years.",
-        "ancestors": [
-            "hobby",
-            "experience"
-        ],
-        "required": true,
-        "default": null,
-        "number_constraints": {
-            "max_value": 120,
-            "min_value": 0,
-            "step": null
-        }
+  {
+    "type": "string",
+    "title": "Name",
+    "description": "Name of the person you want to greet.",
+    "ancestors": ["name"],
+    "required": false,
+    "default": "John Doe"
+  },
+  {
+    "type": "integer",
+    "title": "Age",
+    "description": "Age of person in years.",
+    "ancestors": ["age"],
+    "required": false,
+    "default": 30,
+    "number_constraints": {
+      "max_value": 125,
+      "min_value": 0,
+      "step": null
     }
+  },
+  {
+    "type": "number",
+    "title": "Height",
+    "description": "Height of person in cm.",
+    "ancestors": ["height"],
+    "required": false,
+    "default": 175,
+    "number_constraints": {
+      "max_value": 300,
+      "min_value": 0,
+      "step": 0.1
+    }
+  },
+  {
+    "type": "boolean",
+    "title": "Alive",
+    "description": "Whether the person is (currently) alive.",
+    "ancestors": ["alive"],
+    "required": false,
+    "default": true
+  },
+  {
+    "type": "number",
+    "title": "Weight",
+    "description": "The person's weight in kg.",
+    "ancestors": ["weight"],
+    "required": true,
+    "default": null,
+    "number_constraints": {
+      "max_value": null,
+      "min_value": 0,
+      "step": null
+    }
+  },
+  {
+    "type": "array",
+    "title": "Leg Lengths",
+    "description": "The length of the person's left and right legs in cm.",
+    "ancestors": ["leg_lengths"],
+    "required": true
+  },
+  {
+    "type": "composite",
+    "title": "Hobby",
+    "description": "The person's only hobby.",
+    "ancestors": ["hobby"],
+    "required": true
+  },
+  {
+    "type": "string",
+    "title": "Name",
+    "description": "Name of the activity.",
+    "ancestors": ["hobby", "name"],
+    "required": true,
+    "default": ""
+  },
+  {
+    "type": "boolean",
+    "title": "Active",
+    "description": "Does the person actively engage with it?",
+    "ancestors": ["hobby", "active"],
+    "required": true,
+    "default": null
+  },
+  {
+    "type": "integer",
+    "title": "Experience",
+    "description": "Experience practising it in years.",
+    "ancestors": ["hobby", "experience"],
+    "required": true,
+    "default": null,
+    "number_constraints": {
+      "max_value": 120,
+      "min_value": 0,
+      "step": null
+    }
+  }
 ]
