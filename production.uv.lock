@@ -4373,10 +4373,13 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "click" },
+    { name = "furo", marker = "extra == 'dev'" },
     { name = "furo", marker = "extra == 'docs'" },
     { name = "jinja2" },
     { name = "matplotlib", marker = "extra == 'dev'" },
+    { name = "myst-nb", marker = "extra == 'dev'" },
     { name = "myst-nb", marker = "extra == 'docs'" },
+    { name = "myst-parser", marker = "extra == 'dev'" },
     { name = "myst-parser", marker = "extra == 'docs'" },
     { name = "numpy" },
     { name = "orjson" },
@@ -4387,19 +4390,23 @@ requires-dist = [
     { name = "pyvista", extras = ["jupyter"] },
     { name = "pyyaml", marker = "extra == 'dev'" },
     { name = "requests" },
+    { name = "sphinx", marker = "extra == 'dev'", specifier = "<9" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = "<9" },
+    { name = "sphinx-autodoc-typehints", marker = "extra == 'dev'" },
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'" },
+    { name = "sphinx-copybutton", marker = "extra == 'dev'" },
     { name = "sphinx-copybutton", marker = "extra == 'docs'" },
+    { name = "sphinx-design", marker = "extra == 'dev'" },
     { name = "sphinx-design", marker = "extra == 'docs'" },
+    { name = "sphinxext-opengraph", marker = "extra == 'dev'" },
     { name = "sphinxext-opengraph", marker = "extra == 'docs'" },
     { name = "stpyvista" },
     { name = "streamlit" },
     { name = "tesseract-core", specifier = ">=1.0.0" },
-    { name = "tesseract-streamlit", extras = ["docs"], marker = "extra == 'dev'" },
     { name = "typeguard", marker = "extra == 'dev'" },
     { name = "typing-extensions" },
 ]
-provides-extras = ["docs", "dev"]
+provides-extras = ["dev", "docs"]
 
 [[package]]
 name = "tinycss2"

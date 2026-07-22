@@ -51,22 +51,26 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools", "versioneer[toml]==0.29"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs", "setuptools-scm!=9.0.0"]
+build-backend = "hatchling.build"
 
-[tool.setuptools]
-include-package-data = true
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.packages.find]
-include = ["tesseract_streamlit", "tesseract_streamlit.*"]
+[tool.hatch.build.hooks.vcs]
+version-file = "tesseract_streamlit/_version.py"
 
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "tesseract_streamlit/_version.py"
-versionfile_build = "tesseract_streamlit/_version.py"
-tag_prefix = "v"
-parentdir_prefix = "tesseract_streamlit-"
+[tool.hatch.build.targets.wheel]
+packages = ["tesseract_streamlit"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "tesseract_streamlit/",
+    "examples/",
+    "requirements.txt",
+    "README.md",
+    "LICENSE",
+]
 
 [tool.pytest.ini_options]
 # Test type hints via typeguard - disabled by default
