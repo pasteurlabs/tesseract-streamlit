@@ -1,5 +1,18 @@
 from . import parse
-from ._version import __version__ as scm_version
+
+try:
+    from ._version import __version__ as scm_version
+except ImportError:
+    import warnings
+
+    warnings.warn(
+        "Unable to import version information from _version.py. "
+        "This is likely due to the package not being installed. "
+        "Using default version '0.0.0+unknown'.",
+        ImportWarning,
+        stacklevel=1,
+    )
+    scm_version = "0.0.0+unknown"
 
 __version__ = scm_version
 

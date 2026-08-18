@@ -56,6 +56,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
+fallback-version = "0.0.0+unknown"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "tesseract_streamlit/_version.py"
