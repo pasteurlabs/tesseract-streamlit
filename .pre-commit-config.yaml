@@ -6,7 +6,7 @@ repos:
     additional_dependencies: [--isolated]
     args: ["--maxkb=2000"]
     # Add exceptions here, as a regex
-    exclude: ""
+    # exclude: ""
 
   - id: check-json
     additional_dependencies: [--isolated]
@@ -28,7 +28,7 @@ repos:
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.15.18
+  rev: v0.15.22
   hooks:
   # Run the linter.
   - id: ruff-check
@@ -68,7 +68,7 @@ repos:
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.7.17,--isolated]
+    additional_dependencies: [uv==0.11.21,--isolated]
 
   # Update requirements.txt after production.uv.lock changes
   - id: update-requirements
@@ -86,4 +86,4 @@ repos:
         mv uv.lock.bak uv.lock; \
         exit $rc;
       '
-    additional_dependencies: [uv==0.7.17,--isolated]
+    additional_dependencies: [uv==0.11.21,--isolated]
