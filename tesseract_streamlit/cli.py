@@ -5,6 +5,7 @@ The main entrypoint of this module is the ``main()`` function.
 """
 
 import contextlib
+import enum
 import os
 import sys
 import typing
@@ -28,6 +29,13 @@ PACKAGE_DIR = Path(__file__).parent
 
 err_console = Console(stderr=True)
 cli = typer.Typer()
+
+
+class Layout(enum.StrEnum):
+    """Layout options for the generated Streamlit app."""
+
+    two_column = "two-column"
+    single = "single"
 
 
 @cli.command()
@@ -76,6 +84,17 @@ def main(
             help="Tesseract image to serve automatically.",
         ),
     ] = None,
+    layout: typing.Annotated[
+        Layout,
+        typer.Option(
+            "--layout",
+            help=(
+                "Layout of the generated app. 'two-column' shows inputs and "
+                "outputs side-by-side with independent scrolling; 'single' "
+                "stacks outputs below inputs in one column."
+            ),
+        ),
+    ] = Layout.two_column,
 ) -> None:
     """Generates a Streamlit app from Tesseract OpenAPI schemas.
 
@@ -161,6 +180,7 @@ def main(
             **render_kwargs,
             test=test,
             favicon_path=_copy_favicon(),
+            layout=layout.value,
         )
 
         if app_path is None:
