@@ -256,9 +256,7 @@ def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
     """
     shape_dict = copy.deepcopy(shape_dict)
     min_items, max_items = shape_dict.pop("minItems"), shape_dict.pop("maxItems")
-    if min_items == max_items == 0:
-        return True
-    return False
+    return min_items == max_items == 0
 
 
 class NumberConstraints(typing.TypedDict):

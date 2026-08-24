@@ -44,7 +44,6 @@ def sample_func(inputs):
     3. a robot must protect its own existence as long as it does not
        conflict with the first two laws
     """
-    pass
 
 
 def test_func_description() -> None:
@@ -67,7 +66,7 @@ def _udf_message(params: typing.Literal["input", "output", "both"]) -> str:
 
 
 def _udf_names(udfs: list[parse.FuncDescription]) -> set[str]:
-    return set(udf["name"] for udf in udfs)
+    return {udf["name"] for udf in udfs}
 
 
 def test_udf_register() -> None:
