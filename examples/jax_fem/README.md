@@ -58,6 +58,7 @@ Check out the [source code to see how it works](https://github.com/pasteurlabs/t
 
 > [!TIP]
 > You can also skip Step 3 entirely and let `tesseract-streamlit` serve the Tesseract for you:
+>
 > ```bash
 > tesseract-streamlit --from-image jax_fem --user-code udf.py
 > ```
@@ -77,7 +78,6 @@ To easily provide the input parameters for the structure itself, you can upload 
 ---
 
 ## 🖼️ Screenshots
-
 
 |     |     |
 | --- | --- |

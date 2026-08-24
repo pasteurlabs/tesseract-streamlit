@@ -1,0 +1,17 @@
+{% import "templates/macros.j2" as m with context %}
+{#- simple layout: the input form and, once submitted, the outputs are
+    rendered stacked in a single centered column, in the natural page flow.
+    this is the classic Streamlit layout and the lightest on visual complexity.
+    args:
+        schema: the schema for the Streamlit form
+    outputs: interactive streamlit form code -#}
+{% macro insert_form(schema, udfs) %}
+with st.form("tesseract_form"):
+    {{ m.render_fields(schema) | indent(4) }}
+    submitted = st.form_submit_button("Submit", use_container_width=True)
+
+if submitted:
+    {{ m.required_field_guard(schema) | indent(4) }}
+    if not _missing_names:
+        {{ m.render_outputs(schema, udfs) | indent(8) }}
+{% endmacro %}

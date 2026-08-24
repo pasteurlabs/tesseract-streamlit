@@ -5,11 +5,11 @@ The generated app allows users to interactively submit input to the `apply` endp
 
 ## ✨ Features
 
-* 🔍 Parses Tesseract's OpenAPI schema
-* ⚙️ Automatically builds input forms for the `apply` endpoint
-* 📊 Supports user-defined plotting of inputs and outputs
-* 🚀 Outputs a ready-to-run Streamlit app script
-* 🧩 Modular and customizable with minimal boilerplate
+- 🔍 Parses Tesseract's OpenAPI schema
+- ⚙️ Automatically builds input forms for the `apply` endpoint
+- 📊 Supports user-defined plotting of inputs and outputs
+- 🚀 Outputs a ready-to-run Streamlit app script
+- 🧩 Modular and customizable with minimal boilerplate
 
 ## 🛠 Requirements
 
@@ -29,8 +29,8 @@ $ pip install tesseract-streamlit
 $ tesseract-streamlit [OPTIONS] [URL] [OUTPUT]
 ```
 
-* `URL`: The address to the Tesseract instance you want to interface with. Not needed with `--from-image`.
-* `OUTPUT`: (Optional) The file path to write the generated Streamlit app. When omitted, the app is written to a cache file and Streamlit is launched automatically.
+- `URL`: The address to the Tesseract instance you want to interface with. Not needed with `--from-image`.
+- `OUTPUT`: (Optional) The file path to write the generated Streamlit app. When omitted, the app is written to a cache file and Streamlit is launched automatically.
 
 ### Quick start
 
@@ -75,11 +75,25 @@ $ streamlit run app.py
 
 ### ⚙️ Options
 
-| Option                 | Description                                                        |
-| ---------------------- | ------------------------------------------------------------------ |
-| `--from-image`         | (Optional) Tesseract image to serve automatically                  |
-| `--user-code, -u`      | (Optional) Path to Python file with plotting functions             |
-| `--help`               | Show the help message and exit                                     |
+| Option            | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `--from-image`    | (Optional) Tesseract image to serve automatically         |
+| `--user-code, -u` | (Optional) Path to Python file with plotting functions    |
+| `--layout`        | (Optional) App layout: `two-column` (default) or `simple` |
+| `--help`          | Show the help message and exit                            |
+
+### 🖼 Layouts
+
+Choose how inputs and outputs are arranged with `--layout`:
+
+```bash
+$ tesseract-streamlit --layout simple http://localhost:48819
+```
+
+| `two-column` (default)                                                                                      | `simple`                                                                                           |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| ![Two-column layout](docs/static/layout-two-column.png)                                                     | ![Simple layout](docs/static/layout-simple.png)                                                    |
+| Inputs and outputs side-by-side, each scrolling independently — tweak inputs while keeping results in view. | Inputs stacked above outputs in one centered column — simpler, and easier to read with many plots. |
 
 ### 📊 With Custom Plotting
 
@@ -117,21 +131,20 @@ Where we have chosen Plotly as our plotting back-end, but [any supported library
 
 Custom plotting is easy and flexible. Here’s how to make the most of it:
 
-
 - Function names don't matter, so name them however you like.
 - Define multiple functions to visualise more than one aspect of the data. Each one will generate a separate plot in the Streamlit app.
 - Add a docstring to each function to add descriptive text in the app:
-    - **First line** of the docstring will appear as the **plot title**.
-    - Remaining lines will be shown as a **description** below the title.
-    - Omitting docstrings is allowed, but raises a `UserDefinedFunctionWarning`.
+  - **First line** of the docstring will appear as the **plot title**.
+  - Remaining lines will be shown as a **description** below the title.
+  - Omitting docstrings is allowed, but raises a `UserDefinedFunctionWarning`.
 - Public functions must include either `inputs`, `outputs`, or both as parameter names. Any public function that doesn't use these names will raise a `UserDefinedFunctionError`.
-- Private functions may be defined with a leading underscore in their name, *eg.* `def _foo(x: float) -> float: ...`.
-    - Arbitrary parameters and return types are allowed.
-    - Will not produce plots directly in the Web UI.
-    - Can be called from within your public plotting functions.
-
+- Private functions may be defined with a leading underscore in their name, _eg._ `def _foo(x: float) -> float: ...`.
+  - Arbitrary parameters and return types are allowed.
+  - Will not produce plots directly in the Web UI.
+  - Can be called from within your public plotting functions.
 
 This setup gives you control over what to display and how to explain it, directly from your code.
+
 </details>
 
 ## 📁 Example
@@ -145,7 +158,7 @@ $ bash examples/vectoradd_jax/run.sh
 This will open a browser window with the Streamlit UI where users can input values and visualise the response.
 
 | ![](examples/vectoradd_jax/screenshots/header-vec-a.png) | ![](examples/vectoradd_jax/screenshots/outputs.png) |
-| --------------------------------- | ---------------------------- |
+| -------------------------------------------------------- | --------------------------------------------------- |
 | ![](examples/vectoradd_jax/screenshots/vec-b.png)        | ![](examples/vectoradd_jax/screenshots/plot.png)    |
 
 ## ⚠️ Current Limitations

@@ -1,25 +1,24 @@
 name: Test installation via pip
 
 on:
-    # run on PRs for validation
-    pull_request:
-      paths:
-        - "requirements.txt"
-        - "pyproject.toml"
-
+  # run on PRs for validation
+  pull_request:
+    paths:
+      - "requirements.txt"
+      - "pyproject.toml"
 
 jobs:
   test-pip-install:
     name: "Test pip install"
-    runs-on: '${{ matrix.os }}'
+    runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
         os:
           - ubuntu-latest
           - macos-latest
         python-version:
-          - "3.10"
-          - "3.13"
+          - "3.12"
+          - "3.14"
     steps:
       - name: Checkout
         uses: actions/checkout@v7

@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import orjson
+import pytest
 from streamlit.testing.v1 import AppTest
 from typer.testing import CliRunner
 
@@ -49,6 +50,13 @@ def test_auto_launch(goodbyeworld_url: str) -> None:
     assert app_path.suffix == ".py"
 
 
+def test_invalid_layout_rejected() -> None:
+    """An unrecognised --layout value is rejected before serving anything."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["http://localhost:1234", "-", "--layout", "diagonal"])
+    assert result.exit_code != 0
+
+
 def test_py_extension(goodbyeworld_url: str) -> None:
     """Checks that exception raised if not using '.py' extension."""
     runner = CliRunner()
@@ -58,9 +66,10 @@ def test_py_extension(goodbyeworld_url: str) -> None:
         assert result.exit_code != 0
 
 
-def test_app(goodbyeworld_url: str) -> None:
+@pytest.mark.parametrize("layout", ["two-column", "simple"])
+def test_app(goodbyeworld_url: str, layout: str) -> None:
     runner = CliRunner()
-    result = runner.invoke(cli, [goodbyeworld_url, "-"])
+    result = runner.invoke(cli, [goodbyeworld_url, "-", "--layout", layout])
     assert result.exit_code == 0
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
