@@ -66,10 +66,14 @@ input_col, output_col = st.columns([2, 3])
 with input_col.container(height=_COLUMN_FALLBACK_HEIGHT, key="io_col_input"):
     with st.form("tesseract_form", border=False):
         {{ m.render_fields(schema) | indent(8) }}
+        {# reserve a slot for validation errors just above the submit button so
+           they stay in view; the page body is `overflow: hidden`, so a banner
+           rendered below the columns would be clipped and easy to miss. #}
+        error_slot = st.empty()
         submitted = st.form_submit_button("Submit", use_container_width=True)
 
 if submitted:
-    {{ m.required_field_guard(schema) | indent(4) }}
+    {{ m.required_field_guard(schema, "error_slot") | indent(4) }}
     if not _missing_names:
         with output_col.container(
             height=_COLUMN_FALLBACK_HEIGHT, key="io_col_output"
