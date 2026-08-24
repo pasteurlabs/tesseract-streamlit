@@ -75,11 +75,25 @@ $ streamlit run app.py
 
 ### ⚙️ Options
 
-| Option            | Description                                            |
-| ----------------- | ------------------------------------------------------ |
-| `--from-image`    | (Optional) Tesseract image to serve automatically      |
-| `--user-code, -u` | (Optional) Path to Python file with plotting functions |
-| `--help`          | Show the help message and exit                         |
+| Option            | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `--from-image`    | (Optional) Tesseract image to serve automatically         |
+| `--user-code, -u` | (Optional) Path to Python file with plotting functions    |
+| `--layout`        | (Optional) App layout: `two-column` (default) or `simple` |
+| `--help`          | Show the help message and exit                            |
+
+### 🖼 Layouts
+
+Choose how inputs and outputs are arranged with `--layout`:
+
+```bash
+$ tesseract-streamlit --layout simple http://localhost:48819
+```
+
+| `two-column` (default)                                                                                      | `simple`                                                                                           |
+| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| ![Two-column layout](docs/static/layout-two-column.png)                                                     | ![Simple layout](docs/static/layout-simple.png)                                                    |
+| Inputs and outputs side-by-side, each scrolling independently — tweak inputs while keeping results in view. | Inputs stacked above outputs in one centered column — simpler, and easier to read with many plots. |
 
 ### 📊 With Custom Plotting
 
