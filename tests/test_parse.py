@@ -66,7 +66,7 @@ def _udf_message(params: typing.Literal["input", "output", "both"]) -> str:
 
 
 def _udf_names(udfs: list[parse.FuncDescription]) -> set[str]:
-    return set(udf["name"] for udf in udfs)
+    return {udf["name"] for udf in udfs}
 
 
 def test_udf_register() -> None:
