@@ -1,0 +1,202 @@
+{#- SHARED MACROS FOR THE STREAMLIT APP TEMPLATES
+    ===============================================
+    Building blocks used by both the top-level template and the individual
+    layout files under templates/layouts/. Import with:
+        {% import "templates/macros.j2" as m %}
+    and call as m.render_fields(...), m.render_outputs(...), etc. -#}
+
+{#- splits up a string spanning multiple lines into multiple strings
+    args:
+        text: the string you wish to break up (with linebreaks included)
+        indentlevel: the number of (4 space) tabs to insert before each line
+    outputs: double quote delimited strings on separate lines, split wherever
+        a line break was found in text. -#}
+{% macro multiline(text) -%}
+    {% for line in text.splitlines() -%}
+        {{- '\n' -}}
+        "{{- line -}}
+        {{- ' ' if not loop.last else '' -}}"{#- add space to end of str -#}
+    {%- endfor %}
+{%- endmacro %}
+
+{#- output the udf plot, along with description and docs
+    args:
+        udf_subset: a list of udf dictionaries, eg. udfs.inputs
+        key: the key associated with this specific list, eg. inputs
+        subheader: text to display as a subheader, below which the plots
+            are nested
+    outputs: streamlit subheader, plot title, description from docs, and
+        streamlit write call to render the output of the plotting func -#}
+{% macro udf_plot(udf_subset, key, subheader) -%}
+{% if udf_subset %}
+st.subheader("{{ subheader }}")
+{% set args = 'inputs=inputs, outputs=outputs' if key == 'both' else key %}
+{% for udf in udf_subset %}
+st.markdown("**{{ udf.title }}**")
+st.markdown({% if not udf.docs %}""{% else %}
+    {{- multiline(udf.docs) | indent(4) }}
+{% endif %})
+{% if udf.backend == "pyvista" -%}stpyvista(
+{%- else -%}st.write(
+{%- endif -%}{{ udf.name }}({{ args }}))
+{% endfor %}
+{% endif %}
+{%- endmacro %}
+
+{#- renders the streamlit form elements for each field.
+    args:
+        schema: the schema for the Streamlit form
+    outputs: streamlit form input elements structure
+-#}
+{% macro render_fields(schema) %}
+{# AUTOMATICALLY POPULATING THE WEB-APP WITH INPUTS FROM THE SCHEMA
+   ================================================================ #}
+{% for field in schema %}
+{% if field.type == 'composite' %}
+{# composite fields get a bordered container with heading #}
+{{ field.container }} = {{ field.parent_container }}.container(border=True)
+{{ field.container }}.subheader("{{ field.title }}")
+{% if field.description -%}
+{{ field.container }}.caption(
+    {{- multiline(field.description) | indent(4) }}
+)
+{% endif -%}
+{% else %}
+{# leaf fields render directly into their parent container; alias it to
+   `container` so the field-type branches below read uniformly #}
+{% set container = field.parent_container %}
+{% if field.type == 'string' -%}
+{{ field.uid }} = {{ container }}.text_input(
+    "{{ field.get('title', field.uid) }}",
+    key="int.{{ field.key }}",
+    value="{{ field.get('default', '') }}",
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
+)
+{% elif field.type == 'integer' -%}
+{{ field.uid }} = {{ container }}.number_input(
+    "{{ field.get('title', field.uid) }}",
+    min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
+    max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
+    step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
+    format="%d",
+    key="int.{{ field.key }}",
+    value=_cast_type({{ field.get("default", None) }}, int),
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
+)
+{% elif field.type == 'number' -%}
+{{ field.uid }} = {{ container }}.number_input(
+    "{{ field.get('title', field.uid) }}",
+    min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
+    max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
+    step=_cast_type({{ field.get("number_constraints", {}).get("step", None) }}, float),
+    key="number.{{ field.key }}",
+    format="%f",
+    value=_cast_type({{ field.get("default", None) }}, float),
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
+)
+{% elif field.type == 'boolean' -%}
+{{ field.uid }} = {{ container }}.checkbox(
+    "{{ field.get('title', field.uid) }}",
+    key="boolean.{{ field.key }}",
+    value={{ field.get("default", None) }},
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
+)
+{% elif field.type == 'array' -%}
+{{ field.uid }}_text = {{ container }}.text_area(
+    "{{ field.get('title', field.uid) }}",
+    height=100,
+    key="textarea.{{ field.key }}",
+    placeholder="[1.0, 2.0, 3.0]",
+    {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
+)
+with {{ container }}.popover("Upload from file"):
+    {{ field.uid }}_file = st.file_uploader(
+        "Upload {{ field.uid.replace("_", ".") }} JSON file",
+        type=["json", "txt"],
+        key="fileupload.{{ field.key }}"
+    )
+{{ field.uid }} = None
+if {{ field.uid }}_file is not None:
+    try:
+        {{ field.uid }} = orjson.loads({{ field.uid }}_file.getvalue())
+    except Exception as e:
+        {{ container }}.error(f"Failed to load {{ field.uid }} from file: {e}")
+elif {{ field.uid }}_text:
+    try:
+        {{ field.uid }} = orjson.loads({{ field.uid }}_text)
+    except Exception as e:
+        {{ container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
+if {{ field.uid }} is not None:
+    try:
+        arr = np.array({{ field.uid }}, dtype=np.float64)
+        {{ container }}.write("Array preview:")
+        {{ container }}.code(arr)
+    except Exception as e:
+        {{ container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endif -%}
+{% endif -%}
+{% endfor %}
+{% endmacro %}
+
+{#- renders the streamlit output display after the inputs are collected
+    args:
+        schema: the schema for the Streamlit form
+    outputs: code processing and displaying the outputs
+-#}
+{% macro render_outputs(schema, udfs) %}
+{# COLLECT THE INPUTS FOR THE TESSERACT
+   ==================================== #}
+inputs_flat = {
+    {% for field in schema if field.type != "composite" %}
+    "{{ field.key }}": {{ field.uid }},
+    {% endfor %}
+}
+inputs = _flat_to_nested(inputs_flat)
+
+{# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
+   ========================================================== #}
+start_time = time.perf_counter()
+with (
+    st.spinner("Executing Tesseract", show_time=True),
+    Tesseract.from_url("{{ url }}") as tess
+):
+    outputs = tess.apply(inputs)
+elapsed = time.perf_counter() - start_time
+st.success(f"Tesseract execution completed in {elapsed:.1f} seconds.")
+
+{# RENDER USER-DEFINED FUNCTIONS FIRST (primary visual output)
+   ============================================================ #}
+{% if udfs %}
+{{- udf_plot(udfs.inputs, 'inputs', 'Input plots') -}}
+{{- udf_plot(udfs.outputs, 'outputs', 'Output plots') -}}
+{{- udf_plot(udfs.both, 'both', 'Mixed input + output plots') -}}
+{% endif %}
+
+{# JSON PREVIEWS (for debugging and download)
+   =========================================== #}
+_tesseract_io_preview(inputs, "input")
+_tesseract_io_preview(outputs, "output")
+{% endmacro %}
+
+{#- emits the required-field validation guard shared by every layout.
+    populates `_missing_names` with the titles of any required fields the user
+    left empty, so the caller can decide whether to render outputs.
+    args:
+        schema: the schema for the Streamlit form
+    outputs: code assigning `_missing_names` -#}
+{% macro required_field_guard(schema) %}
+_missing_fields = [
+    {% for field in schema if field.type == "array" and field.required -%}
+    ("{{ field.qualified_title }}", {{ field.uid }} is None),
+    {% endfor -%}
+    {% for field in schema if field.type == "string" and field.required -%}
+    ("{{ field.qualified_title }}", not {{ field.uid }}),
+    {% endfor -%}
+]
+_missing_names = [name for name, missing in _missing_fields if missing]
+if _missing_names:
+    st.error(
+        "Please fill in the following required field(s): "
+        + ", ".join(f"**{f}**" for f in _missing_names)
+    )
+{% endmacro %}

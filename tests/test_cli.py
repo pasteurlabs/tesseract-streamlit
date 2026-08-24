@@ -66,7 +66,7 @@ def test_py_extension(goodbyeworld_url: str) -> None:
         assert result.exit_code != 0
 
 
-@pytest.mark.parametrize("layout", ["two-column", "single"])
+@pytest.mark.parametrize("layout", ["two-column", "simple"])
 def test_app(goodbyeworld_url: str, layout: str) -> None:
     runner = CliRunner()
     result = runner.invoke(cli, [goodbyeworld_url, "-", "--layout", layout])

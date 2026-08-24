@@ -35,7 +35,7 @@ class Layout(enum.StrEnum):
     """Layout options for the generated Streamlit app."""
 
     two_column = "two-column"
-    single = "single"
+    simple = "simple"
 
 
 @cli.command()
@@ -90,7 +90,7 @@ def main(
             "--layout",
             help=(
                 "Layout of the generated app. 'two-column' shows inputs and "
-                "outputs side-by-side with independent scrolling; 'single' "
+                "outputs side-by-side with independent scrolling; 'simple' "
                 "stacks outputs below inputs in one column."
             ),
         ),
