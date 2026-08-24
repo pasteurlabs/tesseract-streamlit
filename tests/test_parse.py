@@ -44,7 +44,6 @@ def sample_func(inputs):
     3. a robot must protect its own existence as long as it does not
        conflict with the first two laws
     """
-    pass
 
 
 def test_func_description() -> None:
