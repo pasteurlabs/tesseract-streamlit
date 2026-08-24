@@ -1,10 +1,10 @@
 name: Bump UV lockfile
 
 on:
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch: # Allows manual trigger
 
   schedule:
-    - cron:  '0 0 * * 1'  # 12AM only on Mondays
+    - cron: "0 0 * * 1" # 12AM only on Mondays
 
 jobs:
   bump-lockfile:
@@ -35,7 +35,7 @@ jobs:
           pre-commit run update-uv-env --all-files || true
 
       - name: Generate new requirements.txt
-        run : |
+        run: |
           pre-commit run update-requirements --all-files || true
 
       - name: Detect if changes were made
@@ -49,14 +49,14 @@ jobs:
         if: steps.git-diff.outputs.update_done == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
-            token: ${{ secrets.PL_PASTEURBOT_PAT_PUBLIC }}
-            committer: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
-            author: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
-            commit-message: "chore: update dependencies"
-            title: "chore: 📦 update dependencies"
-            branch: _bot/update-deps
-            draft: false
-            base: main
-            body: |
-              This PR updates the lockfile to the latest versions of the dependencies.
-              Please review the changes and merge when ready.
+          token: ${{ secrets.PL_PASTEURBOT_PAT_PUBLIC }}
+          committer: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
+          author: PasteurBot <${{ vars.PL_PASTEURBOT_EMAIL }}>
+          commit-message: "chore: update dependencies"
+          title: "chore: 📦 update dependencies"
+          branch: _bot/update-deps
+          draft: false
+          base: main
+          body: |
+            This PR updates the lockfile to the latest versions of the dependencies.
+            Please review the changes and merge when ready.
