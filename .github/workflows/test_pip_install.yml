@@ -1,17 +1,16 @@
 name: Test installation via pip
 
 on:
-    # run on PRs for validation
-    pull_request:
-      paths:
-        - "requirements.txt"
-        - "pyproject.toml"
-
+  # run on PRs for validation
+  pull_request:
+    paths:
+      - "requirements.txt"
+      - "pyproject.toml"
 
 jobs:
   test-pip-install:
     name: "Test pip install"
-    runs-on: '${{ matrix.os }}'
+    runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
         os:
