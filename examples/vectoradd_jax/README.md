@@ -35,7 +35,7 @@ tesseract serve vectoradd_jax
 ```
 
 > [!NOTE]
-> Make note of the `port` and `container_name` printed to stdout — you'll need them shortly.
+> Make note of the `port` and `container_name` printed to stdout: you'll need them shortly.
 
 ---
 
