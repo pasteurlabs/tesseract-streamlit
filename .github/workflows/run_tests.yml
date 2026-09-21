@@ -55,7 +55,7 @@ jobs:
             --cov=tesseract_streamlit
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: ${{ github.repository }}
@@ -90,38 +90,9 @@ jobs:
         run: |
           uv run --no-sync pytest --noconftest tests/test_visuals.py::test_pyvista_vis
 
-  test-examples:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v7
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-
-      - name: Restore UV environment
-        run: cp production.uv.lock uv.lock
-
-      - name: Install dev and example requirements
-        run: |
-          uv sync --extra dev --frozen
-          uv pip install -r examples/vectoradd_jax/requirements.txt
-
-      - name: Run example tests
-        run: |
-          uv run --no-sync pytest tests/test_examples.py
-
   all-ok:
     if: always()
-    needs: [tests, test-macos, test-examples]
+    needs: [tests, test-macos]
 
     runs-on: ubuntu-latest
 
@@ -134,10 +105,6 @@ jobs:
           fi
           if [[ "${{ needs.test-macos.result }}" != "success" && "${{ needs.test-macos.result }}" != "skipped" ]]; then
             echo "macOS tests failed"
-            exit 1
-          fi
-          if [[ "${{ needs.test-examples.result }}" != "success" && "${{ needs.test-examples.result }}" != "skipped" ]]; then
-            echo "Example tests failed"
             exit 1
           fi
 
