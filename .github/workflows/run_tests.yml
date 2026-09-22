@@ -124,7 +124,7 @@ jobs:
             echo "::group::$example"
             setsid bash "examples/$example/run.sh" > "$example.log" 2>&1 &
             pid=$!
-            for _ in $(seq 1 180); do
+            for _ in $(seq 1 90); do
               curl -sf localhost:8501/_stcore/health > /dev/null && break
               sleep 5
             done
