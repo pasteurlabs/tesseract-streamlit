@@ -6,7 +6,7 @@ aiohttp==3.14.3
     # via wslink
 aiosignal==1.4.0
     # via aiohttp
-altair==6.2.2
+altair==6.3.0
     # via streamlit
 annotated-doc==0.0.5
     # via typer
@@ -51,7 +51,7 @@ contourpy==1.4.0
     #   matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==4.25.2
+cyclopts==4.25.3
     # via pyvista
 docstring-parser==0.18.0
     # via cyclopts
@@ -67,7 +67,7 @@ h11==0.16.0
     # via uvicorn
 httptools==0.8.0
     # via streamlit
-idna==3.19
+idna==3.20
     # via
     #   anyio
     #   requests
@@ -122,7 +122,7 @@ more-itertools==11.1.0
     # via trame-server
 msgpack==1.2.2
     # via wslink
-multidict==6.8.0
+multidict==6.9.0
     # via
     #   aiohttp
     #   yarl
@@ -162,7 +162,7 @@ packaging==26.3
     #   streamlit
     #   tesseract-core
     #   trame-pyvista
-pandas==3.0.5
+pandas==3.0.6
     # via
     #   panel
     #   streamlit
@@ -188,7 +188,7 @@ pillow==12.3.0
     #   streamlit
 pip==26.2.1
     # via tesseract-core
-platformdirs==4.11.8
+platformdirs==4.11.11
     # via
     #   pooch
     #   tesseract-streamlit
@@ -196,11 +196,11 @@ pooch==1.9.0
     # via pyvista
 prompt-toolkit==3.0.53
     # via ipython
-propcache==0.5.2
+propcache==0.5.4
     # via
     #   aiohttp
     #   yarl
-protobuf==7.36.1
+protobuf==7.36.2
     # via streamlit
 psutil==7.2.2 ; sys_platform != 'cygwin' and sys_platform != 'emscripten'
     # via ipython
@@ -228,7 +228,7 @@ pyobjc-core==12.2.2 ; sys_platform == 'darwin'
     # via pyobjc-framework-cocoa
 pyobjc-framework-cocoa==12.2.2 ; sys_platform == 'darwin'
     # via pyvista
-pyparsing==3.3.2
+pyparsing==3.3.3
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via
@@ -285,15 +285,15 @@ starlette==1.6.0
     # via streamlit
 stpyvista==0.2.1
     # via tesseract-streamlit
-streamlit==1.63.0
+streamlit==1.64.0
     # via
     #   stpyvista
     #   tesseract-streamlit
-tesseract-core==1.12.0
+tesseract-core==1.13.0
     # via tesseract-streamlit
 toml==0.10.2
     # via streamlit
-tornado==6.5.8 ; sys_platform != 'emscripten'
+tornado==6.5.10 ; sys_platform != 'emscripten'
     # via bokeh
 tqdm==4.70.1
     # via panel
@@ -348,15 +348,15 @@ typing-inspection==0.4.4
     # via pydantic
 tzdata==2026.4 ; sys_platform == 'emscripten' or sys_platform == 'win32'
     # via pandas
-urllib3==2.7.0
+urllib3==2.8.0
     # via requests
-uvicorn==0.52.4
+uvicorn==0.53.0
     # via streamlit
 vtk==9.7.0
     # via pyvista
 watchdog==6.0.0 ; sys_platform != 'darwin'
     # via streamlit
-wcwidth==0.8.3
+wcwidth==0.8.4
     # via prompt-toolkit
 websockets==16.1.1
     # via streamlit
@@ -368,5 +368,5 @@ wslink==2.5.7
     #   trame-server
 xyzservices==2026.9.1
     # via bokeh
-yarl==1.24.5
+yarl==1.25.1
     # via aiohttp
