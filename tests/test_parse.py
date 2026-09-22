@@ -1,4 +1,5 @@
 import ast
+import math
 import random
 import typing
 from pathlib import Path
@@ -196,3 +197,27 @@ def test_description_from_oas(
         f"Apply the Tesseract to the input data.\n\n{zerodim_apply_docstring}"
     )
     assert zd_descr == zd_apply_docs
+
+
+@pytest.mark.parametrize(
+    "field_type,bounds,expected",
+    [
+        ("integer", {"exclusiveMinimum": 0, "exclusiveMaximum": 10}, (1, 9)),
+        ("integer", {"exclusiveMinimum": 0.5}, (1, None)),
+        (
+            "number",
+            {"exclusiveMinimum": 2.0, "maximum": 6.0},
+            (math.nextafter(2.0, math.inf), 6.0),
+        ),
+        (
+            "number",
+            {"minimum": 1.0, "exclusiveMaximum": 5.0},
+            (1.0, math.nextafter(5.0, -math.inf)),
+        ),
+        ("number", {"minimum": 3.0, "exclusiveMinimum": 2.0}, (3.0, None)),
+    ],
+)
+def test_exclusive_number_bounds(field_type, bounds, expected) -> None:
+    field = parse._format_field("x", {"type": field_type, **bounds}, [], use_title=True)
+    constraints = field["number_constraints"]
+    assert (constraints["min_value"], constraints["max_value"]) == expected
