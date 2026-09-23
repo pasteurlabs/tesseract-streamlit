@@ -20,7 +20,7 @@ pip install -r "${scriptdir}/requirements.txt"
 example=jax_fem
 tesseract build "${workdir}/examples/${example}"
 tessinfo=$(tesseract serve $example)
-tessid=$(echo $tessinfo | jq -r '.project_id')
+tessid=$(echo $tessinfo | jq -r '.container_name')
 tessport=$(echo $tessinfo | jq -r '.containers[0].port')
 
 # automatically generate the Streamlit app from the served tesseract:

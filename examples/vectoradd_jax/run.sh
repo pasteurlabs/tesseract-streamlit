@@ -7,7 +7,7 @@ scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 tmpdir=$(mktemp -d)
 
 # clone tesseract-core for its example subdirectory:
-git clone --depth 1 --branch v0.9.0 https://github.com/pasteurlabs/tesseract-core.git "${tmpdir}/tesseract-core"
+git clone --depth 1 --branch v1.13.0 https://github.com/pasteurlabs/tesseract-core.git "${tmpdir}/tesseract-core"
 
 # install requirements for the udf.py module:
 pip install -r "${scriptdir}/requirements.txt"
@@ -16,7 +16,7 @@ pip install -r "${scriptdir}/requirements.txt"
 example=vectoradd_jax
 tesseract build "${tmpdir}/tesseract-core/examples/${example}"
 tessinfo=$(tesseract serve $example)
-tessid=$(echo $tessinfo | jq -r '.project_id')
+tessid=$(echo $tessinfo | jq -r '.container_name')
 tessport=$(echo $tessinfo | jq -r '.containers[0].port')
 
 # automatically generate the Streamlit app from the served tesseract:
