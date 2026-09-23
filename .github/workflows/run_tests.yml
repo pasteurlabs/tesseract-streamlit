@@ -90,9 +90,56 @@ jobs:
         run: |
           uv run --no-sync pytest --noconftest tests/test_visuals.py::test_pyvista_vis
 
+  test-examples:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Restore UV environment
+        run: cp production.uv.lock uv.lock
+
+      - name: Install dev requirements
+        run: |
+          uv sync --extra dev --frozen
+          uv pip install pip
+
+      - name: Run example scripts
+        env:
+          STREAMLIT_SERVER_HEADLESS: "true"
+        run: |
+          source .venv/bin/activate
+          for example in vectoradd_jax jax_fem; do
+            echo "::group::$example"
+            setsid bash "examples/$example/run.sh" > "$example.log" 2>&1 &
+            pid=$!
+            for _ in $(seq 1 90); do
+              curl -sf localhost:8501/_stcore/health > /dev/null && break
+              sleep 5
+            done
+            if ! curl -sf localhost:8501/_stcore/health > /dev/null; then
+              cat "$example.log"; exit 1
+            fi
+            kill -INT -- "-$pid"
+            wait "$pid" || { cat "$example.log"; exit 1; }
+            tail -5 "$example.log"
+            echo "::endgroup::"
+          done
+
   all-ok:
     if: always()
-    needs: [tests, test-macos]
+    needs: [tests, test-macos, test-examples]
 
     runs-on: ubuntu-latest
 
@@ -105,6 +152,10 @@ jobs:
           fi
           if [[ "${{ needs.test-macos.result }}" != "success" && "${{ needs.test-macos.result }}" != "skipped" ]]; then
             echo "macOS tests failed"
+            exit 1
+          fi
+          if [[ "${{ needs.test-examples.result }}" != "success" && "${{ needs.test-examples.result }}" != "skipped" ]]; then
+            echo "Example scripts failed"
             exit 1
           fi
 

@@ -37,7 +37,7 @@ tesseract serve jax_fem
 ```
 
 > [!NOTE]
-> Make note of the `PORT` and `PROJECT ID` printed to stdout — you'll need them shortly.
+> Make note of the `port` and `container_name` printed to stdout: you'll need them shortly.
 
 ---
 
@@ -90,7 +90,7 @@ To easily provide the input parameters for the structure itself, you can upload 
 When you're done, you can stop the Tesseract server with:
 
 ```bash
-tesseract teardown <PROJECT ID>
+tesseract teardown <CONTAINER NAME>
 ```
 
 ---

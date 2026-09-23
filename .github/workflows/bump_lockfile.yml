@@ -38,6 +38,13 @@ jobs:
         run: |
           pre-commit run update-requirements --all-files || true
 
+      - name: Bump tesseract-core version used by the examples
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh release view --repo pasteurlabs/tesseract-core --json tagName -q .tagName)
+          sed -i -E "s/--branch v[0-9.]+ /--branch ${latest} /" examples/vectoradd_jax/run.sh examples/vectoradd_jax/README.md
+
       - name: Detect if changes were made
         id: git-diff
         run: |
