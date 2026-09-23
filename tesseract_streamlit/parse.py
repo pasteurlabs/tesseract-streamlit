@@ -20,6 +20,7 @@ import copy
 import functools
 import importlib.util
 import inspect
+import math
 import operator
 import sys
 import typing
@@ -283,6 +284,36 @@ class _InputField(typing.TypedDict):
     number_constraints: NumberConstraints
 
 
+def _number_constraints(
+    field_data: dict[str, typing.Any], is_integer: bool
+) -> NumberConstraints:
+    """Maps OAS bounds onto the inclusive bounds ``st.number_input`` accepts.
+
+    Strict bounds (``exclusiveMinimum`` / ``exclusiveMaximum``, from pydantic's
+    ``gt`` / ``lt``) become the nearest value inside them: the next integer for
+    integer fields, the next representable float otherwise.
+    """
+    min_value = field_data.get("minimum", None)
+    max_value = field_data.get("maximum", None)
+    if "exclusiveMinimum" in field_data:
+        bound = field_data["exclusiveMinimum"]
+        strict = (
+            math.floor(bound) + 1 if is_integer else math.nextafter(bound, math.inf)
+        )
+        min_value = strict if min_value is None else max(min_value, strict)
+    if "exclusiveMaximum" in field_data:
+        bound = field_data["exclusiveMaximum"]
+        strict = (
+            math.ceil(bound) - 1 if is_integer else math.nextafter(bound, -math.inf)
+        )
+        max_value = strict if max_value is None else min(max_value, strict)
+    return {
+        "min_value": min_value,
+        "max_value": max_value,
+        "step": field_data.get("multipleOf", None),
+    }
+
+
 def _key_to_title(key: str) -> str:
     """Formats an OAS key to a title for the web UI."""
     return key.replace("_", " ").title()
@@ -326,11 +357,9 @@ def _format_field(
                 default_val = ""
             field["default"] = default_val
             if field_data["type"] in ("number", "integer"):
-                field["number_constraints"] = {
-                    "min_value": field_data.get("minimum", None),
-                    "max_value": field_data.get("maximum", None),
-                    "step": field_data.get("multipleOf", None),
-                }
+                field["number_constraints"] = _number_constraints(
+                    field_data, is_integer=field_data["type"] == "integer"
+                )
         return field
     field["title"] = _key_to_title(field_key) if use_title else field_key
     if ARRAY_PROPS <= set(field_data["properties"]):
@@ -338,11 +367,9 @@ def _format_field(
         if _is_scalar(field_data["properties"]["shape"]):
             data_type = "number"
             field["default"] = field_data.get("default", None)
-            field["number_constraints"] = {
-                "min_value": field_data.get("minimum", None),
-                "max_value": field_data.get("maximum", None),
-                "step": field_data.get("multipleOf", None),
-            }
+            field["number_constraints"] = _number_constraints(
+                field_data, is_integer=False
+            )
         field["type"] = data_type
         return field
     # at this point, not an array or primitive, so must be composite
