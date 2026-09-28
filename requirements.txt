@@ -51,13 +51,13 @@ contourpy==1.4.0
     #   matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==4.25.3
+cyclopts==5.0.0
     # via pyvista
 docstring-parser==0.18.0
     # via cyclopts
 executing==2.2.1
     # via stack-data
-fonttools==4.65.0
+fonttools==4.66.0
     # via matplotlib
 frozenlist==1.8.0
     # via
@@ -99,7 +99,7 @@ kiwisolver==1.5.1
     # via matplotlib
 linkify-it-py==2.2.0
     # via panel
-markdown==3.10.3
+markdown==3.11
     # via panel
 markdown-it-py==4.2.0
     # via
@@ -122,7 +122,7 @@ more-itertools==11.1.0
     # via trame-server
 msgpack==1.2.2
     # via wslink
-multidict==6.9.0
+multidict==6.9.1
     # via
     #   aiohttp
     #   yarl
@@ -131,7 +131,7 @@ narwhals==2.26.0
     #   altair
     #   bokeh
     #   panel
-nest-asyncio2==1.7.2
+nest-asyncio2==1.7.3
     # via pyvista
 nh3==0.3.7
     # via panel
@@ -170,7 +170,7 @@ panel==1.9.4
     # via
     #   panel-material-ui
     #   stpyvista
-panel-material-ui==0.14.2
+panel-material-ui==0.15.0
     # via panel
 param==2.4.2
     # via
@@ -188,7 +188,7 @@ pillow==12.3.0
     #   streamlit
 pip==26.2.1
     # via tesseract-core
-platformdirs==4.11.11
+platformdirs==4.12.0
     # via
     #   pooch
     #   tesseract-streamlit
@@ -267,7 +267,7 @@ rich==15.0.0
     #   rich-rst
     #   tesseract-core
     #   typer
-rich-rst==2.1.0
+rich-rst==2.2.0
     # via cyclopts
 rpds-py==2026.6.3
     # via
@@ -281,7 +281,7 @@ six==1.17.0
     # via python-dateutil
 stack-data==0.6.3
     # via ipython
-starlette==1.6.0
+starlette==1.7.0
     # via streamlit
 stpyvista==0.2.1
     # via tesseract-streamlit
@@ -289,7 +289,7 @@ streamlit==1.64.0
     # via
     #   stpyvista
     #   tesseract-streamlit
-tesseract-core==1.13.0
+tesseract-core==1.14.0
     # via tesseract-streamlit
 toml==0.10.2
     # via streamlit
@@ -350,13 +350,13 @@ tzdata==2026.4 ; sys_platform == 'emscripten' or sys_platform == 'win32'
     # via pandas
 urllib3==2.8.0
     # via requests
-uvicorn==0.53.0
+uvicorn==0.54.0
     # via streamlit
 vtk==9.7.0
     # via pyvista
 watchdog==6.0.0 ; sys_platform != 'darwin'
     # via streamlit
-wcwidth==0.8.4
+wcwidth==0.9.1
     # via prompt-toolkit
 websockets==16.1.1
     # via streamlit

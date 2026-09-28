@@ -7,7 +7,7 @@ scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 tmpdir=$(mktemp -d)
 
 # clone tesseract-core for its example subdirectory:
-git clone --depth 1 --branch v1.13.0 https://github.com/pasteurlabs/tesseract-core.git "${tmpdir}/tesseract-core"
+git clone --depth 1 --branch v1.14.0 https://github.com/pasteurlabs/tesseract-core.git "${tmpdir}/tesseract-core"
 
 # install requirements for the udf.py module:
 pip install -r "${scriptdir}/requirements.txt"
