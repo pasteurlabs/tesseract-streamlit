@@ -78,20 +78,24 @@ def test_app(goodbyeworld_url: str, layout: str) -> None:
     # Note: AppTest.set_value() bypasses UI validation, so we only test valid values
     # The min_value/max_value constraints are enforced by the browser UI, not Python
 
+    # Inputs live inside a form, so widget changes only take effect once the
+    # form is submitted.
+
     # Test manually set step
-    app.number_input(key="number.height").increment().run()
-    height_after_decrement = app.number_input(key="number.height").value
-    assert height_after_decrement == 175.1, (
-        f"Height should be incremented in steps 0.1, but got {height_after_decrement - 175}"
+    app.number_input(key="number.height").increment()
+    app.button[0].click().run()
+    height_after_increment = app.number_input(key="number.height").value
+    assert height_after_increment == 175.1, (
+        f"Height should be incremented in steps 0.1, but got {height_after_increment - 175}"
     )
     # reset to original default
-    app.number_input(key="number.height").decrement().run()
+    app.number_input(key="number.height").decrement()
 
-    app.number_input(key="number.weight").set_value(83.0).run()
-    app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
-    app.text_input(key="int.hobby.name").input("hula hoop").run()
-    app.checkbox(key="boolean.hobby.active").check().run()
-    app.number_input(key="int.hobby.experience").set_value(3).run()
+    app.number_input(key="number.weight").set_value(83.0)
+    app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]")
+    app.text_input(key="int.hobby.name").input("hula hoop")
+    app.checkbox(key="boolean.hobby.active").check()
+    app.number_input(key="int.hobby.experience").set_value(3)
     app.button[0].click().run()
     assert not app.exception
     tess_output = orjson.loads(app.json[1].value)
@@ -108,10 +112,10 @@ def test_missing_array_blocked(goodbyeworld_url: str) -> None:
     app.run()
 
     # Fill everything except the required array field (leg_lengths)
-    app.number_input(key="number.weight").set_value(83.0).run()
-    app.text_input(key="int.hobby.name").input("hula hoop").run()
-    app.checkbox(key="boolean.hobby.active").check().run()
-    app.number_input(key="int.hobby.experience").set_value(3).run()
+    app.number_input(key="number.weight").set_value(83.0)
+    app.text_input(key="int.hobby.name").input("hula hoop")
+    app.checkbox(key="boolean.hobby.active").check()
+    app.number_input(key="int.hobby.experience").set_value(3)
     app.button[0].click().run()
 
     assert not app.exception
@@ -127,10 +131,10 @@ def test_missing_string_blocked(goodbyeworld_url: str) -> None:
     app.run()
 
     # Fill everything except the required string field (hobby.name)
-    app.number_input(key="number.weight").set_value(83.0).run()
-    app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]").run()
-    app.checkbox(key="boolean.hobby.active").check().run()
-    app.number_input(key="int.hobby.experience").set_value(3).run()
+    app.number_input(key="number.weight").set_value(83.0)
+    app.text_area(key="textarea.leg_lengths").input("[100.0, 100.0]")
+    app.checkbox(key="boolean.hobby.active").check()
+    app.number_input(key="int.hobby.experience").set_value(3)
     app.button[0].click().run()
 
     assert not app.exception
@@ -145,6 +149,6 @@ def test_zerodim_pprint(zerodim_url: str) -> None:
     assert result.output != ""
     app = AppTest.from_string(result.output, default_timeout=3)
     app.run()
-    app.number_input(key="int.max_num").set_value(10).run()
+    app.number_input(key="int.max_num").set_value(10)
     app.button[0].click().run()
     assert not app.exception
