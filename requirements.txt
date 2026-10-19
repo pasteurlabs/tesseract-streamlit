@@ -42,7 +42,7 @@ bokeh==3.9.2
     #   panel
     #   panel-material-ui
     #   stpyvista
-certifi==2026.7.22
+certifi==2026.10.18
     # via requests
 cffi==2.1.1
     # via
@@ -79,7 +79,7 @@ executing==2.3.0
     # via stack-data
 fastjsonschema==2.22.2
     # via nbformat
-fonttools==4.66.1
+fonttools==4.67.0
     # via matplotlib
 fqdn==1.6.0
     # via jsonschema
@@ -89,8 +89,6 @@ frozenlist==1.8.0
     #   aiosignal
 h11==0.16.0
     # via uvicorn
-httptools==0.9.0
-    # via streamlit
 idna==3.20
     # via
     #   anyio
@@ -107,7 +105,7 @@ isoduration==20.11.0
     # via jsonschema
 itsdangerous==2.2.0
     # via streamlit
-jedi==0.20.0
+jedi==0.20.1
     # via ipython
 jinja2==3.1.6
     # via
@@ -118,7 +116,7 @@ jinja2==3.1.6
     #   pydeck
     #   tesseract-core
     #   tesseract-streamlit
-jsonpointer==3.2.1
+jsonpointer==3.3
     # via jsonschema
 jsonschema==4.26.0
     # via
@@ -158,7 +156,7 @@ linkify-it-py==2.2.0
     # via panel
 loguru==0.7.3
     # via trame-dataclass
-markdown==3.11
+markdown==3.11.1
     # via panel
 markdown-it-py==4.2.0
     # via
@@ -181,7 +179,7 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.3.4
     # via nbconvert
-more-itertools==11.1.0
+more-itertools==11.2.1
     # via trame-server
 msgpack==1.2.3
     # via wslink
@@ -196,7 +194,7 @@ narwhals==2.27.1
     #   panel
 nbclient==0.11.0
     # via nbconvert
-nbconvert==7.17.1
+nbconvert==7.17.2
     # via jupyter-server
 nbformat==5.11.1
     # via
@@ -249,7 +247,7 @@ panel==1.9.4
     # via
     #   panel-material-ui
     #   stpyvista
-panel-material-ui==0.16.1
+panel-material-ui==0.16.3
     # via panel
 param==2.4.2
     # via
@@ -268,7 +266,7 @@ pillow==12.3.0
     #   trame-rca
 pip==26.2.1
     # via tesseract-core
-platformdirs==4.13.0
+platformdirs==4.13.4
     # via
     #   jupyter-core
     #   pooch
@@ -293,7 +291,7 @@ ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_pla
     #   terminado
 pure-eval==0.2.4
     # via stack-data
-pyarrow==25.0.1
+pyarrow==26.0.0
     # via streamlit
 pybase64==1.5.1
     # via tesseract-core
@@ -337,7 +335,7 @@ pyvista-validation==0.2.2
     # via pyvista
 pyviz-comms==3.0.6
     # via panel
-pywinpty==3.0.5 ; os_name == 'nt'
+pywinpty==3.1.0 ; os_name == 'nt'
     # via
     #   jupyter-server
     #   jupyter-server-terminals
@@ -398,15 +396,15 @@ six==1.17.0
     # via
     #   python-dateutil
     #   rfc3339-validator
-soupsieve==3.0.1
+soupsieve==3.0.3
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==1.7.0
+starlette==1.9.0
     # via streamlit
 stpyvista==0.2.1
     # via tesseract-streamlit
-streamlit==1.65.0
+streamlit==1.66.0
     # via
     #   stpyvista
     #   tesseract-streamlit
@@ -414,12 +412,10 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-tesseract-core==1.14.0
+tesseract-core==1.15.0
     # via tesseract-streamlit
 tinycss2==1.5.1
     # via bleach
-toml==0.10.2
-    # via streamlit
 tornado==6.5.10
     # via
     #   bokeh
@@ -446,7 +442,7 @@ trame==4.0.0
     # via
     #   trame-pyvista
     #   trame-vtklocal
-trame-client==4.1.0
+trame-client==4.1.4
     # via
     #   trame
     #   trame-dataclass
@@ -454,7 +450,7 @@ trame-client==4.1.0
     #   trame-rca
     #   trame-vtk
     #   trame-vuetify
-trame-common==1.2.7
+trame-common==1.2.9
     # via
     #   trame
     #   trame-client
@@ -462,21 +458,21 @@ trame-common==1.2.7
     #   trame-rca
     #   trame-server
     #   trame-vtklocal
-trame-dataclass==2.2.1
+trame-dataclass==2.2.2
     # via trame-pyvista
-trame-pyvista==0.2.0
+trame-pyvista==0.2.1
     # via pyvista
 trame-rca==2.11.8
     # via trame-pyvista
-trame-server==4.0.0
+trame-server==4.1.0
     # via
     #   trame
     #   trame-pyvista
 trame-vtk==2.11.17
     # via trame-pyvista
-trame-vtklocal==1.7.1
+trame-vtklocal==1.7.2
     # via trame-pyvista
-trame-vuetify==3.2.6
+trame-vuetify==3.3.0
     # via trame-pyvista
 typer==0.27.3
     # via tesseract-core
@@ -531,7 +527,7 @@ widgetsnbextension==4.0.16
     # via ipywidgets
 win32-setctime==1.2.0 ; sys_platform == 'win32'
     # via loguru
-wslink==2.5.7
+wslink==2.6.0
     # via
     #   trame
     #   trame-pyvista
