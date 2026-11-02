@@ -33,7 +33,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version-file: "pyproject.toml"
+          # vtk does not publish wheels for every new CPython release right away
+          python-version: "3.14"
 
       - name: Restore UV environment
         run: cp production.uv.lock uv.lock
