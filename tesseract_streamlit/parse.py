@@ -255,9 +255,7 @@ def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
     Returns:
         ``True`` if the shape is 0-dimensional, ``False`` otherwise.
     """
-    shape_dict = copy.deepcopy(shape_dict)
-    min_items, max_items = shape_dict.pop("minItems"), shape_dict.pop("maxItems")
-    return min_items == max_items == 0
+    return shape_dict.get("minItems") == shape_dict.get("maxItems") == 0
 
 
 class NumberConstraints(typing.TypedDict):
