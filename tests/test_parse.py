@@ -221,3 +221,25 @@ def test_exclusive_number_bounds(field_type, bounds, expected) -> None:
     field = parse._format_field("x", {"type": field_type, **bounds}, [], use_title=True)
     constraints = field["number_constraints"]
     assert (constraints["min_value"], constraints["max_value"]) == expected
+
+
+@pytest.mark.parametrize(
+    "shape,expected",
+    [
+        ({"type": "array", "items": {"type": "integer"}}, "array"),
+        ({"type": "array", "minItems": 0, "maxItems": 0}, "number"),
+        ({"type": "array", "minItems": 1, "maxItems": 1}, "array"),
+    ],
+)
+def test_array_field_type_from_shape(shape, expected) -> None:
+    field_data = {
+        "type": "object",
+        "properties": {
+            "object_type": {"type": "string", "const": "array"},
+            "shape": shape,
+            "dtype": {"type": "string"},
+            "data": {},
+        },
+    }
+    field = parse._format_field("x", field_data, [], use_title=True)
+    assert field["type"] == expected
