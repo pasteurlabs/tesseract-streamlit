@@ -173,6 +173,48 @@ def test_newline_in_field_description() -> None:
     ast.parse(rendered)
 
 
+@pytest.mark.parametrize(
+    "description",
+    ['The "x" coordinate', r"Angle \theta, read from C:\xdata", 'a "b"\nc \\ d'],
+)
+def test_quotes_and_backslashes_in_description(description: str) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    schema = [
+        parse.JinjaField(
+            container="container_foo",
+            parent_container="st",
+            uid="foo",
+            stem="foo",
+            key="foo",
+            type="array",
+            title="Foo",
+            description=description,
+            number_constraints={},
+        ),
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": description},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    strings = {
+        node.value
+        for node in ast.walk(ast.parse(rendered))
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert description.replace("\n", " ") in strings
+
+
 def test_description_from_oas(
     goodbyeworld_url: str,
     goodbyeworld_config: dict[str, str],
