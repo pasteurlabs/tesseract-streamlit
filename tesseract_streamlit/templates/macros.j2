@@ -14,7 +14,7 @@
 {% macro multiline(text) -%}
     {% for line in text.splitlines() -%}
         {{- '\n' -}}
-        "{{- line -}}
+        "{{- line | replace('\\', '\\\\') | replace('"', '\\"') -}}
         {{- ' ' if not loop.last else '' -}}"{#- add space to end of str -#}
     {%- endfor %}
 {%- endmacro %}
