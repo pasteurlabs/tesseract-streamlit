@@ -77,7 +77,7 @@ st.markdown({% if not udf.docs %}""{% else %}
     "{{ field.get('title', field.uid) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
-    step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
+    step=_cast_type({{ field.get("number_constraints", {}).get("step") or 1 }}, int),
     format="%d",
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),

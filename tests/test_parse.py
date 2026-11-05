@@ -8,6 +8,7 @@ import orjson
 import pytest
 import pyvista as pv
 from jinja2 import Environment, FileSystemLoader
+from streamlit.testing.v1 import AppTest
 
 from tesseract_streamlit import parse
 
@@ -285,3 +286,59 @@ def test_array_field_type_from_shape(shape, expected) -> None:
     }
     field = parse._format_field("x", field_data, [], use_title=True)
     assert field["type"] == expected
+
+
+def _scalar_array_field(dtype: str) -> dict[str, typing.Any]:
+    return {
+        "type": "object",
+        "properties": {
+            "object_type": {"type": "string", "const": "array"},
+            "shape": {"type": "array", "minItems": 0, "maxItems": 0},
+            "dtype": {"type": "string", "examples": [dtype]},
+            "data": {},
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    "dtype,expected",
+    [
+        ("float32", "number"),
+        ("int32", "integer"),
+        ("uint8", "integer"),
+        ("bool", "boolean"),
+    ],
+)
+def test_scalar_field_type_from_dtype(dtype, expected) -> None:
+    field = parse._format_field("x", _scalar_array_field(dtype), [], use_title=True)
+    assert field["type"] == expected
+
+
+def test_scalar_int_and_bool_widgets() -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    schema = [
+        parse._input_to_jinja(
+            parse._format_field(key, _scalar_array_field(dtype), [], use_title=True)
+        )
+        for key, dtype in [("count", "int32"), ("flag", "bool")]
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    count = app.number_input(key="int.count")
+    assert count.proto.data_type == count.proto.DataType.INT
+    assert app.checkbox(key="boolean.flag").value is False
