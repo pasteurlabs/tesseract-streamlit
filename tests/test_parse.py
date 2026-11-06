@@ -216,6 +216,49 @@ def test_quotes_and_backslashes_in_description(description: str) -> None:
     assert description.replace("\n", " ") in strings
 
 
+@pytest.mark.parametrize("text", ['The "x" file', r"C:\xdata\theta"])
+def test_quotes_and_backslashes_in_titles_and_defaults(text: str) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    schema = [
+        parse.JinjaField(
+            container="container_foo",
+            parent_container="st",
+            uid="foo",
+            stem="foo",
+            key="foo",
+            type="string",
+            title=text,
+            description="d",
+            default=text,
+            number_constraints={},
+        ),
+    ]
+    udf = parse.FuncDescription(name="plot", title=text, docs="", backend="builtin")
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": text, "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs={"inputs": [udf], "outputs": [], "both": []},
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    strings = {
+        node.value
+        for node in ast.walk(ast.parse(rendered))
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    assert text in strings
+    assert f"**{text}**" in strings
+    assert f"{text} v0 - Tesseract Streamlit" in strings
+
+
 def test_description_from_oas(
     goodbyeworld_url: str,
     goodbyeworld_config: dict[str, str],

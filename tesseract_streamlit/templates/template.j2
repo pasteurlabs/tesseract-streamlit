@@ -139,7 +139,7 @@ def _count_json_lines(json_str: bytes) -> int:
    ======= #}
 def main() -> None:
     st.set_page_config(
-        page_title="{{ metadata.title }} v{{ metadata.version }} - Tesseract Streamlit",
+        page_title="{{ m.escape_str(metadata.title) }} v{{ metadata.version }} - Tesseract Streamlit",
         page_icon="{{ favicon_path }}",
         layout="{{ 'centered' if layout == 'simple' else 'wide' }}",
     )
@@ -150,7 +150,7 @@ def main() -> None:
        description is. #}
     with st.container(key="app_header"):
         st.markdown(
-            "# {{ metadata.title }} "
+            "# {{ m.escape_str(metadata.title) }} "
             "<span style='font-size:1rem;color:gray;'>v{{ metadata.version }}</span>",
             unsafe_allow_html=True,
         )
