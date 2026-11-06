@@ -1,6 +1,7 @@
 import ast
 import math
 import random
+import types
 import typing
 from pathlib import Path
 
@@ -137,6 +138,20 @@ def test_metadata_extract(mock_schema: bytes) -> None:
     for key, val in reference_vals.items():
         message = f"Tesseract {key} incorrectly extracted."
         assert val == metadata[key], message
+
+
+@pytest.mark.parametrize("url", ["localhost:8000", "127.0.0.1:8000"])
+def test_url_without_scheme(url: str, mock_schema: bytes, monkeypatch) -> None:
+    requested = []
+
+    def fake_get(request_url, *args, **kwargs):
+        requested.append(request_url)
+        return types.SimpleNamespace(content=mock_schema)
+
+    monkeypatch.setattr(parse.requests, "get", fake_get)
+    template_data = parse.extract_template_data(url, None, True)
+    assert requested == [f"http://{url}/openapi.json"]
+    assert template_data["url"] == f"http://{url}"
 
 
 def test_newline_in_field_description() -> None:
