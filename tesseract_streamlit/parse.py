@@ -27,7 +27,6 @@ import typing
 import warnings
 from pathlib import Path
 from typing import NotRequired
-from urllib.parse import urlparse
 
 import orjson
 import pyvista as pv
@@ -594,7 +593,7 @@ def extract_template_data(
             Preprocessed data describing the Streamlit app based on the
             ``InputSchema``, ready for injection into the app template.
     """
-    if not urlparse(url).netloc:
+    if "://" not in url:
         url = f"http://{url}"
     response = requests.get(f"{url}/openapi.json")
     metadata, schema = _parse_tesseract_oas(

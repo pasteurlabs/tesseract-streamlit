@@ -139,8 +139,17 @@ def test_metadata_extract(mock_schema: bytes) -> None:
         assert val == metadata[key], message
 
 
-@pytest.mark.parametrize("url", ["localhost:8000", "127.0.0.1:8000"])
-def test_url_without_scheme(url: str, mock_schema: bytes, monkeypatch) -> None:
+@pytest.mark.parametrize(
+    "url, expected",
+    [
+        ("localhost:8000", "http://localhost:8000"),
+        ("127.0.0.1:8000", "http://127.0.0.1:8000"),
+        ("https://example.com:8000", "https://example.com:8000"),
+    ],
+)
+def test_url_without_scheme(
+    url: str, expected: str, mock_schema: bytes, monkeypatch
+) -> None:
     requested = []
 
     def fake_get(request_url, *args, **kwargs):
@@ -149,8 +158,8 @@ def test_url_without_scheme(url: str, mock_schema: bytes, monkeypatch) -> None:
 
     monkeypatch.setattr(parse.requests, "get", fake_get)
     template_data = parse.extract_template_data(url, None, True)
-    assert requested == [f"http://{url}/openapi.json"]
-    assert template_data["url"] == f"http://{url}"
+    assert requested == [f"{expected}/openapi.json"]
+    assert template_data["url"] == expected
 
 
 def test_newline_in_field_description() -> None:
