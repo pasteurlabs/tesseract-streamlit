@@ -1,4 +1,5 @@
 import ast
+import contextlib
 import math
 import random
 import types
@@ -8,6 +9,7 @@ from pathlib import Path
 import orjson
 import pytest
 import pyvista as pv
+import tesseract_core
 from jinja2 import Environment, FileSystemLoader
 from streamlit.testing.v1 import AppTest
 
@@ -196,6 +198,60 @@ def test_newline_in_field_description() -> None:
     )
     # The rendered code must be valid Python — this was the bug in GH-87
     ast.parse(rendered)
+
+
+def test_blank_optional_array_left_out_of_inputs(monkeypatch) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    array_field = {
+        "type": "object",
+        "default": [1.0, 2.0],
+        "properties": {
+            "object_type": {"type": "string", "const": "array"},
+            "shape": {"type": "array", "minItems": 1, "maxItems": 1},
+            "dtype": {"type": "string", "examples": ["float64"]},
+            "data": {},
+        },
+    }
+    schema = [
+        parse._input_to_jinja(parse._format_field("arr", array_field, [], True)),
+        parse._input_to_jinja(
+            parse._format_field(
+                "name", {"type": "string"}, [], True, required_keys={"name"}
+            )
+        ),
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    sent = []
+
+    class FakeTesseract:
+        def apply(self, inputs):
+            sent.append(inputs)
+            return {}
+
+    monkeypatch.setattr(
+        tesseract_core.Tesseract,
+        "from_url",
+        classmethod(lambda cls, url: contextlib.nullcontext(FakeTesseract())),
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    app.text_input(key="int.name").set_value("Ada")
+    app.button[0].click().run()
+    assert sent == [{"name": "Ada"}]
 
 
 @pytest.mark.parametrize(
