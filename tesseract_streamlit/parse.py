@@ -611,6 +611,8 @@ def extract_template_data(
             Preprocessed data describing the Streamlit app based on the
             ``InputSchema``, ready for injection into the app template.
     """
+    if "://" not in url:
+        url = f"http://{url}"
     response = requests.get(f"{url}/openapi.json")
     metadata, schema = _parse_tesseract_oas(
         response.content, pretty_headings=pretty_headings
