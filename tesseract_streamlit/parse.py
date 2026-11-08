@@ -258,6 +258,23 @@ def _is_scalar(shape_dict: dict[str, typing.Any]) -> bool:
     return shape_dict.get("minItems") == shape_dict.get("maxItems") == 0
 
 
+def _scalar_type(dtype_dict: dict[str, typing.Any]) -> str:
+    """Maps the declared dtype of a 0-d array onto a primitive field type.
+
+    Args:
+        dtype_dict: Dictionary under the "dtype" key of an array schema.
+
+    Returns:
+        "boolean", "integer", or "number".
+    """
+    dtype = (dtype_dict.get("examples") or [None])[0]
+    if dtype == "bool":
+        return "boolean"
+    if isinstance(dtype, str) and dtype.startswith(("int", "uint")):
+        return "integer"
+    return "number"
+
+
 class NumberConstraints(typing.TypedDict):
     """Container for constraints on scalar numeric values."""
 
@@ -363,11 +380,12 @@ def _format_field(
     if ARRAY_PROPS <= set(field_data["properties"]):
         data_type = "array"
         if _is_scalar(field_data["properties"]["shape"]):
-            data_type = "number"
+            data_type = _scalar_type(field_data["properties"]["dtype"])
             field["default"] = field_data.get("default", None)
-            field["number_constraints"] = _number_constraints(
-                field_data, is_integer=False
-            )
+            if data_type != "boolean":
+                field["number_constraints"] = _number_constraints(
+                    field_data, is_integer=data_type == "integer"
+                )
         field["type"] = data_type
         return field
     # at this point, not an array or primitive, so must be composite

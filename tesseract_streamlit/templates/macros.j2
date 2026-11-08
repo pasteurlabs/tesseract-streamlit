@@ -5,6 +5,10 @@
         {% import "templates/macros.j2" as m %}
     and call as m.render_fields(...), m.render_outputs(...), etc. -#}
 
+{% macro escape_str(text) -%}
+    {{- text | replace('\\', '\\\\') | replace('"', '\\"') -}}
+{%- endmacro %}
+
 {#- splits up a string spanning multiple lines into multiple strings
     args:
         text: the string you wish to break up (with linebreaks included)
@@ -14,7 +18,7 @@
 {% macro multiline(text) -%}
     {% for line in text.splitlines() -%}
         {{- '\n' -}}
-        "{{- line -}}
+        "{{- escape_str(line) -}}
         {{- ' ' if not loop.last else '' -}}"{#- add space to end of str -#}
     {%- endfor %}
 {%- endmacro %}
@@ -32,7 +36,7 @@
 st.subheader("{{ subheader }}")
 {% set args = 'inputs=inputs, outputs=outputs' if key == 'both' else key %}
 {% for udf in udf_subset %}
-st.markdown("**{{ udf.title }}**")
+st.markdown("**{{ escape_str(udf.title) }}**")
 st.markdown({% if not udf.docs %}""{% else %}
     {{- multiline(udf.docs) | indent(4) }}
 {% endif %})
@@ -67,17 +71,17 @@ st.markdown({% if not udf.docs %}""{% else %}
 {% set container = field.parent_container %}
 {% if field.type == 'string' -%}
 {{ field.uid }} = {{ container }}.text_input(
-    "{{ field.get('title', field.uid) }}",
+    "{{ escape_str(field.get('title', field.uid)) }}",
     key="int.{{ field.key }}",
-    value="{{ field.get('default', '') }}",
+    value="{{ escape_str(field.get('default', '')) }}",
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'integer' -%}
 {{ field.uid }} = {{ container }}.number_input(
-    "{{ field.get('title', field.uid) }}",
+    "{{ escape_str(field.get('title', field.uid)) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, int),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, int),
-    step=_cast_type({{ field.get("number_constraints", {}).get("step", 1) }}, int),
+    step=_cast_type({{ field.get("number_constraints", {}).get("step") or 1 }}, int),
     format="%d",
     key="int.{{ field.key }}",
     value=_cast_type({{ field.get("default", None) }}, int),
@@ -85,7 +89,7 @@ st.markdown({% if not udf.docs %}""{% else %}
 )
 {% elif field.type == 'number' -%}
 {{ field.uid }} = {{ container }}.number_input(
-    "{{ field.get('title', field.uid) }}",
+    "{{ escape_str(field.get('title', field.uid)) }}",
     min_value=_cast_type({{ field.get("number_constraints", {}).get("min_value", None) }}, float),
     max_value=_cast_type({{ field.get("number_constraints", {}).get("max_value", None) }}, float),
     step=_cast_type({{ field.get("number_constraints", {}).get("step", None) }}, float),
@@ -96,14 +100,14 @@ st.markdown({% if not udf.docs %}""{% else %}
 )
 {% elif field.type == 'boolean' -%}
 {{ field.uid }} = {{ container }}.checkbox(
-    "{{ field.get('title', field.uid) }}",
+    "{{ escape_str(field.get('title', field.uid)) }}",
     key="boolean.{{ field.key }}",
     value={{ field.get("default", None) }},
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 {% elif field.type == 'array' -%}
 {{ field.uid }}_text = {{ container }}.text_area(
-    "{{ field.get('title', field.uid) }}",
+    "{{ escape_str(field.get('title', field.uid)) }}",
     height=100,
     key="textarea.{{ field.key }}",
     placeholder="[1.0, 2.0, 3.0]",
