@@ -196,7 +196,7 @@ _tesseract_io_preview(outputs, "output")
     outputs: code assigning `_missing_names` -#}
 {% macro required_field_guard(schema, container="st") %}
 _missing_fields = [
-    {% for field in schema if field.type == "array" and field.required -%}
+    {% for field in schema if field.type in ("array", "number", "integer") and field.required -%}
     ("{{ field.qualified_title }}", {{ field.uid }} is None),
     {% endfor -%}
     {% for field in schema if field.type == "string" and field.required -%}

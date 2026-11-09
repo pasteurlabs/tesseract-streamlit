@@ -214,6 +214,49 @@ def test_newline_in_field_description() -> None:
     ast.parse(rendered)
 
 
+def test_blank_required_number_blocks_submission(monkeypatch) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    schema = [
+        parse._input_to_jinja(
+            parse._format_field(key, {"type": kind}, [], True, required_keys={key})
+        )
+        for key, kind in [("weight", "number"), ("count", "integer")]
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    sent = []
+
+    class FakeTesseract:
+        def apply(self, inputs):
+            sent.append(inputs)
+            return {}
+
+    monkeypatch.setattr(
+        tesseract_core.Tesseract,
+        "from_url",
+        classmethod(lambda cls, url: contextlib.nullcontext(FakeTesseract())),
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    app.button[0].click().run()
+    assert not app.exception
+    assert sent == []
+    assert "**Weight**, **Count**" in app.error[0].value
+
+
 def test_blank_optional_array_left_out_of_inputs(monkeypatch) -> None:
     env = Environment(
         loader=FileSystemLoader(str(PACKAGE_DIR)),
