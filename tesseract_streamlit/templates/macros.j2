@@ -6,7 +6,8 @@
     and call as m.render_fields(...), m.render_outputs(...), etc. -#}
 
 {% macro escape_str(text) -%}
-    {{- text | replace('\\', '\\\\') | replace('"', '\\"') -}}
+    {{- text | replace('\\', '\\\\') | replace('"', '\\"')
+        | replace('\n', '\\n') | replace('\r', '\\r') -}}
 {%- endmacro %}
 
 {#- splits up a string spanning multiple lines into multiple strings

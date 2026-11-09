@@ -339,6 +339,32 @@ def test_quotes_and_backslashes_in_titles_and_defaults(text: str) -> None:
     assert f"{text} v0 - Tesseract Streamlit" in strings
 
 
+@pytest.mark.parametrize("default", ["line one\nline two", "a\r\nb"])
+def test_line_breaks_in_string_default(default: str) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    field = parse._format_field(
+        "note", {"type": "string", "title": "Note", "default": default}, [], True
+    )
+    rendered = template.render(
+        schema=[parse._input_to_jinja(field)],
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    assert app.text_input(key="int.note").value == default
+
+
 def test_description_from_oas(
     goodbyeworld_url: str,
     goodbyeworld_config: dict[str, str],
