@@ -156,6 +156,7 @@ inputs_flat = {
     "{{ field.key }}": {{ field.uid }},
     {% endfor %}
 }
+inputs_flat = {key: val for key, val in inputs_flat.items() if val is not None}
 inputs = _flat_to_nested(inputs_flat)
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS
