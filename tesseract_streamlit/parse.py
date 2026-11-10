@@ -613,6 +613,7 @@ def extract_template_data(
     """
     if "://" not in url:
         url = f"http://{url}"
+    url = url.rstrip("/")
     response = requests.get(f"{url}/openapi.json")
     metadata, schema = _parse_tesseract_oas(
         response.content, pretty_headings=pretty_headings

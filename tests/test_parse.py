@@ -166,6 +166,20 @@ def test_url_without_scheme(
     assert template_data["url"] == expected
 
 
+@pytest.mark.parametrize("url", ["http://localhost:8000/", "localhost:8000//"])
+def test_url_with_trailing_slash(url: str, mock_schema: bytes, monkeypatch) -> None:
+    requested = []
+
+    def fake_get(request_url, *args, **kwargs):
+        requested.append(request_url)
+        return types.SimpleNamespace(content=mock_schema)
+
+    monkeypatch.setattr(parse.requests, "get", fake_get)
+    template_data = parse.extract_template_data(url, None, True)
+    assert requested == ["http://localhost:8000/openapi.json"]
+    assert template_data["url"] == "http://localhost:8000"
+
+
 def test_newline_in_field_description() -> None:
     """Descriptions with newlines must not produce invalid Python (GH-87)."""
     env = Environment(
