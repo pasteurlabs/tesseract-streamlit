@@ -6,6 +6,7 @@ import types
 import typing
 from pathlib import Path
 
+import numpy as np
 import orjson
 import pytest
 import pyvista as pv
@@ -315,6 +316,41 @@ def test_blank_optional_array_left_out_of_inputs(monkeypatch) -> None:
     app.text_input(key="int.name").set_value("Ada")
     app.button[0].click().run()
     assert sent == [{"name": "Ada"}]
+
+
+@pytest.mark.parametrize("key", ["layer1.weight", "0"])
+def test_scalar_output_under_any_dict_key(key: str, monkeypatch) -> None:
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    rendered = template.render(
+        schema=[],
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+
+    class FakeTesseract:
+        def apply(self, inputs):
+            return {"scores": {key: np.array(1.5), "all": [np.array(2.5)]}}
+
+    monkeypatch.setattr(
+        tesseract_core.Tesseract,
+        "from_url",
+        classmethod(lambda cls, url: contextlib.nullcontext(FakeTesseract())),
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    app.button[0].click().run()
+    assert not app.exception
+    assert orjson.loads(app.json[1].value) == {"scores": {key: 1.5, "all": [2.5]}}
 
 
 @pytest.mark.parametrize(

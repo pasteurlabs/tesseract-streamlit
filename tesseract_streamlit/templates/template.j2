@@ -79,27 +79,23 @@ def _nested_setitem(
 
 
 def _find_numpy_arrays(
-    data: typing.Any, path: str = ""
-) -> typing.Iterator[tuple[str, np.ndarray]]:
+    data: typing.Any, path: tuple[str | int, ...] = ()
+) -> typing.Iterator[tuple[list[str | int], np.ndarray]]:
     results = []
     if isinstance(data, dict):
         for key, value in data.items():
-            new_path = f"{path}.{key}" if path else str(key)
-            yield from _find_numpy_arrays(value, new_path)
+            yield from _find_numpy_arrays(value, (*path, key))
     elif isinstance(data, list | tuple):
         for idx, item in enumerate(data):
-            new_path = f"{path}.{idx}"
-            yield from _find_numpy_arrays(item, new_path)
+            yield from _find_numpy_arrays(item, (*path, idx))
     elif isinstance(data, np.ndarray):
-        yield (path, data)
+        yield (list(path), data)
     return results
 
 
 def _replace_zerodim_arrays(data: dict[str, typing.Any]) -> dict[str, typing.Any]:
     data_copy = copy.deepcopy(data)
-    for path, array in _find_numpy_arrays(data_copy):
-        keys = path.split(".")
-        keys = [int(k) if k.isdigit() else k for k in keys]
+    for keys, array in _find_numpy_arrays(data_copy):
         if np.ndim(array) == 0:
             _nested_setitem(data_copy, keys, array.item())
     return data_copy
