@@ -225,7 +225,12 @@ def test_blank_required_number_blocks_submission(monkeypatch) -> None:
         parse._input_to_jinja(
             parse._format_field(key, {"type": kind}, [], True, required_keys={key})
         )
-        for key, kind in [("weight", "number"), ("count", "integer")]
+        for key, kind in [
+            ("weight", "number"),
+            ("count", "integer"),
+            ("name", "string"),
+            ("flag", "boolean"),
+        ]
     ]
     rendered = template.render(
         schema=schema,
@@ -254,7 +259,8 @@ def test_blank_required_number_blocks_submission(monkeypatch) -> None:
     app.button[0].click().run()
     assert not app.exception
     assert sent == []
-    assert "**Weight**, **Count**" in app.error[0].value
+    assert "**Weight**, **Count**, **Name**" in app.error[0].value
+    assert "Flag" not in app.error[0].value
 
 
 def test_blank_optional_array_left_out_of_inputs(monkeypatch) -> None:
