@@ -41,6 +41,10 @@ def _cast_type(val: T | None, type_: type[T]) -> T | None:
     return type_(val)
 
 
+def _is_blank(value: typing.Any) -> bool:
+    return value is None or (isinstance(value, str) and not value)
+
+
 def _insert_nested(
     dict_node: dict[str, typing.Any],
     keys: list[str],
