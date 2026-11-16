@@ -10,7 +10,7 @@ aiosignal==1.4.0
     # via aiohttp
 altair==6.3.0
     # via streamlit
-annotated-doc==0.0.5
+annotated-doc==0.0.6
     # via typer
 annotated-types==0.8.0
     # via pydantic
@@ -23,7 +23,7 @@ anywidget==0.11.0
     # via trame-pyvista
 argon2-cffi==25.1.0
     # via jupyter-server
-argon2-cffi-bindings==26.1.0
+argon2-cffi-bindings==26.2.0
     # via argon2-cffi
 arrow==1.4.0
     # via isoduration
@@ -69,7 +69,7 @@ contourpy==1.4.0
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
-cyclopts==5.4.0
+cyclopts==5.5.0
     # via pyvista
 defusedxml==0.7.1
     # via nbconvert
@@ -118,7 +118,7 @@ jinja2==3.1.6
     #   pydeck
     #   tesseract-core
     #   tesseract-streamlit
-jsonpointer==3.10
+jsonpointer==3.12
     # via jsonschema
 jsonschema==4.26.0
     # via
@@ -142,7 +142,7 @@ jupyter-events==0.12.1
     # via jupyter-server
 jupyter-server==2.21.1
     # via jupyter-server-proxy
-jupyter-server-proxy==4.6.0
+jupyter-server-proxy==4.6.1
     # via trame-pyvista
 jupyter-server-terminals==0.5.4
     # via jupyter-server
@@ -156,11 +156,11 @@ lark==1.3.1
     # via rfc3987-syntax
 linkify-it-py==2.2.0
     # via panel
-loguru==0.7.3
+loguru==0.8.0
     # via trame-dataclass
 markdown==3.11.3
     # via panel
-markdown-it-py==4.2.0
+markdown-it-py==4.3.0
     # via
     #   mdit-py-plugins
     #   panel
@@ -175,7 +175,7 @@ matplotlib==3.11.2
     #   vtk
 matplotlib-inline==0.2.2
     # via ipython
-mdit-py-plugins==0.6.1
+mdit-py-plugins==0.7.0
     # via panel
 mdurl==0.1.2
     # via markdown-it-py
@@ -207,7 +207,7 @@ nest-asyncio2==1.7.4
     # via trame-pyvista
 nh3==0.3.7
     # via panel
-numpy==2.5.4
+numpy==2.5.5
     # via
     #   bokeh
     #   contourpy
@@ -297,12 +297,14 @@ pure-eval==0.2.4
     # via stack-data
 pyarrow==26.0.1
     # via streamlit
-pybase64==1.5.1
+pybase64==1.5.2
     # via tesseract-core
 pycparser==3.12 ; implementation_name != 'PyPy'
     # via cffi
 pydantic==2.14.3
-    # via tesseract-core
+    # via
+    #   tesseract-core
+    #   typer
 pydantic-core==2.50.4
     # via pydantic
 pydeck==0.9.3
@@ -390,7 +392,7 @@ rpds-py==2026.9.1
     #   referencing
 scooby==0.12.1
     # via pyvista
-send2trash==2.1.0
+send2trash==2.2.0
     # via jupyter-server
 shellingham==1.5.4
     # via typer
@@ -398,7 +400,7 @@ simpervisor==1.0.0
     # via jupyter-server-proxy
 six==1.17.0
     # via rfc3339-validator
-soupsieve==4.0.1
+soupsieve==4.1.1
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
@@ -418,7 +420,7 @@ tesseract-core==1.15.0
     # via tesseract-streamlit
 tinycss2==1.5.1
     # via bleach
-tornado==6.6
+tornado==6.6.1
     # via
     #   bokeh
     #   jupyter-client
@@ -476,7 +478,7 @@ trame-vtklocal==1.8.1
     # via trame-pyvista
 trame-vuetify==3.3.0
     # via trame-pyvista
-typer==0.28.0
+typer==0.29.1
     # via tesseract-core
 typing-extensions==4.16.0
     # via
