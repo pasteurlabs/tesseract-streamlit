@@ -106,12 +106,13 @@ st.markdown({% if not udf.docs %}""{% else %}
     value={{ field.get("default", None) }},
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
-{% elif field.type == 'array' -%}
+{% elif field.type in ('array', 'object') -%}
+{# 'object' is a dict (additionalProperties, no properties): JSON like arrays #}
 {{ field.uid }}_text = {{ container }}.text_area(
     "{{ escape_str(field.get('title', field.uid)) }}",
     height=100,
     key="textarea.{{ field.key }}",
-    placeholder="[1.0, 2.0, 3.0]",
+    placeholder="{{ escape_str('[1.0, 2.0, 3.0]' if field.type == 'array' else '{"key": 1}') }}",
     {% if field.description -%}help={{ multiline(field.description) | indent(4) }},{% endif %}
 )
 with {{ container }}.popover("Upload from file"):
@@ -131,6 +132,7 @@ elif {{ field.uid }}_text:
         {{ field.uid }} = orjson.loads({{ field.uid }}_text)
     except Exception as e:
         {{ container }}.error(f"Failed to parse {{ field.uid }} from text: {e}")
+{% if field.type == 'array' %}
 if {{ field.uid }} is not None:
     try:
         arr = np.array({{ field.uid }}, dtype=np.float64)
@@ -138,6 +140,7 @@ if {{ field.uid }} is not None:
         {{ container }}.code(arr)
     except Exception as e:
         {{ container }}.error(f"Invalid array input for {{ field.uid }}: {e}")
+{% endif %}
 {% endif -%}
 {% endif -%}
 {% endfor %}
