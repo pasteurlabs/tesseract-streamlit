@@ -14,7 +14,7 @@ The generated app allows users to interactively submit input to the `apply` endp
 ## 🛠 Requirements
 
 - Modern UNIX based OS (Linux or macOS), or Windows with WSL
-- Python >= 3.10
+- Python >= 3.12
 - [tesseract-core][tesscore]
 
 ## 📦 Installation
