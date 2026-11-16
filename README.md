@@ -179,5 +179,7 @@ You **can** however use these native collections with basic Python types, such a
 
 If you would like to request support for nested models within collections in a future release, please let us know.
 
+Optional inputs (`X | None`) use the input for `X`. A text or number input left blank is left out of the request, so the Tesseract's default applies. An optional boolean is always sent as true or false, and an optional model is left out only when all of its fields are blank text or number inputs. Other unions, such as `int | str`, are not supported yet.
+
 [stplots]: https://docs.streamlit.io/develop/api-reference/charts#advanced-chart-elements
 [tesscore]: https://github.com/pasteurlabs/tesseract-core
