@@ -155,11 +155,11 @@ if {{ field.uid }} is not None:
 {# COLLECT THE INPUTS FOR THE TESSERACT
    ==================================== #}
 inputs_flat = {
-    {% for field in schema if field.type != "composite" %}
-    "{{ field.key }}": {{ field.uid }},
+    {% for field in schema if field.type != "composite" or field.required %}
+    "{{ field.key }}": {{ "{}" if field.type == "composite" else field.uid }},
     {% endfor %}
 }
-inputs_flat = {key: val for key, val in inputs_flat.items() if val is not None}
+inputs_flat = {key: val for key, val in inputs_flat.items() if not _is_blank(val)}
 inputs = _flat_to_nested(inputs_flat)
 
 {# CALL THE TESSERACT'S APPLY FUNCTION TO COLLECT THE OUTPUTS

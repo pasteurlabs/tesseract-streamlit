@@ -643,3 +643,113 @@ def test_scalar_int_and_bool_widgets() -> None:
     count = app.number_input(key="int.count")
     assert count.proto.data_type == count.proto.DataType.INT
     assert app.checkbox(key="boolean.flag").value is False
+
+
+def test_optional_fields(monkeypatch) -> None:
+    """``X | None`` inputs are published as ``anyOf: [X, {"type": "null"}]``."""
+    oas = {
+        "info": {"title": "T", "version": "0"},
+        "paths": {"/apply": {"post": {"description": "d"}}},
+        "components": {
+            "schemas": {
+                "Apply_InputSchema": {
+                    "type": "object",
+                    "required": ["name", "options"],
+                    "properties": {
+                        "name": {"type": "string", "title": "Name"},
+                        "age": {
+                            "anyOf": [
+                                {"type": "integer", "minimum": 0.0},
+                                {"type": "null"},
+                            ],
+                            "title": "Age",
+                            "description": "In years.",
+                            "default": 7,
+                        },
+                        "scale": {
+                            "anyOf": [_scalar_array_field("float32"), {"type": "null"}],
+                            "title": "Scale",
+                        },
+                        "nickname": {
+                            "anyOf": [{"type": "string"}, {"type": "null"}],
+                            "title": "Nickname",
+                            "default": None,
+                        },
+                        "hobby": {
+                            "anyOf": [
+                                {"$ref": "#/components/schemas/Apply_Hobby"},
+                                {"type": "null"},
+                            ],
+                        },
+                        "options": {"$ref": "#/components/schemas/Apply_Options"},
+                    },
+                },
+                "Apply_Options": {
+                    "type": "object",
+                    "properties": {
+                        "tag": {"type": "string", "title": "Tag", "default": ""}
+                    },
+                },
+                "Apply_Hobby": {
+                    "type": "object",
+                    "required": ["name"],
+                    "properties": {"name": {"type": "string", "title": "Name"}},
+                    "title": "Hobby",
+                },
+            }
+        },
+    }
+    _, schema = parse._parse_tesseract_oas(orjson.dumps(oas))
+    assert [(field["key"], field["type"]) for field in schema] == [
+        ("name", "string"),
+        ("age", "integer"),
+        ("scale", "number"),
+        ("nickname", "string"),
+        ("hobby", "composite"),
+        ("hobby.name", "string"),
+        ("options", "composite"),
+        ("options.tag", "string"),
+    ]
+    assert schema[1]["number_constraints"]["min_value"] == 0
+    # the field's own title, description and default survive the unwrap
+    assert schema[1]["title"] == "Age"
+    assert schema[1]["description"] == "In years."
+    assert schema[1]["default"] == 7
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    sent = []
+
+    class FakeTesseract:
+        def apply(self, inputs):
+            sent.append(inputs)
+            return {}
+
+    monkeypatch.setattr(
+        tesseract_core.Tesseract,
+        "from_url",
+        classmethod(lambda cls, url: contextlib.nullcontext(FakeTesseract())),
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    app.text_input(key="int.name").input("Ada")
+    app.number_input(key="int.age").set_value(3)
+    app.text_input(key="int.hobby.name").input("chess")
+    app.button[0].click().run()
+    assert not app.exception
+    assert sent == [
+        {"name": "Ada", "age": 3, "hobby": {"name": "chess"}, "options": {}}
+    ]

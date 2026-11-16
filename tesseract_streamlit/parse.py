@@ -195,16 +195,14 @@ def _chain_subscript(
     return functools.reduce(operator.getitem, keys, data)
 
 
-def _resolve_refs(
-    schema_node: dict[str, typing.Any], schema: dict[str, typing.Any]
-) -> dict[str, typing.Any]:
+def _resolve_refs(schema_node: typing.Any, schema: dict[str, typing.Any]) -> typing.Any:
     """Recursively expands '$ref' paths in the OpenAPI Specification.
 
-    Recursively descends into the nested dictionary, locating '$ref'
-    keys. Where these are found, the URI path to elsewhere in the
-    dictionary is resolved, yielding a dictionary. This dictionary
-    is then merged with the parent dictionary where the '$ref' key was
-    located.
+    Recursively descends into nested dictionaries and lists (such as
+    ``anyOf``), locating '$ref' keys. Where these are found, the URI
+    path to elsewhere in the dictionary is resolved, yielding a
+    dictionary. This dictionary is then merged with the parent
+    dictionary where the '$ref' key was located.
 
     This expands the OpenAPI specification dictionary, allowing more
     simple and explicit processing later.
@@ -217,6 +215,8 @@ def _resolve_refs(
         Schema data stored under '$ref' keys inlined in their parent
         dictionaries.
     """
+    if isinstance(schema_node, list):
+        return [_resolve_refs(item, schema) for item in schema_node]
     # base case: if not a dict / has no $ref, return as-is
     if not isinstance(schema_node, dict):
         return schema_node
@@ -334,6 +334,20 @@ def _key_to_title(key: str) -> str:
     return key.replace("_", " ").title()
 
 
+def _unwrap_optional(field_data: dict[str, typing.Any]) -> dict[str, typing.Any]:
+    """Replaces ``anyOf: [X, {"type": "null"}]`` (``X | None``) with ``X``.
+
+    The field's own keys (title, description, default) take precedence
+    over those of ``X``.
+    """
+    options = field_data.get("anyOf", [])
+    non_null = [opt for opt in options if opt.get("type") != "null"]
+    if len(non_null) != 1 or len(options) != 2:
+        return field_data
+    outer = {key: val for key, val in field_data.items() if key != "anyOf"}
+    return {**non_null[0], **outer}
+
+
 def _format_field(
     field_key: str,
     field_data: dict[str, typing.Any],
@@ -436,6 +450,7 @@ def _simplify_schema(
     if ancestors is None:
         ancestors = []
     for child_key, child_val in schema_node.items():
+        child_val = _unwrap_optional(child_val)
         child_data = _format_field(
             child_key, child_val, ancestors, use_title, required_keys
         )
