@@ -318,6 +318,59 @@ def test_blank_optional_array_left_out_of_inputs(monkeypatch) -> None:
     assert sent == [{"name": "Ada"}]
 
 
+def test_dict_input(monkeypatch) -> None:
+    """``dict[str, int]`` is published as an object with ``additionalProperties``."""
+    env = Environment(
+        loader=FileSystemLoader(str(PACKAGE_DIR)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("templates/template.j2")
+    dict_field = {"additionalProperties": {"type": "integer"}, "type": "object"}
+    schema = [
+        parse._input_to_jinja(
+            parse._format_field(
+                "counts", dict_field, [], True, required_keys={"counts"}
+            )
+        ),
+        parse._input_to_jinja(
+            parse._format_field("extra", {**dict_field, "default": {"b": 2}}, [], True)
+        ),
+    ]
+    rendered = template.render(
+        schema=schema,
+        metadata={"title": "T", "version": "0", "description": "d"},
+        url="http://localhost:0",
+        needs_pyvista=False,
+        udfs=None,
+        udf_defs=None,
+        test=True,
+        favicon_path="icon.png",
+    )
+    sent = []
+
+    class FakeTesseract:
+        def apply(self, inputs):
+            sent.append(inputs)
+            return {}
+
+    monkeypatch.setattr(
+        tesseract_core.Tesseract,
+        "from_url",
+        classmethod(lambda cls, url: contextlib.nullcontext(FakeTesseract())),
+    )
+    app = AppTest.from_string(rendered, default_timeout=10)
+    app.run()
+    app.button[0].click().run()
+    assert not app.exception
+    assert "**Counts**" in app.error[0].value
+    app.text_area(key="textarea.counts").set_value('{"a": 1}')
+    app.button[0].click().run()
+    assert not app.error, [e.value for e in app.error]
+    assert not app.exception
+    assert sent == [{"counts": {"a": 1}}]
+
+
 @pytest.mark.parametrize("key", ["layer1.weight", "0"])
 def test_scalar_output_under_any_dict_key(key: str, monkeypatch) -> None:
     env = Environment(
